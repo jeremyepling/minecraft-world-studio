@@ -5,6 +5,7 @@
     "action",
     "previewOnly",
     "target",
+    "marker",
     "message",
     "height",
     "radius",
@@ -34,6 +35,7 @@
     "message": {
       "type": "string"
     },
+    "marker": {"type":["string","null"]},
     "roofFinish": {
       "type": ["string", "null"],
       "enum": ["copper", "black_to_grey", null]
