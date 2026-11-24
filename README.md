@@ -8,13 +8,15 @@ For project direction, start with the [product vision](docs/product-vision.md), 
 
 ## Open the lab
 
-From this directory in PowerShell 7, start the installed client. The launcher uses the private `WorldStudioLab` save and the local player `WorldStudio`.
+Double-click **World Studio.cmd** to open the lab and its chat listener. Try `@studio help`, or aim at a block and type `@studio mark River Gate`. [In-game conversation, markers and voice](docs/collaborate.md)
+
+For a client-only launch from PowerShell 7, use the private `WorldStudioLab` save and local player `WorldStudio`.
 
 ```powershell
 .\scripts\Start-Client.ps1
 ```
 
-For in-game collaboration, start the listener from a second PowerShell terminal.
+If you used the client-only launch, start the listener from a second PowerShell terminal.
 
 ```powershell
 .\scripts\Start-Chat.ps1 -Background

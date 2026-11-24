@@ -3,7 +3,7 @@
 Use the standalone Fabric 26.3 lab for live checks. The offline tests use its installed Node dependencies and QuickJS runtime. Run from the repository root with Node.js 22.16 or newer.
 
 ```powershell
-node --test scripts/tower.test.mjs scripts/studio-state.test.mjs
+node --test scripts/tower.test.mjs scripts/studio-state.test.mjs scripts/studio-session.test.mjs scripts/studio-planner.test.mjs scripts/studio-voice.test.mjs
 ```
 
 These tests exercise deterministic tower edits, material revisions, guarded writes, conflicts, lost acknowledgements, restart recovery and undo receipts. They can run with Minecraft closed.
@@ -17,6 +17,10 @@ node experiments/chat-loop.mjs
 ```
 
 The fixture sends a preview and checks that the full survey and undo history are unchanged. It then sends one build request, checks the revised roof and journal entry, sends undo, and compares the world and previous history with their baseline. Inspect the reported phase and private receipt before calling the run a pass. The earlier approval-based trial is historical evidence. [Current fixture](../experiments/chat-loop.mjs) · [Earlier trial](chat-loop-playtest.md)
+
+## Milestone 1 sessions and speech
+
+Run the no-block-edit collaboration case with the normal listener active: `node experiments/collaboration-session.mjs --restart`. It checks addressed chat, ray-hit markers, selections, conversation recall, thread resumption and unchanged world state. For component checks, `node scripts/check-agent-session.mjs` uses a disposable signed-in Codex thread; `node scripts/check-voice.mjs` exercises the Windows speech engine using synthesized audio. [Fixture and required starting conditions](collaboration-session-test.md)
 
 ## Human acceptance
 

@@ -9,17 +9,17 @@ The first useful loop is to point at a hill, request a build there, walk around 
 3. For a build request, re-read the footprint and compare it with the survey. Apply a bounded difference with a recorded seed and before-state. Check the changed cells and one ring of untouched neighbors. Keep an uncertain or interrupted operation pending until readback resolves it.
 4. Reply in the game with the location and a short description. For an edit request, reuse the geometry parameters, survey again, and present any human changes before modifying the same cells.
 
-The watchtower prototype implements the local-listener milestone with a schema-constrained ephemeral Codex CLI turn, private state, and conditional Minecraft writes per column. [Implementation and limits](in-game-building.md)
+Addressed chat reaches a local listener and a persistent agent runtime. The listener saves the transcript and spatial references, validates agent decisions, and issues conditional Minecraft writes per column. Read-only visual turns can include the current framebuffer. [Collaboration controls](collaborate.md) · [Implementation and limits](in-game-building.md)
 
 ## Boundaries for Milestone 1
 
-The current path is Minecraft chat → MCPFabric events → local listener → constrained Codex design turn → local survey and checked executor → Minecraft readback and HUD reply. The listener owns the edit receipt. WorldEdit is available for bulk work and has a separate history. The user edits manually with Axiom or ordinary controls. [Current milestone](current-milestone.md) · [Technical decisions](decisions.md)
+The current path is Minecraft chat or authorized push-to-talk → local listener → runtime turn with world context → local survey and checked executor → Minecraft readback and HUD reply. Studio owns the edit receipt. WorldEdit uses its own history. [Current milestone](current-milestone.md) · [Technical decisions](decisions.md)
 
 | Responsibility | Direction as the collaboration loop grows |
 | --- | --- |
 | Minecraft client | Carry the request, player context, markers, selections, progress and interruption. Introduce native Fabric input or rendering when an in-game interaction needs it. Keep provider credentials and runtime-specific logic in the local process. |
-| Local orchestration | Own session lifecycle, event delivery, capability checks and cancellation. Evaluate Codex App Server for persistent turns. Claude Code and a model served by Ollama may require different amounts of tool orchestration. A mock runtime can exercise the UI and lifecycle without a model call. |
-| Speech | Select transcription and synthesis independently of each other and of the agent. A text-only session should exercise the same intent and execution path. |
+| Local orchestration | The persistent Codex App Server adapter resumes a thread per lab/player, interrupts turns and accepts images. Ollama supplies text inference through loopback, and a mock adapter exercises the listener offline. The listener selects features from runtime capabilities. |
+| Speech | The opt-in Windows helper authorizes each push-to-talk hold against the focused lab. The transcript uses the same request handler as chat. Recognition and synthesis can be enabled independently. [Speech controls](voice.md) |
 | World knowledge | Keep stable world and dimension references, spatial observations, creative preferences and edit receipts in Studio-owned storage. A provider thread ID can point to a conversation. The world plan must survive replacing that provider. |
 | Building and artistic knowledge | Tools expose operations such as surveying or committing a difference. Algorithms compute geometry and materials reproducibly. Agent skills explain when to use those operations and how to judge the result from multiple viewpoints. |
 

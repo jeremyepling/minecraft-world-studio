@@ -1,15 +1,21 @@
 # Milestone 1 — In-game collaboration
 
-**In progress.** Success is a human spending an hour comfortably building with the AI inside Minecraft. An automated roof edit proves the request path works. The hour-long human session remains an open acceptance check.
+**Implemented in the Windows Fabric 26.3 lab. Human acceptance is open.** Start **World Studio.cmd**, type `@studio help` and try an hour building in WorldStudioLab. The player decides whether the in-game conversation, pointing, speech and interruption are comfortable enough for regular use. [Player guide](collaborate.md) · [Hour-long acceptance case](collaboration-session-test.md)
 
-| Experience | Current baseline | Milestone goal |
-| --- | --- | --- |
-| Talk in Minecraft | Addressed player chat reaches the local listener. Codex interprets a request and the listener replies in the HUD. | Carry on a persistent conversation, interrupt or redirect work, and recover the session after reconnecting. |
-| Refer to the world | View ray, known towers, bounded surveys and framebuffer captures. An independent survey identified the hillside roof from live blocks without consulting its recipe. | Attach relevant spatial context, named markers and selections to turns. Let the player see which location the agent understood. |
-| Control a build | Direct instructions apply checked edits. Explicit previews are read-only. The player can inspect status, cancel, and undo confirmed writes. | Keep progress and interruption understandable while the player continues building manually. |
-| Choose how to communicate | The working agent path uses Codex CLI. The listener stores a short turn history locally. | Support configurable agent capabilities, text, push-to-talk and optional spoken responses. Configure recognition and synthesis independently. Keep credentials outside the mod. |
-| Develop and test | A disposable Fabric lab, offline checks, real chat fixtures and independent block readback are available. | Make collaboration behavior repeatable across restarts. Exercise the human controls and record where the player had to leave Minecraft or repeat context. |
+| Experience | Implementation |
+| --- | --- |
+| Keep a conversation | Codex App Server keeps a dedicated thread. Studio resumes it across listener restarts. It also saves provider-independent messages and world references in private storage. |
+| Refer to the world | A view ray identifies the pointed block. Name and highlight markers, select a point or two corners, refer to a saved marker in a request, or explicitly attach the current framebuffer for a read-only critique. |
+| Control the work | Direct build requests retain checked writes and undo. Explicit previews are read-only. The HUD reports activity and block progress. Cancel or redirect an active turn from chat or recognized speech. |
+| Choose input and output | Text is available throughout. F8 push-to-talk and spoken replies are independently opt-in. The Windows helper checks the focused Studio instance and lab authorization. |
+| Choose an agent | Codex is the default. The mock adapter supports offline tests. The Ollama adapter accepts a compatible installed local model through loopback. Image-capable turns currently use Codex. |
 
-The detailed Milestone 1 implementation brief is forthcoming. The goals above come from the product vision. Record implementation order and accepted changes here when the brief arrives. The next milestone covers composable geometry and execution backends. [Product vision](product-vision.md) · [Roadmap](roadmap.md)
+## Evidence and remaining acceptance
 
-For the baseline, start with the working chat instructions and the relevant test fixture. The survey example used two opposite camera positions and restored the player afterward. [Chat guide](in-game-building.md) · [Testing](testing.md) · [Northwest roof detail](../screenshots/survey-roof-northwest-detail.png)
+* The combined automated suite passed 19 tests covering checked editing and recovery, provider contracts, durable markers and conversations, and speech lifecycle.
+* A real Minecraft chat fixture placed and selected a marker at an independently raycast block, established a conversation, restarted the listener, then checked the same Codex thread and recalled phrase. The fixture restored the prior marker selection and checked all 2,700 roof and neighboring cells and the previous edit history. [Reproduce the test](collaboration-session-test.md)
+* In the same lab, Codex described the tower and daylight sky from the attached framebuffer. Active turns were cancelled and redirected, the replacement returned the requested code, and the player switched from Codex to the mock adapter and back. A roof preview crossing a two-marker region was refused. The camera, selection, original provider, edit history and all surveyed blocks were restored.
+* The installed Codex runtime passed a separate interruption, recovery, isolated-survey and image-input check. The local Windows speech engine recognized an in-memory synthesized sentence exactly. Ollama was exercised with a loopback API fixture. [Provider tests](agent-providers.md) · [Speech tests](voice.md)
+* Physical microphone intelligibility, audible playback at the player's desk, a real Axiom edit during collaboration, and the one-hour comfort criterion remain human checks. Text, voice and provider support are documented separately from the historical Phase 1 trials. [Known limitations](known-limitations.md)
+
+Milestone 2 covers building fluency. The broader SDK and regional planning work remain on the [roadmap](roadmap.md).
