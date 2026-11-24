@@ -4,7 +4,9 @@ import {runScript} from "../local/server/server/script/sandbox.js";
 const WORLD = "sp:WorldStudioLab";
 const DIM = "minecraft:overworld";
 const AIR = "minecraft:air";
-const materials = new Set([AIR,"minecraft:andesite","minecraft:stone_bricks","minecraft:waxed_weathered_cut_copper"]);
+const materials = new Set([AIR,"minecraft:andesite","minecraft:stone_bricks","minecraft:waxed_weathered_cut_copper",
+  "minecraft:polished_blackstone","minecraft:deepslate_tiles","minecraft:deepslate_bricks",
+  "minecraft:polished_deepslate","minecraft:polished_andesite"]);
 const skill = new URL("../experiments/sample.js", import.meta.url);
 const cellKey = (x,y,z) => `${x},${y},${z}`;
 const length = r => r.top - r.y + 1;

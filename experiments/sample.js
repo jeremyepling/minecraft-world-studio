@@ -28,6 +28,7 @@ function design(p) {
     const taper = bounded(p.taper ?? 2, 0, 3);
     const thickness = bounded(p.thickness ?? 2, 1, 3);
     const roof = bounded(p.roof ?? 9, 4, 16);
+    const slate = ["polished_blackstone", "deepslate_tiles", "deepslate_bricks", "polished_deepslate", "polished_andesite"];
     for (let y = 0; y < height + roof; y++) {
       const cap = y >= height;
       const r = cap ? (radius - taper + 1) * (1 - (y - height) / roof) : radius - taper * y / (height - 1);
@@ -38,7 +39,18 @@ function design(p) {
           const entrance = z < 0 && Math.abs(x) <= 1 && y < (x === 0 ? 5 : 4);
           const window = y > 7 && y % 10 < 3 && ((x === 0 && z !== 0) || (z === 0 && x !== 0));
           if (!cap && (entrance || window)) continue;
-          put(x, y, z, cap ? "waxed_weathered_cut_copper" : y < 3 ? "andesite" : "stone_bricks");
+          let material = y < 3 ? "andesite" : "stone_bricks";
+          if (cap) {
+            material = "waxed_weathered_cut_copper";
+            if (p.roofFinish === "black_to_grey") {
+              const rise = (y - height) / (roof - 1);
+              const variation = (cloud(x / 2.7, z / 2.7, 42) - 0.5) * 1.8;
+              // Keep the eaves and tip distinct. Break up the intermediate courses in clusters.
+              const shade = Math.round((slate.length - 1) * rise + variation * Math.sin(Math.PI * rise));
+              material = slate[Math.max(0, Math.min(slate.length - 1, shade))];
+            }
+          }
+          put(x, y, z, material);
         }
       }
     }
@@ -97,7 +109,7 @@ const next = design(a);
 // Host-side approval planning uses these same skill voxels without touching a world.
 if (a.action === "geometry") return runs(next).map(r => [r.x, r.y, r.z, r.top, r.id]);
 if (a.action === "describe") return {blocks: next.size, verticalRuns: runs(next).length};
-const prev = a.previous ? design({...a, ...a.previous, sample:a.sample}) : new Map();
+const prev = a.previous ? design({...a, ...a.previous, roofFinish:a.previous.roofFinish ?? "copper", sample:a.sample}) : new Map();
 const {x: ox, y: oy, z: oz} = a.origin;
 bounded(ox, -29999900, 29999900); bounded(oz, -29999900, 29999900);
 bounded(oy, -63, 263);

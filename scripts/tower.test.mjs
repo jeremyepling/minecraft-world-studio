@@ -92,3 +92,22 @@ test("a lost acknowledgment leaves a single uncertain write and stops subsequent
   assert.equal(client.cells.get(key(4,110,2)),stone);
   assert.equal(client.cells.has(key(5,110,2)),false);
 });
+
+test("an existing copper roof can be shaded without changing its massing, then restored", async()=>{
+  const c=fixture(), origin={x:9,y:96,z:86};
+  const shape={height:30,radius:7,taper:2,thickness:2,roof:10};
+  const original=await previewTower(c,origin,null,shape);
+  await applyTower(c,original);
+  const colored={...shape,roofFinish:"black_to_grey"};
+  const plan=await previewTower(c,origin,shape,colored);
+  assert.equal(plan.count,258);
+  assert.ok(plan.runs.every(r=>r.before==="minecraft:waxed_weathered_cut_copper" && r.y>=126 && r.top<=135));
+  assert.equal(new Set(plan.runs.map(r=>r.after)).size,5);
+  const result=await applyTower(c,plan);
+  assert.equal(result.verified,258);
+  assert.equal(c.cells.get(key(15,126,86)),"minecraft:polished_blackstone");
+  assert.equal(c.cells.get(key(9,135,86)),"minecraft:polished_andesite");
+  assert.equal((await previewTower(c,origin,colored,colored)).count,0);
+  assert.equal((await applyTower(c,reverseTower(result.applied))).verified,258);
+  assert.equal((await previewTower(c,origin,shape,shape)).protectedCount,0);
+});

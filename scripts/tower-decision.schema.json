@@ -9,7 +9,8 @@
     "radius",
     "taper",
     "thickness",
-    "roof"
+    "roof",
+    "roofFinish"
   ],
   "properties": {
     "action": {
@@ -30,6 +31,10 @@
     },
     "message": {
       "type": "string"
+    },
+    "roofFinish": {
+      "type": ["string", "null"],
+      "enum": ["copper", "black_to_grey", null]
     },
     "height": {
       "type": [
