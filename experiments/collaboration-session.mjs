@@ -130,7 +130,10 @@ async function main() {
     ownedMarker=true;
     const tagged=await hud(client,"mark "+marker,/^Marked /i);
     assert.ok(tagged.includes(marker) && tagged.includes(coords),"Marker differs from independent raycast");
-    assert.ok((await hud(client,"markers",/^Markers:/i)).includes(marker));
+    const markerIndex=(await session()).markers.findIndex(m=>m.name===marker);
+    assert.ok(markerIndex>=0,"Trial marker was not saved");
+    const page=1+Math.floor(markerIndex/5);
+    assert.ok((await hud(client,"markers "+page,/^Markers:/i)).includes(marker));
     assert.ok((await hud(client,"select "+marker,/^Selected /i)).includes(marker));
     const where=await hud(client,"where",/^Looking at /i);
     assert.ok(where.includes(coords) && where.includes(marker),"HUD is missing the ray hit or selection");
