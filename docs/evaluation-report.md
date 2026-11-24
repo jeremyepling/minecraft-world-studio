@@ -1,6 +1,6 @@
 # Initial evaluation · November 24, 2026
 
-The findings below describe the stock Phase 1 installation. The subsequent watchtower prototype now supports addressed in-game Codex requests, previews, checked approval and undo. [Use the prototype](in-game-building.md) · [Live evidence](chat-loop-playtest.md)
+The findings below describe the stock Phase 1 installation. The subsequent watchtower prototype now supports addressed in-game Codex requests, direct edits, optional previews and checked undo. [Use the prototype](in-game-building.md) · [Live evidence](chat-loop-playtest.md)
 
 **Adopt the published MCPFabric release for the local prototype.** A real Codex conversation discovered the server and read the player in Minecraft 26.3 Creative. A second Codex turn inspected the hillside watchtower, identified its overhanging green roof and sent that observation privately inside Minecraft. WorldEdit worked through both the player and console, and a parameterized skill revised the tower. The two largest gaps for day-to-day collaboration are starting a turn from Minecraft and protecting subsequent manual edits. [Codex turn](codex-model-smoke.json) · [Visual conversation](codex-visual-chat.json) · [Post-restart capture](codex-reconnect.json) · [Creative trials](experiments.md)
 

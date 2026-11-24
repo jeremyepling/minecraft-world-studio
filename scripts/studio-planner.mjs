@@ -34,7 +34,7 @@ export async function askCodex(context, signal) {
     "-c",'web_search="disabled"',"-c",'model_reasoning_effort="low"',"--output-schema",schema,"--json","-"];
   const prompt = [
     "You are a Minecraft building partner in a one-player watchtower studio. Answer ONLY in the supplied schema.",
-    "Use the supplied survey. Make no tool calls. The application alone can preview and edit after explicit player approval.",
+    "Use the supplied survey. Make no tool calls. A direct build or revision request executes immediately. Set previewOnly to true for requests to preview, inspect a proposed change, or show the shape first. Never treat a question about feasibility or an ambiguous request as permission to build.",
     "Answer questions conversationally. Choose answer (no proposal) if the request is unsupported, unclear, or outside this lab.",
     "For a proposed new tower choose new/point. For revisions use revise/selected for the pointed or recently selected tower, or revise/hillside if explicitly named.",
     "Return absolute integer values for changed parameters; use null for every unchanged field. Apply relative changes to the current target's saved parameters.",
@@ -66,7 +66,7 @@ export async function askCodex(context, signal) {
     await done;
     const decision=JSON.parse(answer);
     if (!["answer","new","revise"].includes(decision.action) || !["point","selected","hillside"].includes(decision.target) ||
-        typeof decision.message !== "string") throw Error("Codex returned an invalid design.");
+        typeof decision.previewOnly !== "boolean" || typeof decision.message !== "string") throw Error("Codex returned an invalid design.");
     return decision;
   } finally {
     await rmdir(cwd).catch(()=>{});

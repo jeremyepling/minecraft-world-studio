@@ -21,7 +21,7 @@ On November 24, 2026, the player asked for a two-block increase in roof height w
 
 The HUD reported completion approximately 20 seconds after the approval and 20 seconds after the undo request. The first exploratory run had needed a second approval because the listener was still drawing the preview when it announced the proposal. The repeat above accepted the first approval. The final listener also releases the busy state before publishing the completion message. The pointed-site trial below ran with this final source.
 
-The [repeatable scenario](../experiments/chat-loop.mjs) contains the independent expected roof calculation and region assertions. Run `node experiments/chat-loop.mjs` with the original hillside tower in the loaded lab and the ordinary listener stopped. It starts its own listener, sends player chat, reads actual in-game replies from the Minecraft render log and writes a private receipt under `local/chat-loop-test-scenario-*/fixture-result.json`. The passing receipt for this run is in the directory ending in `4ba97e09-7c6c-44d8-a468-aca9818c3fa0`.
+This trial used the approval-based listener at revision `43da9f8`. The current [repeatable scenario](../experiments/chat-loop.mjs) exercises single-message edits against the running listener. The passing receipt for this run is in the directory ending in `4ba97e09-7c6c-44d8-a468-aca9818c3fa0`.
 
 ## Pointed site and rejection
 

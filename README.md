@@ -18,7 +18,7 @@ For in-game collaboration, start the listener from a second PowerShell terminal.
 .\scripts\Start-Chat.ps1 -Background
 ```
 
-When **Studio ready** appears in Minecraft, try `@studio make the hillside watchtower roof two blocks taller`. Inspect the particle guide, then use the proposal ID to approve or reject it. Use `@studio undo` for a checked reversal. [Chat commands and recovery](docs/in-game-building.md)
+When **Studio ready** appears in Minecraft, try `@studio make the hillside watchtower roof two blocks taller`. The request applies immediately. To see a particle guide first, start the request with `@studio preview`. Use `@studio undo` for a checked reversal. [Chat commands and recovery](docs/in-game-building.md)
 
 For the full MCP toolset, open **this repository** as a Codex project, or run `codex` from a second terminal in the repository. In a new conversation, try:
 

@@ -26,8 +26,10 @@ const store=new StudioState(dir), state=store.data;
 const stopFile=join(dir,"stop.request");
 if(existsSync(stopFile)) unlinkSync(stopFile);
 if(state.active) store.finish(null);
+// Older listeners saved uncommitted proposals. Never execute those on upgrade.
+if(state.pending) { state.pending=null;store.save(); }
 const c=await connect();
-let busy, stopping=false, online=false, cursor=0;
+let busy, lastPreview, stopping=false, online=false, cursor=0;
 
 const compact = txt => String(txt).replace(/[\u0000-\u001f\u007f§]/g," ").trim();
 async function say(text) {
@@ -68,9 +70,9 @@ async function survey() {
   return {hit,selected:pointed??state.selected,player:{x:self.x,y:self.y,z:self.z,yaw:self.yaw,pitch:self.pitch}};
 }
 
-function proposalText(p) {
+function previewText(p) {
   const {origin:o,next:n,count,protectedCount}=p.plan;
-  return `Proposal ${p.id} at ${o.x} ${o.y} ${o.z}. ${p.summary} Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}; roof ${n.roof}. ${count} cells to change, ${protectedCount} protected. @studio approve ${p.id} or @studio reject ${p.id}.`;
+  return `Preview at ${o.x} ${o.y} ${o.z}. ${p.summary} Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}; roof ${n.roof}. ${count} cells would change, ${protectedCount} protected.`;
 }
 async function outline(p) {
   await context();
@@ -93,13 +95,12 @@ function acceptNextInput(signal) {
   if(busy?.abort.signal===signal) busy=null;
 }
 
-async function design(request,signal) {
+async function design(request,signal,previewOnly) {
   const site=await survey();
-  const prior=state.pending;
   const objects=Object.fromEntries(Object.entries(state.towers).map(([key,t])=>[key,{origin:t.origin,params:t.params}]));
   await say("Designing with Codex. You can type @studio cancel.");
   const decision=await askCodex({request,site,towers:objects,defaultNewTower:defaults,recent:state.turns,
-    pending:prior?{key:prior.key,origin:prior.plan.origin,params:prior.plan.next}:null},signal);
+    previewOnly},signal);
   signal.throwIfAborted();
   await context();
   const summary=compact(decision.message).slice(0,170);
@@ -113,10 +114,9 @@ async function design(request,signal) {
     origin={x:site.hit.x,y:site.hit.y+1,z:site.hit.z};
     key="tower-"+[origin.x,origin.y,origin.z].join("_"); before=null; base=defaults;
   } else {
-    key=decision.target==="hillside"?"hillside":site.selected??prior?.key;
+    key=decision.target==="hillside"?"hillside":site.selected;
     before=state.towers[key]??null;
-    if(prior && prior.key===key) { origin=prior.plan.origin; base=prior.plan.next; }
-    else if(before) { origin=before.origin;base=before.params; }
+    if(before) { origin=before.origin;base=before.params; }
     else throw Error("Point at a known tower or ask for a new tower on the ground.");
   }
   const next=parameters(base,decision);
@@ -130,13 +130,21 @@ async function design(request,signal) {
   }
   const plan=await previewTower(c,origin,before?.params??null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
   signal.throwIfAborted();
-  if(!plan.count) { state.pending=null;store.save();await say(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
+  if(!plan.count) { lastPreview=null;store.save();await say(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
   const p={id:randomBytes(4).toString("hex"),key,before,plan,summary};
-  await outline(p).catch(e=>console.error("Particle guide unavailable:",e.message));
-  signal.throwIfAborted();
-  state.pending=p;state.selected=key;store.save();
-  acceptNextInput(signal);
-  await say(proposalText(p));
+  if(previewOnly || decision.previewOnly) {
+    await outline(p);
+    signal.throwIfAborted();
+    lastPreview=p;
+    store.save();
+    acceptNextInput(signal);
+    await say(previewText(p));
+    return;
+  }
+  busy.label="applying "+p.id;
+  lastPreview=null;
+  await say(`Applying ${plan.count} block changes at ${origin.x} ${origin.y} ${origin.z}. ${plan.protectedCount} protected. Use @studio cancel to stop.`);
+  await edit("apply",p,signal);
 }
 
 async function edit(direction,entry,signal) {
@@ -175,42 +183,37 @@ async function handle(input) {
   const body=input.trim();
   const cmd=body.toLowerCase();
   if(cmd==="status" || cmd==="help") {
-    await say(busy ? "Working: "+busy.label : state.pending ? proposalText(state.pending) :
+    await say(busy ? "Working: "+busy.label :
       recoveryNote() || "Studio ready. Point and ask @studio build a watchtower here, or @studio make the hillside roof two blocks taller. Use @studio undo after a revision.");
     return;
   }
   if(cmd==="cancel" || cmd==="stop") {
     if(busy) {busy.abort.abort();await say("Stopping the current request.");}
-    else {state.pending=null;store.save();await say("Cancelled. No pending design.");}
+    else {lastPreview=null;await say("Studio is idle.");}
     return;
   }
   if(busy) {await say("One request is active. Use @studio status or @studio cancel.");return;}
-  const [verb,id,...extra]=cmd.split(/\s+/);
-  if(["approve","reject"].includes(verb)) {
-    if(!state.pending || id!==state.pending.id || extra.length) {
-      await say("That proposal ID is not current. Type @studio status.");return;
-    }
-    if(verb==="reject") {state.pending=null;store.save();await say("Rejected "+id+". No blocks changed.");return;}
-    const p=state.pending;
-    start("applying "+id,s=>edit("apply",p,s));return;
+  if(/^(approve|reject)\b/.test(cmd)) {
+    await say("Build requests apply directly. Type @studio followed by the change you want.");return;
   }
   if(cmd==="undo") {
     const last=state.history.at(-1);
     if(!last){await say("No Studio revision to undo.");return;}
-    start("undoing "+last.id,s=>edit("undo",last,s));return;
+    lastPreview=null;start("undoing "+last.id,s=>edit("undo",last,s));return;
   }
   if(cmd==="preview") {
-    if(state.pending) start("showing the proposal",async signal=>{
-      const p=state.pending;
+    if(lastPreview) start("showing the preview",async signal=>{
+      const p=lastPreview;
       await outline(p);
       signal.throwIfAborted();
       acceptNextInput(signal);
-      await say(proposalText(p));
+      await say(previewText(p));
     });
-    else await say("No pending design.");
+    else await say("Type @studio preview followed by the change you want to see.");
     return;
   }
-  start("designing",s=>design(body,s));
+  const previewOnly=/^preview\s/i.test(body);
+  start("designing",s=>design(previewOnly?body.slice(7).trim():body,s,previewOnly));
 }
 
 function shutdown() { stopping=true;busy?.abort.abort(); }
@@ -235,7 +238,7 @@ try {
         if(e.type!=="chat" || d?.kind!=="chat" || d.self!==true || d.sender!=="WorldStudio" || typeof d.text!=="string") continue;
         const input=stripPrefix(d.text,"@studio");
         if(!input) continue;
-        // Consume before dispatch. A crash during handling cannot reapprove a write.
+        // Consume before dispatch so a crash cannot replay a build request.
         state.cursor=cursor;store.save();
         await handle(input);
       }

@@ -3,6 +3,7 @@
   "additionalProperties": false,
   "required": [
     "action",
+    "previewOnly",
     "target",
     "message",
     "height",
@@ -13,6 +14,7 @@
     "roofFinish"
   ],
   "properties": {
+    "previewOnly": {"type":"boolean"},
     "action": {
       "type": "string",
       "enum": [

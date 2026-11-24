@@ -1,12 +1,12 @@
 # From a prototype to a building partner
 
-The first useful loop is to point at a hill, get a proposal tied to that point, approve a silhouette, walk around it and request one revision. The player should be able to place a custom block between those steps and find it still there afterward.
+The first useful loop is to point at a hill, request a build there, walk around it and request one revision. The player should be able to place a custom block between those steps and find it still there afterward.
 
 ## One collaboration loop
 
 1. Bind a request to this world, dimension, player, eye ray and selected bounds. Read terrain and the affected cells. Report an entrance facing and a proposed footprint the player can identify.
 2. Generate massing locally from a few parameters. Show a slice, dimensions and material counts. A temporary, separate staging plot or external schematic viewer is enough for a first visual preview. A command-generated change to the real site is a commit.
-3. On approval, re-read the footprint and compare it with the survey. Apply a bounded difference with a recorded seed and before-state. Check the changed cells and one ring of untouched neighbors. Keep an uncertain or interrupted operation pending until readback resolves it.
+3. For a build request, re-read the footprint and compare it with the survey. Apply a bounded difference with a recorded seed and before-state. Check the changed cells and one ring of untouched neighbors. Keep an uncertain or interrupted operation pending until readback resolves it.
 4. Reply in the game with the location and a short description. For an edit request, reuse the geometry parameters, survey again, and present any human changes before modifying the same cells.
 
 The watchtower prototype implements the local-listener milestone with a schema-constrained ephemeral Codex CLI turn, private state, and conditional Minecraft writes per column. [Implementation and limits](in-game-building.md)
