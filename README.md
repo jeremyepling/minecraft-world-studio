@@ -4,6 +4,8 @@ A local creative building lab for Minecraft Java 26.3. The player builds in Axio
 
 ![Stone watchtower with a stepped copper roof above a winding hillside road in WorldStudioLab](screenshots/hillside-watchtower-and-road.png)
 
+For project direction, start with the [product vision](docs/product-vision.md), [current milestone](docs/current-milestone.md) and [roadmap](docs/roadmap.md). Implementation context lives in the [architecture](docs/architecture.md), [decisions](docs/decisions.md), [known limitations](docs/known-limitations.md) and [test procedures](docs/testing.md).
+
 ## Open the lab
 
 From this directory in PowerShell 7, start the installed client. The launcher uses the private `WorldStudioLab` save and the local player `WorldStudio`.

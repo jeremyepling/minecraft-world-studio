@@ -11,6 +11,20 @@ The first useful loop is to point at a hill, request a build there, walk around 
 
 The watchtower prototype implements the local-listener milestone with a schema-constrained ephemeral Codex CLI turn, private state, and conditional Minecraft writes per column. [Implementation and limits](in-game-building.md)
 
+## Boundaries for Milestone 1
+
+The current path is Minecraft chat → MCPFabric events → local listener → constrained Codex design turn → local survey and checked executor → Minecraft readback and HUD reply. The listener owns the edit receipt. WorldEdit is available for bulk work and has a separate history. The user edits manually with Axiom or ordinary controls. [Current milestone](current-milestone.md) · [Technical decisions](decisions.md)
+
+| Responsibility | Direction as the collaboration loop grows |
+| --- | --- |
+| Minecraft client | Carry the request, player context, markers, selections, progress and interruption. Introduce native Fabric input or rendering when an in-game interaction needs it. Keep provider credentials and runtime-specific logic in the local process. |
+| Local orchestration | Own session lifecycle, event delivery, capability checks and cancellation. Evaluate Codex App Server for persistent turns. Claude Code and a model served by Ollama may require different amounts of tool orchestration. A mock runtime can exercise the UI and lifecycle without a model call. |
+| Speech | Select transcription and synthesis independently of each other and of the agent. A text-only session should exercise the same intent and execution path. |
+| World knowledge | Keep stable world and dimension references, spatial observations, creative preferences and edit receipts in Studio-owned storage. A provider thread ID can point to a conversation. The world plan must survive replacing that provider. |
+| Building and artistic knowledge | Tools expose operations such as surveying or committing a difference. Algorithms compute geometry and materials reproducibly. Agent skills explain when to use those operations and how to judge the result from multiple viewpoints. |
+
+These are responsibilities within the evolving product. Split a package or process when the working interaction needs that boundary. [Product vision](product-vision.md) · [Future roadmap](roadmap.md)
+
 The initial proposal for asynchronous in-game requests was a **local listener** that reads addressed messages from the known player, tracks the event cursor, and submits one turn to a dedicated Codex thread. Persist the cursor and request ID to prevent replays on reconnect. Handle interrupt separately from undo. Keep the local player in charge of applying changes, especially following cancellation or a stale survey. This runner could use Codex app-server's documented thread and turn methods with the same MCP registration. A chat message becomes input data. It should never grant more game or filesystem permissions. [Codex app-server](https://developers.openai.com/codex/app-server/) · [MCB prompt queue](https://github.com/Gasased/mcb) · [ACP example](https://github.com/emil28092005/minecraft-builder-mcp)
 
 ## Standalone SDK, when the first loop works
