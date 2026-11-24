@@ -14,6 +14,27 @@ function setup(t) {
   return new StudioState(dir);
 }
 
+test("survey recolors and their undo have receipts without claiming a generated object", t=>{
+  const store=setup(t);
+  const generated={origin:{x:0,y:60,z:0},params:defaults,exclude:[]};
+  store.data.towers.existing=generated;
+  store.data.selected="existing";
+  const run={x:2,y:70,top:71,z:3,before:"minecraft:bricks",after:"minecraft:dark_oak_planks"};
+  const surveyed={id:"sample",kind:"survey",plan:{runs:[run]}};
+  store.begin("apply",surveyed);
+  store.receipt({before:run});store.receipt({done:run,changed:true});
+  store.finish({conflicts:[]});
+  assert.deepEqual(store.data.history[0].applied,[run]);
+  assert.deepEqual(store.data.towers,{existing:generated});
+  store.begin("undo",store.data.history[0]);
+  const inverse={...run,before:run.after,after:run.before};
+  store.receipt({before:inverse});store.receipt({done:inverse,changed:true});
+  store.finish({conflicts:[]});
+  assert.deepEqual(store.data.history,[]);
+  assert.equal(store.data.selected,"existing");
+  assert.deepEqual(store.data.towers,{existing:generated});
+});
+
 test("a rejected conditional fill can retry unaffected siblings without abandoning ownership", t=>{
   const store=setup(t);
   store.begin("apply",entry);

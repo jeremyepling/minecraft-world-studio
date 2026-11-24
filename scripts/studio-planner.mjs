@@ -26,12 +26,6 @@ export function parameters(base, decision) {
 // The agent sees the player's site survey and previous design as data. Only
 // the listener holds the bridge; model output is a small validated design.
 export async function askCodex(context, signal) {
-  const cwd = await mkdtemp(join(tmpdir(),"worldstudio-planner-"));
-  const timeout = AbortSignal.timeout(120000);
-  const cancel = AbortSignal.any([signal, timeout]);
-  const args = ["exec","--ephemeral","--ignore-user-config","--skip-git-repo-check","--sandbox","read-only",
-    "--disable","shell_tool","--disable","unified_exec","--disable","apps","--disable","plugins",
-    "-c",'web_search="disabled"',"-c",'model_reasoning_effort="low"',"--output-schema",schema,"--json","-"];
   const prompt = [
     "You are a Minecraft building partner in a one-player watchtower studio. Answer ONLY in the supplied schema.",
     "Use the supplied survey. Make no tool calls. A direct build or revision request executes immediately. Set previewOnly to true for requests to preview, inspect a proposed change, or show the shape first. Never treat a question about feasibility or an ambiguous request as permission to build.",
@@ -43,6 +37,25 @@ export async function askCodex(context, signal) {
     "Keep message under 180 characters: describe the proposed change or answer the question. Never claim an edit has been applied.",
     JSON.stringify(context),
   ].join("\n");
+  const decision=await structuredTurn(prompt,schema,signal);
+  if (!["answer","new","revise"].includes(decision.action) || !["point","selected","hillside"].includes(decision.target) ||
+      typeof decision.previewOnly !== "boolean" || typeof decision.message !== "string") throw Error("Codex returned an invalid design.");
+  return decision;
+}
+
+// This turn receives only the addressed request, without previous turns, objects or recipes.
+export function surveyIntent(request,signal) {
+  const prompt = "Classify the player's request for a live Minecraft roof survey. Return paint only for an explicit instruction to recolor the roof brown, dark at the bottom to light at the top. Return inspect for a survey or preview without an instruction to commit. Return other for unsupported colors, shapes, negated edits or ambiguous instructions. Photography may be requested alongside paint. Player message: "+JSON.stringify(request);
+  return structuredTurn(prompt,fileURLToPath(new URL("./survey-intent.schema.json",import.meta.url)),signal);
+}
+
+async function structuredTurn(prompt,outputSchema,signal) {
+  const cwd = await mkdtemp(join(tmpdir(),"worldstudio-planner-"));
+  const timeout = AbortSignal.timeout(120000);
+  const cancel = AbortSignal.any([signal, timeout]);
+  const args = ["exec","--ephemeral","--ignore-user-config","--skip-git-repo-check","--sandbox","read-only",
+    "--disable","shell_tool","--disable","unified_exec","--disable","apps","--disable","plugins",
+    "-c",'web_search="disabled"',"-c",'model_reasoning_effort="low"',"--output-schema",outputSchema,"--json","-"];
   try {
     const child = spawn("codex",args,{cwd,signal:cancel,windowsHide:true,stdio:["pipe","pipe","pipe"]});
     let answer, completed=false, diagnostic="";
@@ -64,10 +77,7 @@ export async function askCodex(context, signal) {
     });
     child.stdin.end(prompt);
     await done;
-    const decision=JSON.parse(answer);
-    if (!["answer","new","revise"].includes(decision.action) || !["point","selected","hillside"].includes(decision.target) ||
-        typeof decision.previewOnly !== "boolean" || typeof decision.message !== "string") throw Error("Codex returned an invalid design.");
-    return decision;
+    return JSON.parse(answer);
   } finally {
     await rmdir(cwd).catch(()=>{});
   }

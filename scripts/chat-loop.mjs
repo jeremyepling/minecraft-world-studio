@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
 import { stripPrefix } from "../local/server/server/channel.js";
 import { connect } from "../experiments/client.mjs";
-import { askCodex, defaults, parameters } from "./studio-planner.mjs";
+import { askCodex, defaults, parameters, surveyIntent } from "./studio-planner.mjs";
+import { surveyBrownRoof } from "./survey-roof.mjs";
 import { StudioState } from "./studio-state.mjs";
 import { previewTower, applyTower, reverseTower } from "./tower.mjs";
 
@@ -153,11 +154,28 @@ async function edit(direction,entry,signal) {
   signal.throwIfAborted();
   store.begin(direction,entry);
   let receipt,result;
-  try { result=await applyTower(c,plan,store.callbacks(signal)); }
+  try { result=await applyTower(c,plan,{...store.callbacks(signal),surveyed:entry.kind==="survey"}); }
   finally { receipt=store.finish(result); }
   acceptNextInput(signal);
   const verb=direction==="apply"?"Applied":"Undid";
   await say(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.`);
+}
+async function surveyedEdit(request,signal) {
+  await context();
+  await say("Surveying the roof from the blocks in your view.");
+  const {action}=await surveyIntent(request,signal);
+  if(!["paint","inspect"].includes(action)) {await say("This survey supports roof inspection and a dark-to-light brown recolor.");return;}
+  const plan=await surveyBrownRoof(c,signal);
+  signal.throwIfAborted();
+  if(!plan.count || action==="inspect") {await say(`Survey complete. ${plan.count} eligible roof blocks for recoloring.`);return;}
+  if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before editing again.");
+  if((state.uncertainSpans??[]).some(s=>plan.runs.some(r=>r.x===s.x && r.z===s.z && r.y<=s.top && r.top>=s.y)))
+    throw Error("Survey intersects an unacknowledged write. Inspect the area before editing.");
+  const entry={id:randomBytes(4).toString("hex"),kind:"survey",plan};
+  busy.label="recoloring the surveyed roof";
+  lastPreview=null;
+  await say(`Applying the brown gradient to ${plan.count} surveyed blocks.`);
+  await edit("apply",entry,signal);
 }
 function start(label,work) {
   const abort=new AbortController();
@@ -193,6 +211,7 @@ async function handle(input) {
     return;
   }
   if(busy) {await say("One request is active. Use @studio status or @studio cancel.");return;}
+  if(/^survey\b/i.test(body)) {start("surveying",s=>surveyedEdit(body,s));return;}
   if(/^(approve|reject)\b/.test(cmd)) {
     await say("Build requests apply directly. Type @studio followed by the change you want.");return;
   }

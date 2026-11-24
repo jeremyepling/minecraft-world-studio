@@ -1,0 +1,6 @@
+{
+  "type": "object",
+  "properties": {"action": {"type":"string", "enum":["inspect","paint","other"]}},
+  "required": ["action"],
+  "additionalProperties": false
+}

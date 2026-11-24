@@ -73,9 +73,9 @@ export class StudioState {
     if(direction==="apply") {
       if(confirmed.length) {
         this.data.history.push({...entry,applied:confirmed,partial:!result});
-        this.data.selected=entry.key;
+        if(entry.kind!=="survey") this.data.selected=entry.key;
       }
-      if(result && confirmed.length) {
+      if(result && confirmed.length && entry.kind!=="survey") {
         this.data.towers[entry.key]={origin:entry.plan.origin,params:entry.plan.next,
           exclude:[...entry.plan.excluded,...omitted]};
       }
@@ -89,10 +89,12 @@ export class StudioState {
         last.undoExcluded=[...(last.undoExcluded??[]),...omitted];
       } else {
         this.data.history.pop();
-        if(entry.before) this.data.towers[entry.key]={...entry.before,
-          exclude:[...entry.before.exclude,...(last.undoExcluded??[]),...omitted]};
-        else delete this.data.towers[entry.key];
-        this.data.selected=this.data.towers[entry.key] ? entry.key : null;
+        if(entry.kind!=="survey") {
+          if(entry.before) this.data.towers[entry.key]={...entry.before,
+            exclude:[...entry.before.exclude,...(last.undoExcluded??[]),...omitted]};
+          else delete this.data.towers[entry.key];
+          this.data.selected=this.data.towers[entry.key] ? entry.key : null;
+        }
       }
     }
     if(uncertain) {

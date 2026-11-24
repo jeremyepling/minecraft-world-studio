@@ -1,5 +1,6 @@
 import {readFile} from "node:fs/promises";
 import {runScript} from "../local/server/server/script/sandbox.js";
+import {isSurveyMaterial} from "./survey-roof.mjs";
 
 const WORLD = "sp:WorldStudioLab";
 const DIM = "minecraft:overworld";
@@ -7,6 +8,7 @@ const AIR = "minecraft:air";
 const materials = new Set([AIR,"minecraft:andesite","minecraft:stone_bricks","minecraft:waxed_weathered_cut_copper",
   "minecraft:polished_blackstone","minecraft:deepslate_tiles","minecraft:deepslate_bricks",
   "minecraft:polished_deepslate","minecraft:polished_andesite"]);
+const brownPlanks=new Set(["minecraft:dark_oak_planks","minecraft:spruce_planks","minecraft:jungle_planks","minecraft:oak_planks"]);
 const skill = new URL("../experiments/sample.js", import.meta.url);
 const cellKey = (x,y,z) => `${x},${y},${z}`;
 const length = r => r.top - r.y + 1;
@@ -17,10 +19,13 @@ function validPoint({x,y,z}) {
     throw Error("Tower coordinates exceed the Overworld build area.");
 }
 
-function checkRun(r) {
+function checkRun(r,surveyed) {
   validPoint(r);
   validPoint({...r,y:r.top});
-  if (r.top < r.y || r.top-r.y >= 56 || !materials.has(r.before) || !materials.has(r.after) || r.before === r.after)
+  const allowed=surveyed
+    ? (brownPlanks.has(r.after) && isSurveyMaterial(r.before)) || (brownPlanks.has(r.before) && isSurveyMaterial(r.after))
+    : materials.has(r.before) && materials.has(r.after);
+  if (r.top < r.y || r.top-r.y >= 56 || !allowed || r.before === r.after)
     throw Error("Invalid tower edit in the journal.");
 }
 
@@ -149,8 +154,8 @@ function casCommand(r) {
     tests.join(" ")+` run fill ${r.x} ${r.y} ${r.z} ${r.x} ${r.top} ${r.z} ${r.after} replace ${r.before}`;
 }
 
-export async function applyTower(client,plan,{onBeforeRun,onProgress,signal}={}) {
-  for (const r of plan.runs) checkRun(r);
+export async function applyTower(client,plan,{onBeforeRun,onProgress,signal,surveyed=false}={}) {
+  for (const r of plan.runs) checkRun(r,surveyed);
   await checkSite(client);
   const bounds=boundsOf(plan.runs);
   const live=await scan(client,bounds);
