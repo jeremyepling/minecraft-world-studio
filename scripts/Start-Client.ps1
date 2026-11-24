@@ -1,6 +1,6 @@
 #Requires -Version 7
 [CmdletBinding()]
-param([string]$Java = (Get-Command java.exe -ErrorAction Stop).Source)
+param([string]$Java = (Get-Command java.exe -ErrorAction Stop).Source, [switch]$WithChat)
 $ErrorActionPreference = 'Stop'
 $local = Join-Path (Split-Path $PSScriptRoot) 'local'
 $instance = Join-Path $local 'instance'
@@ -10,10 +10,17 @@ if ($config.host -ne '127.0.0.1' -or $config.port -ne 25639 -or $config.requireA
     throw 'Check the project-private bridge settings before launching.'
 }
 $listener = [Net.Sockets.TcpClient]::new()
+if ($WithChat) { & (Join-Path $PSScriptRoot 'Start-Chat.ps1') -Background }
 try {
     $occupied = $false
     try { $listener.Connect('127.0.0.1',25639); $occupied=$true } catch [Net.Sockets.SocketException] {}
-    if ($occupied) { throw 'Port 25639 already has a listener. Use the running instance or stop it first.' }
+    if ($occupied) {
+        if ($WithChat) {
+            Write-Output 'Port 25639 is in use. Studio will connect when the authorized lab is open.'
+            return
+        }
+        throw 'Port 25639 already has a listener. Use the running instance or stop it first.'
+    }
 } finally { $listener.Dispose() }
 $arguments = @('--main-dir',(Join-Path $local 'game'),'start','fabric:26.3:0.20.1','--mc-dir',$instance,
     '--jvm',$Java,'--jvm-arg=-Xmx4G','--username','WorldStudio','--uuid','e9561547-9212-401e-b04b-98f4341cb816',

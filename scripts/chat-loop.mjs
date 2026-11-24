@@ -6,7 +6,9 @@ import { fileURLToPath } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
 import { stripPrefix } from "../local/server/server/channel.js";
 import { connect } from "../experiments/client.mjs";
-import { askCodex, defaults, parameters, surveyIntent } from "./studio-planner.mjs";
+import { createPlanner, defaults, parameters } from "./studio-planner.mjs";
+import { createVoice } from "./studio-voice.mjs";
+import { StudioSession, coordinates, inside, selectionName } from "./studio-session.mjs";
 import { surveyBrownRoof } from "./survey-roof.mjs";
 import { StudioState } from "./studio-state.mjs";
 import { previewTower, applyTower, reverseTower } from "./tower.mjs";
@@ -24,6 +26,11 @@ const lock=createServer(socket=>socket.destroy());
 const lockName="\\\\.\\pipe\\worldstudio-chat-"+createHash("sha256").update(local.toLowerCase()).digest("hex").slice(0,20);
 await new Promise((resolve,reject)=>{ lock.once("error",()=>reject(Error("Another World Studio listener is active."))); lock.listen(lockName,resolve); });
 const store=new StudioState(dir), state=store.data;
+const scope={world:WORLD,dimension:DIM,player:"WorldStudio"};
+const session=new StudioSession(dir,scope,state.turns);
+const makePlanner=(provider,model=session.data.models?.[provider])=>
+  createPlanner({directory:dir,provider,model,world:WORLD,player:scope.player});
+let planner=makePlanner(session.data.provider);
 const stopFile=join(dir,"stop.request");
 if(existsSync(stopFile)) unlinkSync(stopFile);
 if(state.active) store.finish(null);
@@ -31,12 +38,38 @@ if(state.active) store.finish(null);
 if(state.pending) { state.pending=null;store.save(); }
 const c=await connect();
 let busy, lastPreview, stopping=false, online=false, cursor=0;
+let incoming=Promise.resolve();
+const voice=createVoice({directory:dir,instanceDirectory:join(local,"instance"),
+  authorize:async()=>{
+    if(!online || stopping)return false;
+    await context();
+    return (await c.tool("get_screen")).screen==="none";
+  },
+  onStatus:async message=>{if(online && !stopping)await say(message);},
+  onText:async text=>{
+    if(!online || stopping)return;
+    const body=compact(text).replace(/^@?studio\b[:,]?\s*/i,"").replace(/[.!?]+$/,"").trim();
+    if(body.startsWith("/")){await say("Voice takes Studio requests. Type Minecraft slash commands in chat.");return;}
+    await dispatch(body,true);
+  }});
 
 const compact = txt => String(txt).replace(/[\u0000-\u001f\u007f§]/g," ").trim();
 async function say(text) {
   text=compact(text).slice(0,490);
   console.log(text);
   await c.tool("show_message",{text});
+}
+async function reply(text) {
+  session.record("assistant",text);
+  await say(text);
+  voice.speak(text);
+}
+function activity(label) {
+  if(!busy || stopping || busy.abort.signal.aborted)return;
+  busy.progress=compact(label).slice(0,140);
+  if(Date.now()-busy.lastNotice<10000)return;
+  busy.lastNotice=Date.now();
+  void say("Working: "+busy.progress).catch(()=>{});
 }
 
 async function context() {
@@ -53,10 +86,14 @@ function contains(t,p) {
   return p && Math.abs(p.x-o.x)<=n.radius+1 && Math.abs(p.z-o.z)<=n.radius+1 &&
     p.y>=o.y && p.y<o.y+n.height+n.roof;
 }
-async function survey() {
+async function viewRay() {
   const self=await context();
-  const ray=await c.tool("raycast",{origin:{x:self.x,y:self.y+1.62,z:self.z},yaw:self.yaw,pitch:self.pitch,
+  const ray=await c.tool("raycast",{origin:{x:self.x,y:self.y+(self.sneaking?1.27:1.62),z:self.z},yaw:self.yaw,pitch:self.pitch,
     maxDistance:96,includeEntities:false,dimension:DIM});
+  return {hit:ray.hitType==="block"?ray.block:null,player:{x:self.x,y:self.y,z:self.z,yaw:self.yaw,pitch:self.pitch}};
+}
+async function survey() {
+  const view=await viewRay();
   if(!state.towers.hillside) {
     // Adopt only the original lab landmark, identified by its actual copper crown.
     const crown=await c.tool("get_block",{x:9,y:135,z:86,dimension:DIM}).catch(()=>null);
@@ -66,9 +103,14 @@ async function survey() {
       store.save();
     }
   }
-  const hit=ray.hitType==="block"?ray.block:null;
-  const pointed=Object.keys(state.towers).find(key=>contains(state.towers[key],hit));
-  return {hit,selected:pointed??state.selected,player:{x:self.x,y:self.y,z:self.z,yaw:self.yaw,pitch:self.pitch}};
+  const s=session.data.selection;
+  const anchor=s && !s.to?session.marker(s.from):null;
+  const pointed=Object.keys(state.towers).find(key=>contains(state.towers[key],anchor??view.hit));
+  const previous=state.history.at(-1);
+  const lastEdit=previous?{id:previous.id,kind:previous.kind??"tower",object:previous.key??null,
+    bounds:previous.plan.bounds,count:previous.plan.count,partial:previous.partial}:null;
+  return {...view,selected:pointed??(anchor?null:state.selected),world:WORLD,dimension:DIM,lastEdit,
+    markers:session.data.markers,selection:session.data.selection,region:session.region()};
 }
 
 function previewText(p) {
@@ -96,18 +138,34 @@ function acceptNextInput(signal) {
   if(busy?.abort.signal===signal) busy=null;
 }
 
-async function design(request,signal,previewOnly) {
+async function design(request,signal,previewOnly,observeOnly=false) {
   const site=await survey();
   const objects=Object.fromEntries(Object.entries(state.towers).map(([key,t])=>[key,{origin:t.origin,params:t.params}]));
-  await say("Designing with Codex. You can type @studio cancel.");
-  const decision=await askCodex({request,site,towers:objects,defaultNewTower:defaults,recent:state.turns,
-    previewOnly},signal);
+  await say(`Working with ${planner.provider}. Use @studio cancel or @studio redirect <request>.`);
+  let image;
+  if(observeOnly) {
+    if(!planner.capabilities.images)throw Error("The selected provider does not support images.");
+    image=await c.tool("screenshot");
+    if(!Buffer.isBuffer(image))throw Error("Minecraft did not return a screenshot.");
+  }
+  const recent=session.recent.slice(0,-1);
+  const decision=await planner.ask({request,site,towers:objects,defaultNewTower:defaults,recent,
+    observeOnly,previewOnly},signal,activity,image);
   signal.throwIfAborted();
   await context();
-  const summary=compact(decision.message).slice(0,170);
-  state.turns=[...state.turns,{request,reply:summary}].slice(-4);
-  if(decision.action==="answer") { store.save(); await say(summary||"Please describe the tower or revision.");return; }
+  const summary=compact(decision.message).slice(0,450);
+  if(observeOnly || decision.action==="answer") {
+    acceptNextInput(signal);await reply(summary||"Please describe the tower or revision.");return;
+  }
   if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before proposing another edit.");
+  const anchor=decision.marker?session.marker(decision.marker):
+    (site.selection && !site.selection.to?session.marker(site.selection.from):null);
+  if(anchor) {
+    const reference=await c.tool("get_block",{x:anchor.x,y:anchor.y,z:anchor.z,dimension:DIM});
+    site.hit={x:anchor.x,y:anchor.y,z:anchor.z,id:reference.id};
+    if(!reference.id || reference.air || reference.id==="minecraft:air")throw Error("The block at marker "+anchor.name+" is now empty. Move the marker first.");
+    site.selected=Object.keys(state.towers).find(key=>contains(state.towers[key],site.hit));
+  }
   let key, before, origin, base;
   if(decision.action==="new") {
     if(!site.hit) throw Error("Point at solid ground within 96 blocks for a new tower.");
@@ -115,7 +173,7 @@ async function design(request,signal,previewOnly) {
     origin={x:site.hit.x,y:site.hit.y+1,z:site.hit.z};
     key="tower-"+[origin.x,origin.y,origin.z].join("_"); before=null; base=defaults;
   } else {
-    key=decision.target==="hillside"?"hillside":site.selected;
+    key=!anchor && decision.target==="hillside"?"hillside":site.selected;
     before=state.towers[key]??null;
     if(before) { origin=before.origin;base=before.params; }
     else throw Error("Point at a known tower or ask for a new tower on the ground.");
@@ -131,7 +189,8 @@ async function design(request,signal,previewOnly) {
   }
   const plan=await previewTower(c,origin,before?.params??null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
   signal.throwIfAborted();
-  if(!plan.count) { lastPreview=null;store.save();await say(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
+  checkSelection(plan);
+  if(!plan.count) { lastPreview=null;store.save();await reply(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
   const p={id:randomBytes(4).toString("hex"),key,before,plan,summary};
   if(previewOnly || decision.previewOnly) {
     await outline(p);
@@ -139,13 +198,19 @@ async function design(request,signal,previewOnly) {
     lastPreview=p;
     store.save();
     acceptNextInput(signal);
-    await say(previewText(p));
+    await reply(previewText(p));
     return;
   }
   busy.label="applying "+p.id;
   lastPreview=null;
-  await say(`Applying ${plan.count} block changes at ${origin.x} ${origin.y} ${origin.z}. ${plan.protectedCount} protected. Use @studio cancel to stop.`);
+  await say(`Applying ${plan.count} block changes at ${coordinates(origin)}${anchor?" using marker "+anchor.name:""}. ${plan.protectedCount} protected. Use @studio cancel to stop.`);
   await edit("apply",p,signal);
+}
+
+function checkSelection(plan) {
+  const region=session.region();
+  if(region && plan.runs.some(r=>!inside(region,r) || !inside(region,{...r,y:r.top})))
+    throw Error("That edit crosses the selected region. Change the selection or use @studio select clear.");
 }
 
 async function edit(direction,entry,signal) {
@@ -154,21 +219,28 @@ async function edit(direction,entry,signal) {
   signal.throwIfAborted();
   store.begin(direction,entry);
   let receipt,result;
-  try { result=await applyTower(c,plan,{...store.callbacks(signal),surveyed:entry.kind==="survey"}); }
+  const callbacks=store.callbacks(signal);
+  let written=0;
+  try { result=await applyTower(c,plan,{...callbacks,surveyed:entry.kind==="survey",onProgress:async event=>{
+    await callbacks.onProgress(event);
+    if(event.changed)written+=event.run.top-event.run.y+1;
+    activity(`${direction==="undo"?"Undoing":"Applying"} ${entry.id}: ${written} of ${plan.count} blocks`);
+  }}); }
   finally { receipt=store.finish(result); }
   acceptNextInput(signal);
   const verb=direction==="apply"?"Applied":"Undid";
-  await say(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.`);
+  await reply(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.`);
 }
 async function surveyedEdit(request,signal) {
   await context();
   await say("Surveying the roof from the blocks in your view.");
-  const {action}=await surveyIntent(request,signal);
+  const {action}=await planner.survey(request,signal,activity);
   if(!["paint","inspect"].includes(action)) {await say("This survey supports roof inspection and a dark-to-light brown recolor.");return;}
   const plan=await surveyBrownRoof(c,signal);
   signal.throwIfAborted();
   if(!plan.count || action==="inspect") {await say(`Survey complete. ${plan.count} eligible roof blocks for recoloring.`);return;}
   if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before editing again.");
+  checkSelection(plan);
   if((state.uncertainSpans??[]).some(s=>plan.runs.some(r=>r.x===s.x && r.z===s.z && r.y<=s.top && r.top>=s.y)))
     throw Error("Survey intersects an unacknowledged write. Inspect the area before editing.");
   const entry={id:randomBytes(4).toString("hex"),kind:"survey",plan};
@@ -179,7 +251,7 @@ async function surveyedEdit(request,signal) {
 }
 function start(label,work) {
   const abort=new AbortController();
-  const task={label,abort};
+  const task={label,abort,lastNotice:Date.now()};
   busy=task;
   task.done=work(abort.signal).catch(async e=>{
     console.error(label,e.message);
@@ -187,8 +259,11 @@ function start(label,work) {
     const unknown=state.lastUncertain;
     const detail=unknown?` Inspect the uncertain column at ${unknown.run.x} ${unknown.run.y} ${unknown.run.z}.`:"";
     const error=abort.signal.aborted?"Cancelled.":e.message.startsWith("Codex could not")?"Codex could not finish the design turn. Check the listener log.":e.message;
-    await say((error+advice+detail).slice(0,450)).catch(()=>{});
-  }).finally(()=>{ if(busy===task)busy=null; });
+    if(online && !stopping)await reply((error+advice+detail).slice(0,450)).catch(()=>{});
+  }).finally(()=>{
+    if(busy===task)busy=null;
+    if(task.next && !busy && online && !stopping)void dispatch(task.next);
+  });
 }
 function recoveryNote() {
   const messages=[];
@@ -197,21 +272,108 @@ function recoveryNote() {
   if(r) messages.push("An unacknowledged column is protected. Inspect "+r.x+" "+r.y+" "+r.z+" through y="+r.top+".");
   return messages.join(" ");
 }
+async function dispatch(input,spoken=false) {
+  const run=async()=>{
+    if(!online || stopping)return;
+    try {
+      await context();
+      if(spoken)await say("You said: "+compact(input).slice(0,220));
+      await handle(input);
+    } catch(error) {
+      console.error("Player request:",error.message);
+      if(online && !stopping)await say(error.message).catch(()=>{});
+    }
+  };
+  incoming=incoming.then(run,run);
+  await incoming;
+}
 async function handle(input) {
   const body=input.trim();
+  if(!body)return;
   const cmd=body.toLowerCase();
-  if(cmd==="status" || cmd==="help") {
-    await say(busy ? "Working: "+busy.label :
-      recoveryNote() || "Studio ready. Point and ask @studio build a watchtower here, or @studio make the hillside roof two blocks taller. Use @studio undo after a revision.");
+  if(cmd==="help") {
+    await say("Ask @studio a question or request a build. Commands: mark NAME, markers, select NAME, select A to B, where, look QUESTION, voice on/off, spoken on/off, provider, session, history, status, cancel, redirect REQUEST, preview and undo.");
+    return;
+  }
+  if(cmd==="status" || cmd==="session") {
+    await say(busy ? "Working: "+(busy.progress??busy.label) :
+      `Studio ready. Provider: ${planner.provider}. Selection: ${selectionName(session.data.selection)}. ${session.count} saved messages. ${recoveryNote() || "Use @studio help for commands."}`);
     return;
   }
   if(cmd==="cancel" || cmd==="stop") {
-    if(busy) {busy.abort.abort();await say("Stopping the current request.");}
+    voice.quiet();
+    if(busy) {busy.next=null;busy.abort.abort();await say("Stopping the current request.");}
     else {lastPreview=null;await say("Studio is idle.");}
     return;
   }
-  if(busy) {await say("One request is active. Use @studio status or @studio cancel.");return;}
-  if(/^survey\b/i.test(body)) {start("surveying",s=>surveyedEdit(body,s));return;}
+  const redirect=body.match(/^redirect\s+(.+)$/i);
+  if(redirect) {
+    voice.quiet();
+    if(busy) {
+      busy.next=redirect[1];busy.abort.abort();
+      await say("Stopping this request, then starting: "+redirect[1]);return;
+    }
+    return handle(redirect[1]);
+  }
+  const speech=cmd.match(/^(voice|spoken)(?:\s+(on|off|status))?$/);
+  if(speech) {await say(await voice.configure(speech[1],speech[2]??"status"));return;}
+  if(busy) {await say("One request is active. Use @studio status, @studio cancel or @studio redirect <request>.");return;}
+  if(cmd==="provider" || cmd.startsWith("provider ")) {
+    const [name,model,...extra]=body.slice(8).trim().split(/\s+/);
+    if(!name) {await say("Provider: "+planner.provider+". Available: codex, mock, ollama MODEL.");return;}
+    if(!["codex","mock","ollama"].includes(name) || extra.length || (model && !/^[\w./:-]{1,120}$/.test(model)) || (model && name==="mock"))
+      throw Error("Choose @studio provider codex, mock, or ollama MODEL.");
+    if(name==="ollama" && !model && !session.data.models?.ollama)throw Error("Include your installed local model: @studio provider ollama MODEL.");
+    if(name!==planner.provider || (model && model!==session.data.models?.[name])) {
+      const replacement=makePlanner(name,model??session.data.models?.[name]);
+      await planner.close();
+      planner=replacement;session.data.provider=name;
+      if(model){session.data.models??={};session.data.models[name]=model;}
+      session.save();
+    }
+    await say("Provider: "+planner.provider+".");return;
+  }
+  if(cmd==="history") {
+    await say(session.recent.slice(-3).map(t=>(t.role==="user"?"You":"Studio")+": "+t.text.slice(0,124)).join(" | ") || "No saved conversation yet.");return;
+  }
+  if(cmd==="where") {
+    const {hit}=await viewRay();
+    await say(`Looking at ${hit?hit.id+" at "+coordinates(hit):"open space"}. Selection: ${selectionName(session.data.selection)}.`);return;
+  }
+  const mark=body.match(/^(mark|move marker)\s+(.+)$/i);
+  if(mark) {
+    const point=session.mark(mark[2],(await viewRay()).hit,mark[1].toLowerCase()==="move marker");
+    await say("Marked "+point.name+" at "+coordinates(point)+" ("+point.block+").");return;
+  }
+  if(/^markers(?:\s+\d+)?$/.test(cmd)) {
+    const page=Number(cmd.split(/\s+/)[1]??1);
+    const all=session.data.markers, pages=Math.max(1,Math.ceil(all.length/5));
+    if(page<1 || page>pages)throw Error("There are "+pages+" marker pages.");
+    const list=all.slice((page-1)*5,page*5).map(m=>m.name+" ("+coordinates(m)+")");
+    await say("Markers: "+(list.join(", ")||"none")+(pages>1?` · page ${page}/${pages}`:""));return;
+  }
+  const forget=body.match(/^forget marker\s+(.+)$/i);
+  if(forget){await say("Forgot marker "+session.forget(forget[1])+".");return;}
+  const select=body.match(/^select\s+(.+)$/i);
+  if(select) {
+    const s=session.select(select[1]);
+    if(!s)await say("Selection cleared.");
+    else if(s.to)await say("Selected "+selectionName(s)+" from "+coordinates(session.region().from)+" to "+coordinates(session.region().to)+".");
+    else await say("Selected "+s.from+" at "+coordinates(session.marker(s.from))+".");
+    return;
+  }
+  const locate=body.match(/^locate\s+(.+)$/i);
+  if(locate) {
+    const m=session.marker(locate[1]);
+    const pos=[m.x+0.5,m.y+1.2,m.z+0.5].join(" ");
+    const r=await c.tool("run_command",{command:"execute in minecraft:overworld run particle minecraft:end_rod "+pos+" .18 .45 .18 .015 32 force WorldStudio"});
+    if(!r.success)throw Error("The marker could not be highlighted. Its coordinates are "+coordinates(m)+".");
+    await say("Marker "+m.name+" at "+coordinates(m)+".");return;
+  }
+  if(/^survey\b/i.test(body)) {
+    session.record("user",body);
+    start("surveying",s=>surveyedEdit(body,s));return;
+  }
   if(/^(approve|reject)\b/.test(cmd)) {
     await say("Build requests apply directly. Type @studio followed by the change you want.");return;
   }
@@ -232,10 +394,18 @@ async function handle(input) {
     return;
   }
   const previewOnly=/^preview\s/i.test(body);
-  start("designing",s=>design(previewOnly?body.slice(7).trim():body,s,previewOnly));
+  const look=body.match(/^look(?:\s+(.+))?$/i);
+  const request=look?(look[1]??"Describe what you can see in this Minecraft screenshot."):previewOnly?body.slice(7).trim():body;
+  session.record("user",body);
+  start(look?"inspecting the current view":"designing",s=>design(request,s,previewOnly,!!look));
 }
 
-function shutdown() { stopping=true;busy?.abort.abort(); }
+function disconnect() {
+  online=false;
+  voice.disconnect();
+  if(busy){busy.next=null;busy.abort.abort();}
+}
+function shutdown() { stopping=true;disconnect(); }
 process.on("SIGINT",shutdown);
 process.on("SIGTERM",shutdown);
 try {
@@ -244,31 +414,31 @@ try {
       if(!online) {
         await context();
         cursor=(await c.tool("poll_events",{limit:1})).lastId;
-        state.cursor=cursor;store.save(); online=true;
+        state.cursor=cursor;store.save(); online=true;voice.connect();
         await say(("Studio ready. Type @studio followed by a request. Use @studio status for help. "+recoveryNote()).trim());
       }
       const batch=await c.tool("poll_events",{types:["chat","left_world"],sinceId:cursor,limit:500});
-      if(batch.lastId<cursor) { online=false;busy?.abort.abort();continue; }
+      if(batch.lastId<cursor) { disconnect();continue; }
       for(const e of batch.events) {
         if(e.id<=cursor) continue;
         cursor=e.id;
-        if(e.type==="left_world") {online=false;busy?.abort.abort();break;}
+        if(e.type==="left_world") {disconnect();break;}
         const d=e.data;
         if(e.type!=="chat" || d?.kind!=="chat" || d.self!==true || d.sender!=="WorldStudio" || typeof d.text!=="string") continue;
         const input=stripPrefix(d.text,"@studio");
         if(!input) continue;
         // Consume before dispatch so a crash cannot replay a build request.
         state.cursor=cursor;store.save();
-        await handle(input);
+        await dispatch(input);
       }
       await sleep(300);
     } catch(e) {
-      if(online) {console.error("Studio disconnected:",e.message);busy?.abort.abort();}
-      online=false;
+      if(online) {console.error("Studio disconnected:",e.message);disconnect();}
       await sleep(1200);
     }
   }
 } finally {
-  shutdown();await busy?.done;await c.close();lock.close();
+  const task=busy;
+  shutdown();await incoming;await task?.done;await voice.close();await planner.close();await c.close();lock.close();
   if(existsSync(stopFile))unlinkSync(stopFile);
 }

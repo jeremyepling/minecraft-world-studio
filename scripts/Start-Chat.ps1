@@ -18,7 +18,6 @@ $node = @("$env:ProgramFiles/nodejs/node.exe", (Get-Command node.exe -ErrorActio
     Where-Object { $_ -and (Test-Path -LiteralPath $_) -and [version]((& $_ --version).TrimStart('v')) -ge [version]'22.16.0' } |
     Select-Object -First 1
 if (!$node) { throw 'The Studio listener needs Node.js 22.16 or newer.' }
-$null = Get-Command codex.exe -ErrorAction Stop
 $listener = Join-Path $PSScriptRoot 'chat-loop.mjs'
 if (!$Background) {
     & $node $listener
@@ -30,7 +29,14 @@ $stdout = Join-Path $stateDir "listener-$stamp.log"
 $stderr = Join-Path $stateDir "listener-$stamp.err"
 $process = Start-Process -FilePath $node -ArgumentList ('"' + $listener + '"') -WorkingDirectory $root -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
 for ($i=0; $i -lt 35; $i++) {
-    if ($process.HasExited) { throw ("Studio listener exited. " + (Get-Content -LiteralPath $stderr -Raw)) }
+    if ($process.HasExited) {
+        $detail = Get-Content -LiteralPath $stderr -Raw
+        if ($detail -match 'Another World Studio listener is active') {
+            Write-Output 'The Studio listener is already running for this installation.'
+            return
+        }
+        throw ("Studio listener exited. " + $detail)
+    }
     if (Select-String -LiteralPath $stdout -Pattern '^Studio ready' -Quiet) {
         Write-Output "Studio ready in Minecraft. Listener PID $($process.Id)."
         return
