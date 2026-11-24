@@ -1,0 +1,18 @@
+{
+  "client": "codex exec --ephemeral --sandbox read-only",
+  "world": "sp:WorldStudioLab",
+  "turnCompleted": true,
+  "calls": [
+    {
+      "server": "worldstudio",
+      "tool": "get_status",
+      "status": "completed"
+    },
+    {
+      "server": "worldstudio",
+      "tool": "get_self",
+      "status": "completed"
+    }
+  ],
+  "final": "World Studio is connected. `get_status` reported **Minecraft 26.3** with the **Fabric** loader. `get_self` confirmed the player is in the **Overworld** (`minecraft:overworld`) in **Creative** mode."
+}

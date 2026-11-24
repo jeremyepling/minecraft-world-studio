@@ -1,0 +1,67 @@
+{
+  "session": {
+    "inWorld": true,
+    "screen": "none",
+    "paused": false,
+    "canJoin": false,
+    "lastWorldId": "sp:WorldStudioLab"
+  },
+  "seed": {
+    "command": "seed",
+    "success": true,
+    "resultValue": 2048081033,
+    "output": [
+      "Seed: [-8552018580008125303]"
+    ]
+  },
+  "marker": {
+    "x": -35,
+    "y": 170,
+    "z": -35,
+    "id": "minecraft:stone",
+    "air": false,
+    "liquid": false,
+    "dimension": "minecraft:overworld",
+    "blockLight": 0,
+    "skyLight": 0,
+    "hardness": 1.5
+  },
+  "scene": {
+    "type": "none"
+  },
+  "water": {
+    "dimension": "minecraft:overworld",
+    "totalFound": 0,
+    "returned": 0,
+    "truncated": true,
+    "searchedRadius": 30,
+    "matches": []
+  },
+  "before": "creative",
+  "denial": "set_gamemode: Bridge error [unavailable]: The player did not approve this (players.setGameMode {\"player\":\"WorldStudio\",\"mode\":\"survival\"}). Do not retry it unasked; tell them what you need instead.",
+  "elapsedMs": 10325,
+  "after": "creative",
+  "events": {
+    "events": [
+      {
+        "id": 2,
+        "type": "approval_requested",
+        "gameTime": 7082,
+        "data": {
+          "id": 1,
+          "method": "players.setGameMode"
+        }
+      },
+      {
+        "id": 3,
+        "type": "approval_answered",
+        "gameTime": 7288,
+        "data": {
+          "id": 1,
+          "approved": false
+        }
+      }
+    ],
+    "lastId": 3
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "origin": {
+    "x": 9,
+    "y": 96,
+    "z": 86
+  },
+  "site": "script ok · 399 calls · 0.4 s\nresult: {\"supportBlocks\":199,\"columns\":149}",
+  "edit": "script ok · 316 calls · 0.4 s\nresult: {\"bounds\":{\"from\":{\"x\":2,\"y\":96,\"z\":80},\"to\":{\"x\":16,\"y\":135,\"z\":93}},\"designed\":2091,\"already\":0,\"pending\":2023,\"runs\":310,\"updated\":2023,\"protectedCount\":68,\"protectedExamples\":[{\"k\":\"-3,0,-6\",\"found\":\"coarse_dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-2,0,-6\",\"found\":\"coarse_dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-4,0,-5\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-3,0,-5\",\"found\":\"grass_block\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-5,0,-4\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-4,0,-4\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-3,0,-4\",\"found\":\"grass_block\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-6,0,-3\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"}]}",
+  "check": "script ok · 6 calls · 0.1 s\nresult: {\"bounds\":{\"from\":{\"x\":2,\"y\":96,\"z\":80},\"to\":{\"x\":16,\"y\":135,\"z\":93}},\"designed\":2091,\"already\":2023,\"pending\":0,\"runs\":0,\"updated\":0,\"protectedCount\":68,\"protectedExamples\":[{\"k\":\"-3,0,-6\",\"found\":\"coarse_dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-2,0,-6\",\"found\":\"coarse_dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-4,0,-5\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-3,0,-5\",\"found\":\"grass_block\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-5,0,-4\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-4,0,-4\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-3,0,-4\",\"found\":\"grass_block\",\"before\":\"air\",\"want\":\"andesite\"},{\"k\":\"-6,0,-3\",\"found\":\"dirt\",\"before\":\"air\",\"want\":\"andesite\"}]}"
+}

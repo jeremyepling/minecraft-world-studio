@@ -1,0 +1,6 @@
+{
+  "water": "observed 81 chunks (56 new) around -15 100 8 overworld · map knows 81 chunks here\nnew places: #8 spawner @ -51 63 0 (52m) · #9 chest @ -52 63 2 (52m) · #10 spawner @ -72 37 42 (91m) · #11 chest @ -59 36 71 (100m) · #12 spawner @ -60 36 74 (102m) · #13 chest @ -57 36 76 (103m) · #14 chest @ -50 -7 15 (113m) · #15 spawner @ -52 -7 15 (113m) · #16 chest @ -54 -7 15 (114m) · #17 chest @ 50 -3 52 (130m) · #18 spawner @ 48 -3 55 (130m) · #19 chest @ 51 -3 56 (132m)\nores in view: coal_ore×12505 · copper_ore×7634 (nearest ~-8 8, 8m) · iron_ore×4426 (nearest ~-8 8, 8m) · deepslate_redstone_ore×2653 (nearest ~-8 8, 8m) · deepslate_diamond_ore×1944 (nearest ~-8 8, 8m) · deepslate_gold_ore×1776 (nearest ~-8 8, 8m) · deepslate_iron_ore×1756 (nearest ~-8 8, 8m) · deepslate_lapis_ore×1052 (nearest ~-8 8, 8m) · lapis_ore×783 (nearest ~-8 8, 8m) · deepslate_copper_ore×492 (nearest ~-24 -8, 18m)\nwood: 1951 log blocks\nfound: water @ -38 59 -23 (56m) · water @ -37 59 -24 (56m) · water @ -38 58 -22 (56m) · water @ -40 59 -22 (56m) · water @ -37 58 -23 (56m) · water @ -36 59 -25 (56m) · water @ -39 59 -23 (56m) · water @ -38 59 -24 (56m) · water @ -39 58 -22 (56m) · water @ -37 59 -25 (57m) · water @ -38 58 -23 (57m) · water @ -40 59 -23 (57m) +12 more",
+  "scene": {
+    "type": "none"
+  }
+}

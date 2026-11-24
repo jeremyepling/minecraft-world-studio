@@ -1,0 +1,25 @@
+{
+  "bounds": {
+    "from": {
+      "x": -80,
+      "y": 199,
+      "z": 20
+    },
+    "to": {
+      "x": -52,
+      "y": 205,
+      "z": 35
+    },
+    "includeAir": true,
+    "includeState": true
+  },
+  "verified": {
+    "untouched or deliberately empty": 3005,
+    "platform": 100,
+    "wall": 28,
+    "cube": 27,
+    "staircase": 8,
+    "hollow shell": 56,
+    "colors": 24
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "client": "Codex app-server",
+  "profileTools": 34,
+  "minecraftVersion": "26.3",
+  "modVersion": "0.10.0+26.3",
+  "integratedServer": true,
+  "approval": [
+    "players_admin"
+  ],
+  "observer": {
+    "x": -15.5,
+    "y": 100,
+    "z": 7.5,
+    "yaw": 0,
+    "pitch": 0,
+    "dimension": "minecraft:overworld",
+    "gameMode": "creative"
+  },
+  "image": {
+    "bytes": 1233111,
+    "width": 1280,
+    "height": 720
+  }
+}

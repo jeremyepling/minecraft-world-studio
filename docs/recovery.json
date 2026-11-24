@@ -1,0 +1,12 @@
+{
+  "afterFailure": [
+    "minecraft:gold_block",
+    "minecraft:air"
+  ],
+  "conditionalRecovery": true,
+  "afterOwnerDisconnected": [
+    "minecraft:gold_block",
+    "minecraft:air"
+  ],
+  "oneSecondTimeoutMs": 1004
+}

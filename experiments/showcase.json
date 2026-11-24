@@ -1,0 +1,18 @@
+{
+  "view": {
+    "label": "hillside-watchtower-and-road",
+    "x": -16,
+    "y": 109,
+    "z": 52,
+    "width": 1280,
+    "height": 720
+  },
+  "final": {
+    "x": -16.5,
+    "y": 96,
+    "z": 51.5,
+    "yaw": -36.46918,
+    "pitch": -18.530613,
+    "gameMode": "creative"
+  }
+}

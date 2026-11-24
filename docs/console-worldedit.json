@@ -1,0 +1,87 @@
+{
+  "selectWorld": {
+    "command": "//world WorldStudioLab_minecraft:overworld",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Set the world override to WorldStudioLab_minecraft:overworld. (Use //world to go back to default)"
+    ]
+  },
+  "pos1": {
+    "command": "//pos1 -35,166,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "First position set to (-35, 166, -35)."
+    ]
+  },
+  "pos2": {
+    "command": "//pos2 -34,166,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Second position set to (-34, 166, -35) (2)."
+    ]
+  },
+  "set": {
+    "command": "//set quartz_block",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Operation completed (2 blocks affected)."
+    ]
+  },
+  "readback": [
+    "minecraft:quartz_block",
+    "minecraft:quartz_block"
+  ],
+  "prepare": {
+    "command": "setblock -35 166 -35 andesite",
+    "success": true,
+    "resultValue": 1,
+    "output": [
+      "Changed the block at -35, 166, -35"
+    ],
+    "state": "minecraft:andesite"
+  },
+  "mask": {
+    "command": "//gmask andesite",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Global mask set."
+    ]
+  },
+  "masked": {
+    "command": "//set tuff",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Operation completed (1 blocks affected)."
+    ]
+  },
+  "afterMask": [
+    "minecraft:tuff",
+    "minecraft:quartz_block"
+  ],
+  "unmask": {
+    "command": "//gmask",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Global mask disabled."
+    ]
+  },
+  "undo": {
+    "command": "//undo",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Undid 1 available edits."
+    ]
+  },
+  "afterUndo": [
+    "minecraft:andesite",
+    "minecraft:quartz_block"
+  ]
+}

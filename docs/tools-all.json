@@ -1,0 +1,3827 @@
+[
+  {
+    "name": "get_status",
+    "title": "Server/client status",
+    "description": "Get the current state of the running game: mod & Minecraft version, which side this bridge runs on (client / dedicated_server), whether an integrated server is present, whether the player is in a world, current dimension, and the list of available capability groups. Call this first to learn what you can do right now.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "list_capabilities",
+    "title": "List capabilities",
+    "description": "List every capability group and whether it is currently available on this side (e.g. control/interact/vision/nav are client-only; players/command admin need a server). Useful to decide which tools will work.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_block",
+    "title": "Get block at position",
+    "description": "Read the block at an exact integer position: its block id, blockstate properties, whether it is air/fluid/solid, light levels, and hardness. Requires a loaded chunk.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_blocks_region",
+    "title": "Scan a cuboid region",
+    "description": "Scan all blocks in the cuboid between two corners (inclusive) and return their ids. Regions above 16,777,216 positions (e.g. 256x256x256) are refused to protect the server: split larger areas. The answer is capped at maxBlocks (default 32768, truncated=true when hit); air is omitted unless includeAir is true. With includeState each block also has 'state', the id with its properties (facing, half, open, ...), to check that what was built faces the right way.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ],
+          "description": "One corner of the cuboid."
+        },
+        "to": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ],
+          "description": "Opposite corner of the cuboid."
+        },
+        "includeAir": {
+          "default": false,
+          "description": "Include air blocks in the result.",
+          "type": "boolean"
+        },
+        "includeState": {
+          "default": false,
+          "description": "Add each block's full state, e.g. \"minecraft:oak_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]\".",
+          "type": "boolean"
+        },
+        "maxBlocks": {
+          "description": "Override the per-call block cap.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200000
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "find_blocks",
+    "title": "Find nearby blocks by id",
+    "description": "Search a spherical radius around a center point for blocks matching any of the given ids (e.g. minecraft:diamond_ore). Searches outward from the center, so the nearest blocks are always covered; a scan budget of 250,000 positions may stop it early (truncated=true, searchedRadius tells how far it got). Returns matches sorted by distance. Only searches loaded chunks.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ],
+          "description": "Center of the search sphere."
+        },
+        "radius": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128,
+          "description": "Search radius in blocks."
+        },
+        "blockIds": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Block ids to match, e.g. [\"minecraft:diamond_ore\",\"minecraft:ancient_debris\"]."
+        },
+        "maxResults": {
+          "default": 64,
+          "description": "Maximum matches to return.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "center",
+        "radius",
+        "blockIds"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_time_and_weather",
+    "title": "Time & weather",
+    "description": "Get the current day-time (0-24000), total game-time, day count, and weather (raining/thundering) for a dimension.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "list_dimensions",
+    "title": "List dimensions",
+    "description": "List all dimensions present on the server and which one the player is currently in.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "raycast",
+    "title": "Raycast from a point",
+    "description": "Cast a ray and report the first block and/or entity it hits. Blocks are hit by their outline shape, as the crosshair sees them (a ray above a bottom slab passes), and the ray stops at unloaded chunks. Provide either an explicit direction vector or yaw/pitch angles. Great for 'what am I looking at' and line-of-sight checks.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ],
+          "description": "Ray start position (usually an eye position)."
+        },
+        "direction": {
+          "description": "Ray direction vector (need not be normalized). Use this OR yaw/pitch.",
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "yaw": {
+          "description": "Yaw in degrees (Minecraft convention). Use with pitch instead of direction.",
+          "type": "number"
+        },
+        "pitch": {
+          "description": "Pitch in degrees (-90 up .. 90 down).",
+          "type": "number"
+        },
+        "maxDistance": {
+          "default": 32,
+          "description": "Maximum ray length in blocks.",
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 256
+        },
+        "includeFluids": {
+          "default": false,
+          "description": "Treat fluids as hittable.",
+          "type": "boolean"
+        },
+        "includeEntities": {
+          "default": true,
+          "description": "Also test entities along the ray.",
+          "type": "boolean"
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "set_block",
+    "title": "Set a block",
+    "description": "Place/replace the block at an exact position with the given block id (optionally with blockstate properties as a string like 'minecraft:oak_log[axis=y]'). Properties left out take their defaults. 'state' is the block read back afterwards, with all its properties. Requires a server (integrated client or dedicated).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "blockId": {
+          "type": "string",
+          "description": "Block id, optionally with state, e.g. \"minecraft:stone\" or \"minecraft:oak_stairs[facing=east]\"."
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z",
+        "blockId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "fill_blocks",
+    "title": "Fill a region with a block",
+    "description": "Fill the cuboid between two corners with one block id. Volume is capped for safety. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "to": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "blockId": {
+          "type": "string",
+          "description": "Block id to fill with."
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "blockId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "set_time",
+    "title": "Set time of day",
+    "description": "Set the day-time (0-24000; 0=dawn, 6000=noon, 12000=dusk, 18000=midnight). Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "time": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 24000,
+          "description": "Day-time in ticks (0-24000)."
+        }
+      },
+      "required": [
+        "time"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "set_weather",
+    "title": "Set weather",
+    "description": "Set the weather. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "weather": {
+          "type": "string",
+          "enum": [
+            "clear",
+            "rain",
+            "thunder"
+          ],
+          "description": "Target weather."
+        },
+        "durationSeconds": {
+          "description": "How long the weather should last.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "weather"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "query_entities",
+    "title": "Query entities",
+    "description": "List entities, optionally filtered by a sphere (center+radius), entity type ids, living-only, and whether to include players. Returns position, type, name, health and key flags for each.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "description": "Center of the search sphere; omit to use the position of the only player in that dimension (the world spawn when there is none or several; centerSource says which).",
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate (east/west)."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate (height)."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate (north/south)."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "radius": {
+          "default": 32,
+          "description": "Search radius in blocks.",
+          "type": "number",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "types": {
+          "description": "Entity type ids to match, e.g. [\"minecraft:zombie\",\"minecraft:cow\"].",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "includePlayers": {
+          "default": true,
+          "type": "boolean"
+        },
+        "onlyLiving": {
+          "default": false,
+          "type": "boolean"
+        },
+        "maxResults": {
+          "default": 100,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_entity",
+    "title": "Get entity details",
+    "description": "Get detailed info about a single entity by UUID: type, position, velocity, health, equipment, NBT-derived attributes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "Entity UUID."
+        }
+      },
+      "required": [
+        "uuid"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "summon_entity",
+    "title": "Summon entity",
+    "description": "Summon an entity of the given type at a position, optionally with SNBT data. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Entity type id, e.g. \"minecraft:armor_stand\"."
+        },
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "nbt": {
+          "description": "Optional SNBT, e.g. '{NoGravity:1b}'.",
+          "type": "string"
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "remove_entity",
+    "title": "Remove entity",
+    "description": "Discard (remove) a non-player entity by UUID. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "Entity UUID to remove."
+        }
+      },
+      "required": [
+        "uuid"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "list_players",
+    "title": "List online players",
+    "description": "List all online players with name, UUID, position, dimension, health, food, game mode and ping. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_player",
+    "title": "Get player details",
+    "description": "Get detailed state for one online player. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        }
+      },
+      "required": [
+        "player"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "teleport_player",
+    "title": "Teleport player",
+    "description": "Teleport a player to coordinates (and optionally another dimension / facing). Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        },
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "yaw": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player",
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "set_gamemode",
+    "title": "Set player game mode",
+    "description": "Set a player's game mode. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "survival",
+            "creative",
+            "adventure",
+            "spectator"
+          ]
+        }
+      },
+      "required": [
+        "player",
+        "mode"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "give_item",
+    "title": "Give item to player",
+    "description": "Give an item stack to a player. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        },
+        "itemId": {
+          "type": "string",
+          "description": "Item id, e.g. \"minecraft:diamond\"."
+        },
+        "count": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6400
+        },
+        "nbt": {
+          "description": "Optional SNBT components.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "player",
+        "itemId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "apply_effect",
+    "title": "Apply status effect",
+    "description": "Apply a potion/status effect to a player. Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        },
+        "effectId": {
+          "type": "string",
+          "description": "Effect id, e.g. \"minecraft:speed\"."
+        },
+        "durationSeconds": {
+          "default": 30,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "amplifier": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "showParticles": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "player",
+        "effectId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "message_player",
+    "title": "Send system message",
+    "description": "Send a system/chat message to a player (\"@all\" to broadcast). Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "player",
+        "text"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "kick_player",
+    "title": "Kick player",
+    "description": "Kick a player from the server. Requires a dedicated server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "string",
+          "description": "Target player by name or UUID. Use \"@all\" where broadcasting is meaningful."
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "player"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "run_command",
+    "title": "Run a server command",
+    "description": "Execute an arbitrary Minecraft command at operator permission level 4 (do NOT include the leading slash) and capture its feedback output. This is extremely powerful (/setblock, /summon, /give, /tp, /gamerule, /execute, datapacks, ...). Requires a server.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Command without the leading slash, e.g. \"time set day\"."
+        }
+      },
+      "required": [
+        "command"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "send_chat",
+    "title": "Send chat message",
+    "description": "Send a chat message. On a client this is sent as the local player (a leading '/' runs a command as that player, and needs enableCommands); on a dedicated server it is broadcast.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "show_message",
+    "title": "Show a message to the player",
+    "description": "Client only. Show the local player a message from you, prefixed [AI], in their chat or on the action bar. Nothing is sent to the server or other players, so use it rather than send_chat to talk to the player. It works while the player has paused you (get_status reports aiPaused); formatting codes are removed and text is cut at 512 characters.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "The message."
+        },
+        "actionBar": {
+          "description": "Show it briefly above the hotbar instead of in chat.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_recent_chat",
+    "title": "Get recent chat",
+    "description": "Return recently observed chat & system messages (most recent last).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "default": 50,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_self",
+    "title": "Get local player state",
+    "description": "Client-only. Full state of YOUR player: position, yaw/pitch, motion, health, food, saturation, air, XP, game mode, on-ground, in-fluid, selected hotbar slot, dimension.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_inventory",
+    "title": "Get inventory",
+    "description": "Client-only. Full inventory: main slots, hotbar, armor, offhand, and the selected slot. Each item reports id, count and durability.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_equipment",
+    "title": "Get equipment",
+    "description": "Client-only. Currently equipped items: main hand, off hand, helmet, chestplate, leggings, boots.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_status_effects",
+    "title": "Get active effects",
+    "description": "Client-only. Active status effects on your player with amplifier and remaining duration.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "set_movement",
+    "title": "Set movement input",
+    "description": "Client-only. Set held movement inputs as booleans; they persist until changed (like holding keys). Any omitted field is left unchanged. Combine with look/look_at to walk somewhere. Use stop_movement to release everything.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "forward": {
+          "type": "boolean"
+        },
+        "back": {
+          "type": "boolean"
+        },
+        "left": {
+          "type": "boolean"
+        },
+        "right": {
+          "type": "boolean"
+        },
+        "jump": {
+          "type": "boolean"
+        },
+        "sneak": {
+          "type": "boolean"
+        },
+        "sprint": {
+          "type": "boolean"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "stop_movement",
+    "title": "Release all movement",
+    "description": "Client-only. Release all movement inputs (stop walking/jumping/sneaking/sprinting).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "look",
+    "title": "Set/adjust look angles",
+    "description": "Client-only. Set absolute yaw/pitch, or apply relative deltas. Yaw: 0=south,-90=east,90=west,180=north. Pitch: -90=up, 90=down.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "yaw": {
+          "description": "Absolute yaw in degrees.",
+          "type": "number"
+        },
+        "pitch": {
+          "description": "Absolute pitch in degrees (-90..90).",
+          "type": "number"
+        },
+        "deltaYaw": {
+          "description": "Relative yaw change in degrees.",
+          "type": "number"
+        },
+        "deltaPitch": {
+          "description": "Relative pitch change in degrees.",
+          "type": "number"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "look_at",
+    "title": "Look at a point",
+    "description": "Client-only. Rotate the player to face a world coordinate.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "jump",
+    "title": "Jump once",
+    "description": "Client-only. Perform a single jump.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "start_using_item",
+    "title": "Start using held item",
+    "description": "Client-only. Begin using/holding the right-click action of the held item (eat, draw bow, block with shield, etc.).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "stop_using_item",
+    "title": "Stop using held item",
+    "description": "Client-only. Release the right-click use action.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "break_block",
+    "title": "Break a block",
+    "description": "Client-only. Break the block at a position. mode 'instant' breaks it at once: in creative through the normal break packet; in survival only on an integrated server with world writes enabled (the server breaks it). 'broke' is what the integrated server reports (null on a remote server). 'survival' performs realistic timed mining (must be reachable, ~within 5 blocks); it stops by itself when the block cannot break and reports a mining_finished event (see poll_events).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "mode": {
+          "default": "survival",
+          "type": "string",
+          "enum": [
+            "instant",
+            "survival"
+          ]
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "place_block",
+    "title": "Place held block",
+    "description": "Client-only. Place the currently held block against the given position/face. Out of reach, nothing is sent (result OUT_OF_REACH). 'result' is the client's prediction; 'placed' is what the integrated server did (null on a remote server); target.serverState is the placed block with its properties (facing, half, ...), which follow the player's look direction and the clicked spot, so check them. Equip the desired block first with select_hotbar_slot.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "face": {
+          "default": "up",
+          "type": "string",
+          "enum": [
+            "up",
+            "down",
+            "north",
+            "south",
+            "east",
+            "west"
+          ]
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "place_block_at",
+    "title": "Place held block with a given state",
+    "description": "Client-only. Place the held block INTO the given cell so that it gets the properties you ask for (facing, half, axis, hinge, type...): the bridge tries every click within reach (which neighbour and face, which spot on it, which way to turn) against the block's own placement rules and uses one that gives that state, turning the player first. Properties left out are free. Answers with NO_SUPPORT (nothing next to the cell to place against), OUT_OF_REACH, OCCUPIED, CANNOT_PLACE, or NO_CLICK_GIVES_THAT_STATE with 'reachable' (the states possible from here: walk around or add a support block); on an integrated server 'matches' says whether the placed block has the wanted properties. Hold the item first (select_hotbar_slot); a torch item places wall_torch on walls. A stair climbs toward its facing (a roof's stairs face the ridge).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "state": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Wanted block with the properties that matter, e.g. \"oak_stairs[facing=north,half=top]\" or \"wall_torch[facing=east]\"."
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z",
+        "state"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "use_item",
+    "title": "Use item / right-click",
+    "description": "Client-only. Perform a right-click with the held item like the use key does: on the entity or block under the crosshair first, then the item on its own (e.g. eat, throw). 'target' says which one acted (entity, block or air).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "attack_entity",
+    "title": "Attack entity",
+    "description": "Client-only. Attack (left-click) an entity by UUID. Out of reach, nothing is sent (result OUT_OF_REACH). With an integrated server, the answer reports what the server did: removed, and for living targets damaged and serverHealth.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uuid"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "use_entity",
+    "title": "Interact with entity",
+    "description": "Client-only. Right-click/interact with an entity by UUID (e.g. trade with a villager, mount a horse). Out of reach, nothing is sent (result OUT_OF_REACH); otherwise 'result' is the client's prediction.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uuid"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "drop_held_item",
+    "title": "Drop held item",
+    "description": "Client-only. Drop the held item (one, or the whole stack).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "wholeStack": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "select_hotbar_slot",
+    "title": "Select hotbar slot",
+    "description": "Client-only. Select a hotbar slot (0-8) as the held item.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        }
+      },
+      "required": [
+        "slot"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "drop_slot",
+    "title": "Drop a specific slot",
+    "description": "Client-only. Drop the contents of a specific inventory slot.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 40,
+          "description": "Inventory slot index (0-8 hotbar, 9-35 main, 36-39 armor, 40 offhand)."
+        },
+        "wholeStack": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "slot"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "swap_slots",
+    "title": "Swap two inventory slots",
+    "description": "Client-only. Swap the items in two inventory slots via container clicks (player inventory must be the active screen-less context).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "slotA": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 45
+        },
+        "slotB": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 45
+        }
+      },
+      "required": [
+        "slotA",
+        "slotB"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "screenshot",
+    "title": "Capture screenshot",
+    "description": "Client-only. Capture the current game framebuffer as a PNG image (at the game's current resolution) so a vision-capable model can literally see what the player sees. With marks: true, mobs and players in view get numbered labels (#1, #2, ...) on the image and a legend maps each number to its entity uuid, type and distance, so you can act on \"#2\" with attack_entity or use_entity.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "marks": {
+          "description": "Label the mobs and players in view with numbers and list them.",
+          "type": "boolean"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "describe_scene",
+    "title": "Describe visible scene",
+    "description": "Client-only. Produce a structured, text description of what is visible: the block/entity directly under the crosshair, a grid of raycasts across the field of view, and nearby visible entities. A cheap alternative to a screenshot for non-vision models.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "maxDistance": {
+          "default": 48,
+          "type": "number",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "rayColumns": {
+          "default": 9,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 33
+        },
+        "rayRows": {
+          "default": 5,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 33
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "navigate_to",
+    "title": "Navigate to a position",
+    "description": "Client-only. Asynchronously move the player to a target position using A* pathfinding: walks, jumps up 1 block, drops down (at most 3 blocks unless into water), swims at the surface, climbs ladders and vines, and opens wooden doors and fence gates. Unless turned off it also digs through blocks with the best hotbar tool when going around is longer (never next to water or lava, never under its own feet, never bedrock or containers), and pillars up by jumping and placing cobblestone, dirt or similar from the hotbar. Returns immediately with the path's move counts; poll navigation_status (it reports the current move) and stop_navigation to cancel.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate (east/west)."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate (height)."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate (north/south)."
+        },
+        "reachRadius": {
+          "default": 1,
+          "description": "Stop when within this many blocks of the target.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 16
+        },
+        "sprint": {
+          "default": false,
+          "type": "boolean"
+        },
+        "timeoutSeconds": {
+          "default": 60,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        },
+        "allowDig": {
+          "default": true,
+          "description": "Break blocks in the way when that is shorter than going around.",
+          "type": "boolean"
+        },
+        "allowPillar": {
+          "default": true,
+          "description": "Pillar up on throwaway blocks (cobblestone, dirt, netherrack...) from the hotbar.",
+          "type": "boolean"
+        },
+        "allowSwim": {
+          "default": true,
+          "description": "Swim across deep water.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "navigation_status",
+    "title": "Navigation status",
+    "description": "Client-only. Report whether navigation is active, the target, remaining distance/steps, the current move (walk, jump, fall, swim, climb, door, dig, pillar), and whether the bot appears stuck. When it ended, `state` says why (reached, timeout, dig_failed, unsafe_dig, no_blocks, pillar_failed, step_timeout, stopped).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "stop_navigation",
+    "title": "Stop navigation",
+    "description": "Client-only. Cancel any active navigation and release movement.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_screen",
+    "title": "Current screen",
+    "description": "Client-only. Report where the client is: inWorld, the open screen as a coarse kind (none, pause, chat, container, death, title, multiplayer, singleplayer, disconnected, connecting, loading, other), whether the game is paused, whether join_world can run now (canJoin), and the id of the world joined last in this game run. Call it when client tools fail with no_client_player or the player stops reacting.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "close_screen",
+    "title": "Close the open screen",
+    "description": "Client-only, in a world. Close the open screen: leaves the pause menu, chat or a container, and respawns the player on the death screen. Fails while a world is loading and outside a world (use join_world there).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "list_worlds",
+    "title": "List worlds and servers",
+    "description": "Client-only. List what join_world can join: saved singleplayer worlds (worldId sp:<folder>, name, lastPlayed in ms, joinable), newest first, and the server list entries as opaque mp: ids (the same ids session/agent memory uses; addresses and entry names are never returned). Also returns lastWorldId, the world joined last in this game run.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "join_world",
+    "title": "Join a world or server",
+    "description": "Client-only, from the menus (title, multiplayer, disconnected, ... screens). Open a singleplayer world or connect to a server by worldId from list_worlds; without worldId, rejoin the world played last in this game run (after a kick, a server restart or a lost connection). Only servers in the server list, or the one played last, can be joined. Returns immediately: poll get_screen until inWorld is true.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "worldId": {
+          "description": "World id from list_worlds or get_screen, e.g. \"sp:New World\" or \"mp:3f2a...\". Omit to rejoin the last world.",
+          "type": "string"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_ui",
+    "title": "List the widgets of the open screen",
+    "description": "Client-only, needs enableUiControl. List the widgets of the open screen in focus order: id, type (button, checkbox, cycle, slider, text_field, text, other), text, active, checked (checkboxes), value (text fields) and position in GUI coordinates. Works on the pause, title, death, options, advancements, statistics and confirmation screens, container screens and screens added by other mods; the world, server, chat, link, command block and other sensitive screens are refused (ui_refused). Custom-drawn parts such as inventory slots are not widgets: use the container tools for those.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "click_widget",
+    "title": "Click a widget",
+    "description": "Client-only, needs enableUiControl. Left-click a widget of the open screen, by id from get_ui or by its exact label (case-insensitive, must be unique). Returns the screen after the click. Refuses disabled widgets and the Quit Game, Realms and Reset Demo World buttons. For sliders, fraction picks the position (0 = left, 1 = right).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "widget": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Widget id from get_ui, or its exact label."
+        },
+        "fraction": {
+          "description": "Where to click across the widget, 0..1 (default 0.5); sets a slider's value.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "widget"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "set_text_field",
+    "title": "Type into a text field",
+    "description": "Client-only, needs enableUiControl. Replace the text of a text field on the open screen (by id from get_ui or by label), for example a search box or an anvil's name field. Returns the value the field accepted (fields can cut or filter text).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "widget": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Widget id from get_ui, or its exact label."
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "widget",
+        "text"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_status",
+    "title": "Supervised mode status",
+    "description": "Needs enableSupervisedControl. Report the supervised mode: which operations can run on this side right now (with the reason when one cannot), open actions that must be reconciled before anything else, the latest actions and their outcomes, the approved saves, the allowed command roots, the keys supervised input holds, and the limits (grant lifetime, longest input sample).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_stop",
+    "title": "Stop supervised actions",
+    "description": "STOP for the supervised mode; always available. No grant issued before this call admits anything any more, and any supervised input is released. It does not roll back effects that were already admitted.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_input",
+    "title": "One supervised input sample",
+    "description": "Client-only, needs enableSupervisedControl. Hold one movement key (forward, back, left or right) for a few ticks (1-10, 20 ticks = 1 s), then release it. One call is one approved action: a new move needs a new call. Refused while the player holds that key, a screen is open, or movement/navigation runs. Answers with outcome applied, not_applied, interrupted (STOP, the key was released, the world or dimension changed) or uncertain, plus the position before and after.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": [
+            "forward",
+            "back",
+            "left",
+            "right"
+          ]
+        },
+        "ticks": {
+          "default": 4,
+          "description": "How long to hold the key, in client ticks.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        }
+      },
+      "required": [
+        "direction"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_read_block",
+    "title": "Supervised block readback",
+    "description": "Needs enableSupervisedControl and an integrated or dedicated server. Read one block at an exact position as one supervised action. Answers with outcome applied and the block, or not_applied with the reason (for example an unloaded chunk).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "y": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "z": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_set_block",
+    "title": "Supervised block change",
+    "description": "Needs enableSupervisedControl and an integrated or dedicated server. Replace one block at an exact position, only if the block there is `expect` right now. Block state is allowed (oak_stairs[facing=north]), block data ({...}) is not. Answers with outcome applied (read back), not_applied (precondition failed, nothing changed) or uncertain (call supervised_reconcile, which reads the block again; the change is never retried automatically).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "y": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "z": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "dimension": {
+          "description": "Dimension id, e.g. \"minecraft:overworld\", \"minecraft:the_nether\". Defaults to the current/overworld dimension.",
+          "type": "string"
+        },
+        "block": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The new block, e.g. \"minecraft:stone\" or \"oak_stairs[facing=north]\"."
+        },
+        "expect": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "The block id that must be there now, e.g. \"minecraft:air\"."
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z",
+        "block",
+        "expect"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_command",
+    "title": "Supervised command",
+    "description": "Needs enableSupervisedControl and an integrated or dedicated server. Run one server command whose first word is in supervisedCommands in mcpfabric.config.json (time and weather by default); see supervised_status for the list. Command data ({...}) is refused. Answers with outcome applied or not_applied and the command output; uncertain if the server did not answer in time.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The command without or with a leading slash, e.g. \"time set day\"."
+        }
+      },
+      "required": [
+        "command"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_enter_world",
+    "title": "Enter an approved save",
+    "description": "Client-only, from the menus, needs enableSupervisedControl. Open a singleplayer save listed in supervisedWorlds in mcpfabric.config.json (worldId sp:<folder>, see supervised_status). Joining runs in the background: the outcome is pending, so call supervised_reconcile once get_screen shows inWorld (or after a few seconds) before doing anything else.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "worldId": {
+          "type": "string",
+          "description": "An approved save, e.g. \"sp:Test World\"."
+        }
+      },
+      "required": [
+        "worldId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_leave_world",
+    "title": "Save and leave the world",
+    "description": "Client-only, needs enableSupervisedControl. Save and quit the singleplayer world the player is in, like the pause menu's Save and Quit; worldId must name that world. The outcome is pending until supervised_reconcile sees the title screen; that the save reached the disk is not verified.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "worldId": {
+          "type": "string",
+          "description": "The world the player is in, as get_screen reports it (lastWorldId)."
+        }
+      },
+      "required": [
+        "worldId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "supervised_reconcile",
+    "title": "Reconcile a supervised action",
+    "description": "Needs enableSupervisedControl. Settle a supervised action whose outcome is pending or uncertain: reads the game again (the block, the world joined or left, the finished input sample) and reports the outcome. While any action is open, no other supervised action runs. If the outcome cannot be read back (a command), pass acknowledge: true to accept that it is unknown.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "description": "The actionId of the open action, e.g. \"a3\"."
+        },
+        "acknowledge": {
+          "default": false,
+          "description": "Close the action as acknowledged when the readback cannot settle it.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "actionId"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "poll_events",
+    "title": "Poll recent game events",
+    "description": "Return recently observed game events from the in-mod ring buffer (damage taken, entity spawn/death, block break/place, chat, dimension change, etc.). Filter by type and/or pass sinceId to get only events newer than one you've already seen.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "default": 50,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "types": {
+          "description": "Event type filter, e.g. [\"chat\",\"player_damage\",\"entity_death\"].",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sinceId": {
+          "description": "Only return events with id greater than this.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "agent_brief",
+    "title": "Agent brief (resume here)",
+    "description": "One-call situation report for resuming work after a restart or context loss: world id, your position/vitals/inventory, the active goal path, the running job, saved script skills, remembered places nearby and a small map. Call this first in a new session.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "observe",
+    "title": "Observe surroundings",
+    "description": "Scan the loaded chunks around you (client-side, works in multiplayer) and update long-term state: the chunk map, remembered workstations/containers/portals/beds (new ones are added, vanished ones marked gone) and ore/wood counts. Optionally locate specific blocks with `find`. Cheap; call it after moving somewhere new.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "radius": {
+          "default": 6,
+          "description": "Scan radius in chunks (clamped to what is loaded).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "find": {
+          "description": "Block ids to locate, e.g. [\"iron_ore\",\"deepslate_iron_ore\"].",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "map_view",
+    "title": "Show the explored map",
+    "description": "North-up ASCII map of explored chunks around you (1 character = 1 chunk) with remembered places overlaid: base, deaths, portals, storage, workstations, rare ores. Unexplored chunks show as '?'.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "radius": {
+          "default": 10,
+          "description": "Radius in chunks.",
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 24
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "surroundings",
+    "title": "What is around me, relative to my view",
+    "description": "Nearby mobs, players, dropped items and points of interest (containers, workstations, beds, portals), and optionally blocks you name, described relative to where you look: \"zombie: 5 ahead, 2 right · 5.4 m (1 o'clock)\". Easier to act on than world coordinates; each line still ends with the coordinates for tools that need them. Client side, works in multiplayer; needs enableVision.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "radius": {
+          "default": 16,
+          "description": "Search radius in blocks.",
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 48
+        },
+        "find": {
+          "description": "Block ids to locate as well, e.g. [\"oak_log\",\"iron_ore\"].",
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limit": {
+          "default": 12,
+          "description": "Lines per section.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "remember",
+    "title": "Remember something",
+    "description": "Store a long-term memory for this world: a note (facts, player requests, plans), a place worth returning to (base, village, cave entrance — tag 'base' marks home on the map), an event, or a skill (a procedure that worked). Places default to your current position.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "default": "note",
+          "type": "string",
+          "enum": [
+            "note",
+            "place",
+            "container",
+            "event",
+            "skill"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "body": {
+          "description": "Details.",
+          "type": "string",
+          "maxLength": 4000
+        },
+        "tags": {
+          "description": "Short tags, e.g. [\"base\"], [\"danger\",\"lava\"].",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "here": {
+          "description": "Attach your current position (default: true for places).",
+          "type": "boolean"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "dimension": {
+          "type": "string"
+        },
+        "importance": {
+          "description": "0..1, default 0.5.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "recall",
+    "title": "Search memory",
+    "description": "Search long-term memory (full-text, BM25) ranked with proximity, recency and importance. Also reports chunks where matching ores/logs were counted and storage holding matching items. Without a query, lists what is remembered near you. Pass ids for full entries. Entries this session already received are listed as 'already sent' — pass fresh:true to repeat them.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "description": "Free text, e.g. \"iron\", \"village\", \"where did I leave diamonds\".",
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "note",
+            "place",
+            "container",
+            "event",
+            "skill"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "radius": {
+          "description": "Only memories within this many blocks of you.",
+          "type": "number",
+          "minimum": 1
+        },
+        "limit": {
+          "default": 10,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "ids": {
+          "description": "Fetch these entries in full.",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "includeGone": {
+          "description": "Include places marked gone.",
+          "type": "boolean"
+        },
+        "fresh": {
+          "description": "Repeat entries already sent in this session.",
+          "type": "boolean"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "memory_update",
+    "title": "Edit or delete a memory",
+    "description": "Correct, re-tag, re-rate or delete a memory by id (e.g. mark a note obsolete, tag a place 'base').",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "body": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "importance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "valid",
+            "changed",
+            "gone",
+            "unverified"
+          ]
+        },
+        "delete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "memory_verify",
+    "title": "Verify remembered places",
+    "description": "Check remembered positions against the live world (like re-validating cached evidence): each place with a recorded block is reported valid, changed or gone; unloaded ones cannot be checked from here. Defaults to everything within 96 blocks.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "radius": {
+          "default": 96,
+          "type": "number",
+          "minimum": 1,
+          "maximum": 512
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "goal_add",
+    "title": "Add a goal",
+    "description": "Add a goal or a subgoal (with parent) to the persistent goal tree. Break big goals into concrete subgoals with a checkable doneWhen. Goals persist across sessions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "parent": {
+          "description": "Parent goal id for a subgoal.",
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "detail": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "doneWhen": {
+          "description": "Checkable completion condition, e.g. \"iron_pickaxe in inventory\".",
+          "type": "string",
+          "maxLength": 300
+        },
+        "priority": {
+          "description": "Higher runs first among siblings.",
+          "type": "integer",
+          "minimum": -10,
+          "maximum": 10
+        },
+        "activate": {
+          "description": "Mark it active right away.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "goal_update",
+    "title": "Update a goal",
+    "description": "Change a goal's status (pending/active/blocked/done/failed/dropped), record its outcome, edit it, move it under another parent, or delete it with its subgoals. Returns the next goal to work on.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "active",
+            "blocked",
+            "done",
+            "failed",
+            "dropped"
+          ]
+        },
+        "outcome": {
+          "description": "What happened / why it failed / what was learned.",
+          "type": "string",
+          "maxLength": 1000
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "detail": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "doneWhen": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": -10,
+          "maximum": 10
+        },
+        "parent": {
+          "description": "New parent id, or null to make it a root goal.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "delete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "goal_list",
+    "title": "List goals",
+    "description": "The persistent goal tree with statuses; the goal to work on next is marked. Closed goals are hidden unless all=true.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "boolean"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "plan_craft",
+    "title": "Plan a craft",
+    "description": "Expand an item into craft/smelt steps over the game's own recipes (vanilla and modded), using your current inventory, and list the raw materials still missing — plus remembered storage that holds them. On 1.21.2+ multiplayer only unlocked recipes are visible; singleplayer sees all.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string",
+          "description": "Item id, e.g. \"iron_pickaxe\" or \"create:cogwheel\"."
+        },
+        "count": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "knownOnly": {
+          "description": "Only use recipes you have unlocked (what craft_item can execute).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "item"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "get_recipes",
+    "title": "Get recipes for an item",
+    "description": "Recipes that produce an item, as reported by the game (crafting, smelting, stonecutting, smithing; vanilla and modded), with ingredient alternatives and whether you have unlocked each one.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "item"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "explore_next",
+    "title": "Suggest where to explore",
+    "description": "Best unexplored frontier chunks from the map (nearest, keeping the previous exploring direction, avoiding water) with a walkable target for each. Does not move; use travel_to, or the explore job to walk there automatically.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "default": 3,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "build_plan",
+    "title": "Save a build plan",
+    "description": "Save a structure as a plan before building it, and check the plan: palette characters map to blocks with the properties that matter (\"S\": \"oak_stairs[facing=north,half=bottom]\"), layers go bottom-up, each layer is rows north → south and each row is columns west → east. ' ' = any block (not checked), '.' = must stay empty (doorways, head room, the cell a door opens into, windows). Only the properties you write are checked later, so pin facing/half/axis/hinge where they matter. A stair climbs toward its facing: on a roof every stair faces the ridge (the north slope faces south), half=top turns it upside down. spots are places to stand (plan coordinates x = column, y = layer, z = row) that must be reachable on foot from the first one — e.g. an entrance outside, the bed, the chest. rotate turns the whole plan clockwise (properties included); origin is the lowest north-west corner after turning. Answers with size, materials vs inventory and warnings (a door opening into a wall, a torch on nothing, a stair without facing). With only name, shows a saved plan.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "pattern": "^[\\w.-]+$"
+        },
+        "origin": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate."
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate."
+            },
+            "z": {
+              "type": "number",
+              "description": "Z coordinate."
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "rotate": {
+          "anyOf": [
+            {
+              "type": "number",
+              "const": 0
+            },
+            {
+              "type": "number",
+              "const": 90
+            },
+            {
+              "type": "number",
+              "const": 180
+            },
+            {
+              "type": "number",
+              "const": 270
+            }
+          ]
+        },
+        "palette": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "layers": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "maxItems": 64,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        "spots": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "x": {
+                "type": "number",
+                "description": "X coordinate."
+              },
+              "y": {
+                "type": "number",
+                "description": "Y coordinate."
+              },
+              "z": {
+                "type": "number",
+                "description": "Z coordinate."
+              }
+            },
+            "required": [
+              "name",
+              "x",
+              "y",
+              "z"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "build_verify",
+    "title": "Check a build against its plan",
+    "description": "Compare a saved plan with the world: every block (id and the properties the plan pins, e.g. facing), every cell that must stay empty, and whether each spot can be walked to from the first one — when one cannot, it names the fewest blocks in the way. Call it after building and after every fix; build_structure repairs the plan cells itself.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "build_structure",
+    "title": "Build a plan (job)",
+    "description": "Background job: build or repair a saved plan. It first clears cells that must be empty and blocks that are wrong (wrong block, or the right one facing the wrong way), then places the blocks bottom-up with the exact properties of the plan (choosing where to stand and how to click), the hanging and standing ones (torches, doors, ladders, beds) last, then runs build_verify. method 'place' builds like a player from the inventory (fails up front when materials are missing); 'set' writes blocks on the server (needs enableWorldWrite) without items.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "method": {
+          "default": "place",
+          "type": "string",
+          "enum": [
+            "place",
+            "set"
+          ]
+        },
+        "maxSeconds": {
+          "default": 900,
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1800
+        },
+        "waitSeconds": {
+          "description": "Block up to this many seconds for the job to finish before returning (default 0: return at once).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "travel_to",
+    "title": "Travel to a position (job)",
+    "description": "Background job: go to a position (or a remembered place by id) in path-finding segments, routing around obstacles and stopping if health gets low. Walks, swims, climbs ladders, opens doors, and where needed digs through blocks and pillars up on cobblestone/dirt from the hotbar. Longer range than navigate_to. Returns a job id at once.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "description": "Defaults to the mapped surface height there, else your height.",
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "place": {
+          "description": "Memory id of a place to go to instead of coordinates.",
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "reach": {
+          "default": 2,
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 16
+        },
+        "sprint": {
+          "type": "boolean"
+        },
+        "allowDig": {
+          "default": true,
+          "description": "Dig through blocks when going around is longer.",
+          "type": "boolean"
+        },
+        "allowPillar": {
+          "default": true,
+          "description": "Pillar up on throwaway blocks from the hotbar.",
+          "type": "boolean"
+        },
+        "allowSwim": {
+          "default": true,
+          "description": "Swim across water.",
+          "type": "boolean"
+        },
+        "waitSeconds": {
+          "description": "Block up to this many seconds for the job to finish before returning (default 0: return at once).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "explore",
+    "title": "Explore (job)",
+    "description": "Background job: repeatedly walk to the best frontier of the map, observing as it goes (moving like travel_to, digging and pillaring where needed), and report new chunks, places and ores. Unreachable frontiers are remembered and skipped.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "legs": {
+          "default": 4,
+          "description": "How many frontier targets to visit.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "waitSeconds": {
+          "description": "Block up to this many seconds for the job to finish before returning (default 0: return at once).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "collect_blocks",
+    "title": "Collect blocks (job)",
+    "description": "Background job: find the nearest exposed blocks of the given types, walk to them, pick the best hotbar tool, mine them and pick up the drops, until `count` are broken. When none are exposed, tunnels to buried ones up to 16 blocks away (dig: false turns that off). Refuses blocks your tools cannot harvest.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "blocks": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Block ids, e.g. [\"oak_log\",\"birch_log\"] or [\"iron_ore\",\"deepslate_iron_ore\"]."
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "radius": {
+          "default": 48,
+          "description": "Search radius in blocks.",
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 128
+        },
+        "maxSeconds": {
+          "default": 300,
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 1800
+        },
+        "dig": {
+          "default": true,
+          "description": "Tunnel to buried blocks and dig on the way.",
+          "type": "boolean"
+        },
+        "waitSeconds": {
+          "description": "Block up to this many seconds for the job to finish before returning (default 0: return at once).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "blocks",
+        "count"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "craft_item",
+    "title": "Craft an item (job)",
+    "description": "Background job: plan and craft an item including intermediates (planks → sticks → tool) with the recipe book, using the 2×2 grid or a crafting table (walks to a nearby one, or places one from the inventory). Fails with the plan if materials are missing or a smelting step is needed.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string"
+        },
+        "count": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 640
+        },
+        "waitSeconds": {
+          "description": "Block up to this many seconds for the job to finish before returning (default 0: return at once).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "item"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "job_status",
+    "title": "Job status",
+    "description": "Status, progress and log of the running (or last) job. Waits up to waitSeconds for it to finish first.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "waitSeconds": {
+          "default": 20,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "job_cancel",
+    "title": "Cancel the job",
+    "description": "Stop the running job and release movement.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "open_container",
+    "title": "Open a container",
+    "description": "Open the chest/barrel/furnace/crafting table/modded machine at a position within reach, list its contents and remember them (so recall and plan_craft know what is stored where). Leaves the screen open for container_transfer; close_container when done.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate."
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "container_transfer",
+    "title": "Move items in/out of the open container",
+    "description": "With a container open: take items from it into your inventory, or put items from your inventory into it (whole stacks, shift-click style). Filter by item id and stop after roughly `count` items. Updates the remembered contents.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string",
+          "enum": [
+            "take",
+            "put"
+          ]
+        },
+        "item": {
+          "description": "Only this item id (default: everything).",
+          "type": "string"
+        },
+        "count": {
+          "description": "Stop once at least this many were moved.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "direction"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "close_container",
+    "title": "Close the open container",
+    "description": "Close the currently open container / crafting screen.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "run_script",
+    "title": "Run a script",
+    "description": "Run a short JavaScript program (ES2023 in a QuickJS sandbox: no Node, files, network or timers) that drives the game through the bridge, instead of many tool calls; top-level await and return work. API: `await mc.call(method, params)` calls a bridge tool by name or RPC method (mc.call(\"get_self\") = mc.call(\"player.getState\")); every bridge tool is also a helper with the same parameters and checks, e.g. `await mc.get_self()`, `await mc.find_blocks({ center, radius, blockIds })`, `await mc.break_block({ x, y, z })`. supervised_* tools are refused. A failed call throws an Error with `code` (e.g. capability_disabled) and `data`; the mod's enable* locks apply. `mc.log(...)` / console.log record output, `await mc.sleep(ms)` waits, `mc.args` holds args. Return a JSON value as the result. Limits: timeoutSeconds (default 60, max 300), 64 MiB memory, 2000 calls, 5 s of computation between awaits, 16 KB of log. A failed or stopped script makes no more calls and movement, navigation and mining are released. One script at a time, never during an agent job. Keep a program that worked with save_skill.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64000,
+          "description": "The program: the body of an async function."
+        },
+        "args": {
+          "description": "JSON value the program reads as mc.args."
+        },
+        "timeoutSeconds": {
+          "description": "Wall-clock limit of the run in seconds (default 60, max 300).",
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "save_skill",
+    "title": "Save a script as a skill",
+    "description": "Keep a program that worked as a named skill of this world, to run again with run_skill and new args (read them from mc.args). The code is compiled first; a syntax error is refused. Saving under an existing name replaces it.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,47}$",
+          "description": "Skill name, e.g. mine_vein or build_wall."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "What it does and which args it takes."
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64000,
+          "description": "The program, as for run_script."
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "code"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "list_skills",
+    "title": "List skills",
+    "description": "The saved skills of this world with their descriptions and last outcome. With name, also that skill's code.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Show this skill's code too.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,47}$"
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "run_skill",
+    "title": "Run a skill",
+    "description": "Run a saved skill with args (its mc.args), under the same sandbox and limits as run_script.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,47}$"
+        },
+        "args": {
+          "description": "JSON value the program reads as mc.args."
+        },
+        "timeoutSeconds": {
+          "description": "Wall-clock limit of the run in seconds (default 60, max 300).",
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "delete_skill",
+    "title": "Delete a skill",
+    "description": "Delete a saved skill of this world.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,47}$"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    }
+  },
+  {
+    "name": "open_dashboard",
+    "title": "Open the agent dashboard",
+    "description": "Show the user a live panel of the agent: position, health and food, the running job, the explored map, the goal tree and the inventory, with a STOP button. It refreshes itself while open. In hosts without MCP Apps it returns a short text summary.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    },
+    "_meta": {
+      "ui": {
+        "resourceUri": "ui://mcpfabric/dashboard.html"
+      },
+      "ui/resourceUri": "ui://mcpfabric/dashboard.html"
+    }
+  },
+  {
+    "name": "dashboard_state",
+    "title": "Dashboard state",
+    "description": "Current snapshot for the open dashboard (called by the panel).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    },
+    "_meta": {
+      "ui": {
+        "resourceUri": "ui://mcpfabric/dashboard.html",
+        "visibility": [
+          "app"
+        ]
+      },
+      "ui/resourceUri": "ui://mcpfabric/dashboard.html"
+    }
+  },
+  {
+    "name": "dashboard_stop",
+    "title": "Stop the agent",
+    "description": "The dashboard's STOP button: cancel the running job and release movement, navigation, mining and supervised input.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "execution": {
+      "taskSupport": "forbidden"
+    },
+    "_meta": {
+      "ui": {
+        "resourceUri": "ui://mcpfabric/dashboard.html",
+        "visibility": [
+          "app"
+        ]
+      },
+      "ui/resourceUri": "ui://mcpfabric/dashboard.html"
+    }
+  }
+]

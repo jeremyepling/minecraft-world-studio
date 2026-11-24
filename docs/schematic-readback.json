@@ -1,0 +1,126 @@
+{
+  "clear": [
+    "Now placing at the block you stand in.",
+    "Clipboard cleared."
+  ],
+  "load": [
+    "Clipboard cleared.",
+    "studio_probe_1795523475482.schem loaded. Paste it with //paste"
+  ],
+  "emptied": {
+    "command": "fill -35 170 -35 -32 171 -34 air",
+    "success": true,
+    "resultValue": 16,
+    "output": [
+      "Successfully filled 16 block(s)"
+    ]
+  },
+  "paste": [
+    "0 biomes affected",
+    "0 entities affected"
+  ],
+  "reloaded": [
+    {
+      "x": -35,
+      "y": 170,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -35,
+      "y": 170,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -34,
+      "y": 170,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -34,
+      "y": 170,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -33,
+      "y": 170,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -33,
+      "y": 170,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -32,
+      "y": 170,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -32,
+      "y": 170,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -35,
+      "y": 171,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -35,
+      "y": 171,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -34,
+      "y": 171,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -34,
+      "y": 171,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -33,
+      "y": 171,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -33,
+      "y": 171,
+      "z": -34,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -32,
+      "y": 171,
+      "z": -35,
+      "id": "minecraft:stone"
+    },
+    {
+      "x": -32,
+      "y": 171,
+      "z": -34,
+      "id": "minecraft:stone"
+    }
+  ],
+  "consoleAs": {
+    "command": "execute as WorldStudio at @s run /pos1 -35,170,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": []
+  }
+}

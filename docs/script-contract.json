@@ -1,0 +1,24 @@
+{
+  "source": "installed MCPFabric release sandbox with an in-memory host",
+  "defaults": {
+    "timeoutMs": 60000,
+    "memoryBytes": 67108864,
+    "maxCalls": 2000,
+    "maxLogChars": 16000,
+    "maxResultChars": 32000,
+    "maxSliceMs": 5000
+  },
+  "maxTimeoutMs": 300000,
+  "maxCodeChars": 64000,
+  "acceptedCalls": 2000,
+  "resultChars": 32000,
+  "logChars": 16000,
+  "guest": [
+    36,
+    "function",
+    "undefined",
+    "undefined",
+    "undefined",
+    "undefined"
+  ]
+}

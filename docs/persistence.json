@@ -1,0 +1,5 @@
+{
+  "world": "# brief · world sp:WorldStudioLab · memory 7 entries · map 25 chunks",
+  "skills": "# skills · 1\nstudio_sample — Parametric architectural samples, uses mc.args · 4 runs, last ok",
+  "plan": "# verify studio_gate_sample · 5 blocks, 1 must-be-empty cells · -68 190 32 → -68 191 34\nok 6/6 · missing 0 · wrong block 0 · wrong state 0 · obstructed 0\nthe build matches the plan"
+}

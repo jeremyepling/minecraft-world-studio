@@ -1,0 +1,89 @@
+{
+  "consoleWorld": {
+    "command": "//world WorldStudioLab_minecraft:overworld",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Set the world override to WorldStudioLab_minecraft:overworld. (Use //world to go back to default)"
+    ]
+  },
+  "console1": {
+    "command": "//pos1 -35,165,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "First position set to (-35, 165, -35) (4)."
+    ]
+  },
+  "console2": {
+    "command": "//pos2 -34,165,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Second position set to (-34, 165, -35) (2)."
+    ]
+  },
+  "initial": {
+    "console": [
+      "minecraft:air",
+      "minecraft:air"
+    ],
+    "player": [
+      "minecraft:air",
+      "minecraft:air",
+      "minecraft:air"
+    ]
+  },
+  "consoleEdit": {
+    "command": "//set sandstone",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Operation completed (2 blocks affected)."
+    ]
+  },
+  "afterConsole": {
+    "console": [
+      "minecraft:sandstone",
+      "minecraft:sandstone"
+    ],
+    "player": [
+      "minecraft:air",
+      "minecraft:air",
+      "minecraft:air"
+    ]
+  },
+  "afterPlayer": {
+    "console": [
+      "minecraft:sandstone",
+      "minecraft:sandstone"
+    ],
+    "player": [
+      "minecraft:bricks",
+      "minecraft:bricks",
+      "minecraft:bricks"
+    ]
+  },
+  "afterConsoleUndo": {
+    "console": [
+      "minecraft:air",
+      "minecraft:air"
+    ],
+    "player": [
+      "minecraft:bricks",
+      "minecraft:bricks",
+      "minecraft:bricks"
+    ]
+  },
+  "afterPlayerUndo": {
+    "console": [
+      "minecraft:air",
+      "minecraft:air"
+    ],
+    "player": [
+      "minecraft:air",
+      "minecraft:air",
+      "minecraft:air"
+    ]
+  }
+}

@@ -1,0 +1,474 @@
+[
+  {
+    "label": "console //pos1",
+    "result": {
+      "command": "/pos1 -35,170,-35",
+      "success": false,
+      "resultValue": 0,
+      "output": [
+        "Unknown or incomplete command. See below for error",
+        "pos1 -35,170,-35<--[HERE]"
+      ]
+    }
+  },
+  {
+    "label": "console ///pos1",
+    "result": {
+      "command": "//pos1 -35,170,-35",
+      "success": true,
+      "resultValue": 0,
+      "output": [
+        "You need to provide a world (Try //world)"
+      ]
+    }
+  },
+  {
+    "label": "player pos1",
+    "result": {
+      "message": "//pos1 -35,170,-35",
+      "feedback": "Position already set."
+    }
+  },
+  {
+    "label": "player pos2",
+    "result": {
+      "message": "//pos2 -32,171,-34",
+      "feedback": "Position already set."
+    }
+  },
+  {
+    "label": "set",
+    "result": {
+      "message": "//set stone",
+      "feedback": "Operation completed (16 blocks affected)."
+    }
+  },
+  {
+    "label": "filled cuboid",
+    "result": {
+      "count": 16,
+      "volume": 16,
+      "counts": {
+        "minecraft:stone": 16
+      },
+      "examples": [
+        {
+          "x": -35,
+          "y": 170,
+          "z": -35,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -35,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -34,
+          "y": 170,
+          "z": -35,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -34,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        }
+      ]
+    }
+  },
+  {
+    "label": "undo",
+    "result": {
+      "message": "//undo",
+      "feedback": "Undid 1 available edits."
+    }
+  },
+  {
+    "label": "after undo",
+    "result": {
+      "count": 0,
+      "volume": 16,
+      "counts": {},
+      "examples": []
+    }
+  },
+  {
+    "label": "redo",
+    "result": {
+      "message": "//redo",
+      "feedback": "Redid 1 available edits."
+    }
+  },
+  {
+    "label": "after redo",
+    "result": {
+      "count": 16,
+      "volume": 16,
+      "counts": {
+        "minecraft:stone": 16
+      },
+      "examples": [
+        {
+          "x": -35,
+          "y": 170,
+          "z": -35,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -35,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -34,
+          "y": 170,
+          "z": -35,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -34,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        }
+      ]
+    }
+  },
+  {
+    "label": "mask",
+    "result": {
+      "message": "//gmask stone",
+      "feedback": "Global mask set."
+    }
+  },
+  {
+    "label": "pattern",
+    "result": {
+      "message": "//set 50%andesite,50%tuff",
+      "feedback": "Operation completed (16 blocks affected)."
+    }
+  },
+  {
+    "label": "after mask and pattern",
+    "result": {
+      "count": 16,
+      "volume": 16,
+      "counts": {
+        "minecraft:andesite": 10,
+        "minecraft:tuff": 6
+      },
+      "examples": [
+        {
+          "x": -35,
+          "y": 170,
+          "z": -35,
+          "id": "minecraft:andesite",
+          "state": "minecraft:andesite"
+        },
+        {
+          "x": -35,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:tuff",
+          "state": "minecraft:tuff"
+        },
+        {
+          "x": -34,
+          "y": 170,
+          "z": -35,
+          "id": "minecraft:andesite",
+          "state": "minecraft:andesite"
+        },
+        {
+          "x": -34,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:andesite",
+          "state": "minecraft:andesite"
+        }
+      ]
+    }
+  },
+  {
+    "label": "placement origin",
+    "result": {
+      "message": "/toggleplace",
+      "feedback": "Now placing at pos #1."
+    }
+  },
+  {
+    "label": "schematic save",
+    "result": {
+      "message": "//schem save studio_probe_1795523475482",
+      "feedback": "studio_probe_1795523475482 saved."
+    }
+  },
+  {
+    "label": "schematic load",
+    "result": {
+      "message": "//schem load studio_probe_1795523475482",
+      "feedback": "Usage: //schem load <schematic> [format]"
+    }
+  },
+  {
+    "label": "rotate",
+    "result": {
+      "message": "//rotate 90",
+      "feedback": "The clipboard copy has been rotated."
+    }
+  },
+  {
+    "label": "paste",
+    "result": {
+      "message": "//paste -a",
+      "feedback": "0 entities affected"
+    }
+  },
+  {
+    "label": "rotated paste region",
+    "result": {
+      "count": 16,
+      "volume": 396,
+      "counts": {
+        "minecraft:stone": 16
+      },
+      "examples": [
+        {
+          "x": -28,
+          "y": 170,
+          "z": -34,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -28,
+          "y": 170,
+          "z": -33,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -28,
+          "y": 170,
+          "z": -32,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        },
+        {
+          "x": -28,
+          "y": 170,
+          "z": -31,
+          "id": "minecraft:stone",
+          "state": "minecraft:stone"
+        }
+      ]
+    }
+  },
+  {
+    "label": "hollow cylinder",
+    "result": {
+      "message": "//hcyl cobblestone 2 3",
+      "feedback": "48 blocks have been created."
+    }
+  },
+  {
+    "label": "cylinder scan",
+    "result": {
+      "count": 36,
+      "volume": 75,
+      "counts": {
+        "minecraft:cobblestone": 36
+      },
+      "examples": [
+        {
+          "x": -28,
+          "y": 176,
+          "z": -28,
+          "id": "minecraft:cobblestone",
+          "state": "minecraft:cobblestone"
+        },
+        {
+          "x": -28,
+          "y": 176,
+          "z": -27,
+          "id": "minecraft:cobblestone",
+          "state": "minecraft:cobblestone"
+        },
+        {
+          "x": -28,
+          "y": 176,
+          "z": -26,
+          "id": "minecraft:cobblestone",
+          "state": "minecraft:cobblestone"
+        },
+        {
+          "x": -27,
+          "y": 176,
+          "z": -29,
+          "id": "minecraft:cobblestone",
+          "state": "minecraft:cobblestone"
+        }
+      ]
+    }
+  },
+  {
+    "label": "sphere",
+    "result": {
+      "message": "//sphere tuff 2",
+      "feedback": "160 blocks have been created."
+    }
+  },
+  {
+    "label": "sphere scan",
+    "result": {
+      "count": 81,
+      "volume": 125,
+      "counts": {
+        "minecraft:tuff": 81
+      },
+      "examples": [
+        {
+          "x": -27,
+          "y": 174,
+          "z": -28,
+          "id": "minecraft:tuff",
+          "state": "minecraft:tuff"
+        },
+        {
+          "x": -27,
+          "y": 174,
+          "z": -27,
+          "id": "minecraft:tuff",
+          "state": "minecraft:tuff"
+        },
+        {
+          "x": -27,
+          "y": 174,
+          "z": -26,
+          "id": "minecraft:tuff",
+          "state": "minecraft:tuff"
+        },
+        {
+          "x": -26,
+          "y": 174,
+          "z": -28,
+          "id": "minecraft:tuff",
+          "state": "minecraft:tuff"
+        }
+      ]
+    }
+  },
+  {
+    "label": "cone",
+    "result": {
+      "message": "//cone bricks 2 4",
+      "feedback": "56 blocks have been created."
+    }
+  },
+  {
+    "label": "cone scan",
+    "result": {
+      "count": 28,
+      "volume": 100,
+      "counts": {
+        "minecraft:bricks": 28
+      },
+      "examples": [
+        {
+          "x": -28,
+          "y": 176,
+          "z": -27,
+          "id": "minecraft:bricks",
+          "state": "minecraft:bricks"
+        },
+        {
+          "x": -27,
+          "y": 176,
+          "z": -28,
+          "id": "minecraft:bricks",
+          "state": "minecraft:bricks"
+        },
+        {
+          "x": -27,
+          "y": 176,
+          "z": -27,
+          "id": "minecraft:bricks",
+          "state": "minecraft:bricks"
+        },
+        {
+          "x": -27,
+          "y": 176,
+          "z": -26,
+          "id": "minecraft:bricks",
+          "state": "minecraft:bricks"
+        }
+      ]
+    }
+  },
+  {
+    "label": "expression",
+    "result": {
+      "message": "//generate smooth_stone x*x+z*z<=0.5",
+      "feedback": "Second position set to (-24, 177, -25) (75)."
+    }
+  },
+  {
+    "label": "expression scan",
+    "result": {
+      "count": 27,
+      "volume": 75,
+      "counts": {
+        "minecraft:smooth_stone": 27
+      },
+      "examples": [
+        {
+          "x": -27,
+          "y": 175,
+          "z": -28,
+          "id": "minecraft:smooth_stone",
+          "state": "minecraft:smooth_stone"
+        },
+        {
+          "x": -27,
+          "y": 175,
+          "z": -27,
+          "id": "minecraft:smooth_stone",
+          "state": "minecraft:smooth_stone"
+        },
+        {
+          "x": -27,
+          "y": 175,
+          "z": -26,
+          "id": "minecraft:smooth_stone",
+          "state": "minecraft:smooth_stone"
+        },
+        {
+          "x": -26,
+          "y": 175,
+          "z": -28,
+          "id": "minecraft:smooth_stone",
+          "state": "minecraft:smooth_stone"
+        }
+      ]
+    }
+  },
+  {
+    "label": "restore player placement",
+    "result": {
+      "message": "/toggleplace",
+      "feedback": "Now placing at the block you stand in."
+    }
+  }
+]

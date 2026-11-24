@@ -1,0 +1,34 @@
+[
+  {
+    "project": "mcpfabric",
+    "version": "0.10.0+26.3",
+    "id": "7CFkrsmI",
+    "file": "mcpfabric-0.10.0+26.3.jar",
+    "url": "https://cdn.modrinth.com/data/eA63YgUh/versions/7CFkrsmI/mcpfabric-0.10.0%2B26.3.jar",
+    "sha512": "4db052e21fda03eae05aef973a53a87db3fdf44d0291a5639f2635f82d71f2136aa3d35987bd6fe9ffb9e8538cea53d7b30be18f8c6b8ffa8357b14834dbccd2"
+  },
+  {
+    "project": "worldedit",
+    "version": "7.4.6",
+    "id": "ByRNkO83",
+    "file": "worldedit-mod-7.4.6.jar",
+    "url": "https://cdn.modrinth.com/data/1u6JkXh5/versions/ByRNkO83/worldedit-mod-7.4.6.jar",
+    "sha512": "3bc4fbf2ee36746f54dc036283b3ded3f17fd91991eaa1ead76b0861aa902cd7ffbc0962db0065d8690e46d1c4890847ebe97ee0b4e36a979b41168c30586ee4"
+  },
+  {
+    "project": "axiom",
+    "version": "6.1.5",
+    "id": "Gm9DhTF6",
+    "file": "Axiom-6.1.5-for-MC26.3.jar",
+    "url": "https://cdn.modrinth.com/data/N6n5dqoA/versions/Gm9DhTF6/Axiom-6.1.5-for-MC26.3.jar",
+    "sha512": "b37108eaf452b1426786a2bb2f97ca948d76083c733823f2271d1a8fcde83d728ed00ac18b706bce48a755b504d0523b67fea3a458f7e89fb547ca382960ffbd"
+  },
+  {
+    "project": "fabric-api",
+    "version": "0.167.0+26.3",
+    "id": "lPHkrIVF",
+    "file": "fabric-api-0.167.0+26.3.jar",
+    "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/lPHkrIVF/fabric-api-0.167.0%2B26.3.jar",
+    "sha512": "c01532a9a46ae90f83fb57de265e884bbb46106a844e6d9db21d08d1713f360e0a987255d5d965697465fe3910798af6c5dcf64ed3d34e85064ca41b7bff3d20"
+  }
+]

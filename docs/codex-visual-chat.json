@@ -1,0 +1,20 @@
+{
+  "calls": [
+    {
+      "server": "worldstudio",
+      "tool": "agent_brief",
+      "status": "completed"
+    },
+    {
+      "server": "worldstudio",
+      "tool": "screenshot",
+      "status": "completed"
+    },
+    {
+      "server": "worldstudio",
+      "tool": "show_message",
+      "status": "completed"
+    }
+  ],
+  "reply": "In the `sp:WorldStudioLab` Overworld, I saw a gray stone tower with a stepped green roof that overhangs its walls, and the game confirmed it showed the observation privately."
+}

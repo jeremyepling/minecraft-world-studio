@@ -1,0 +1,34 @@
+{
+  "session25639": {
+    "worldId": "sp:WorldStudioLab",
+    "kind": "singleplayer",
+    "name": "WorldStudioLab",
+    "player": "WorldStudio",
+    "dimension": "minecraft:overworld"
+  },
+  "session25640": {
+    "worldId": "sp:WorldStudioLab",
+    "kind": "singleplayer",
+    "name": "WorldStudioLab",
+    "player": "WorldStudio",
+    "dimension": "minecraft:overworld"
+  },
+  "primaryMarkerBefore": "minecraft:stone",
+  "backupMarkerBefore": "minecraft:stone",
+  "restoredGateOverride": "minecraft:waxed_copper_block",
+  "copyEdit": {
+    "command": "setblock -35 170 -35 minecraft:lapis_block",
+    "success": true,
+    "resultValue": 1,
+    "output": [
+      "Changed the block at -35, 170, -35"
+    ],
+    "state": "minecraft:lapis_block"
+  },
+  "primaryMarkerAfter": "minecraft:stone",
+  "backupMarkerAfter": "minecraft:lapis_block",
+  "distinctJavaProcesses": true,
+  "matchingWorldIds": true,
+  "snapshotFiles": 38,
+  "snapshotBytes": 13082654.0
+}

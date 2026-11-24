@@ -1,0 +1,19 @@
+[
+  "get_status",
+  "list_capabilities",
+  "get_block",
+  "get_blocks_region",
+  "find_blocks",
+  "get_time_and_weather",
+  "list_dimensions",
+  "raycast",
+  "set_block",
+  "fill_blocks",
+  "set_time",
+  "set_weather",
+  "send_chat",
+  "show_message",
+  "get_recent_chat",
+  "screenshot",
+  "describe_scene"
+]

@@ -1,0 +1,39 @@
+{
+  "selectWorld": {
+    "command": "//world minecraft:overworld",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "Invalid value for [world] (Not a valid world: minecraft:overworld), acceptable values are any world",
+      "Usage: //world [world]"
+    ]
+  },
+  "pos1": {
+    "command": "//pos1 -35,166,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "You need to provide a world (Try //world)"
+    ]
+  },
+  "pos2": {
+    "command": "//pos2 -34,166,-35",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "You need to provide a world (Try //world)"
+    ]
+  },
+  "set": {
+    "command": "//set quartz_block",
+    "success": true,
+    "resultValue": 0,
+    "output": [
+      "You need to provide a world (Try //world)"
+    ]
+  },
+  "readback": [
+    "minecraft:air",
+    "minecraft:air"
+  ]
+}

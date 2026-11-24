@@ -1,0 +1,6 @@
+local/
+.codex/
+node_modules/
+*.jar
+*.log
+__pycache__/

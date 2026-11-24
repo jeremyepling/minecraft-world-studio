@@ -1,0 +1,197 @@
+{
+  "scope": "Stock QuickJS with in-memory block observations. No game, rendering, or bridge timing.",
+  "tower": {
+    "bounds": {
+      "from": {
+        "x": -7,
+        "y": 0,
+        "z": -6
+      },
+      "to": {
+        "x": 7,
+        "y": 38,
+        "z": 7
+      }
+    },
+    "designed": 2059,
+    "already": 0,
+    "pending": 2059,
+    "runs": 322,
+    "updated": 2059,
+    "protectedCount": 0,
+    "protectedExamples": []
+  },
+  "towerVariants": [
+    {
+      "height": 35,
+      "blocks": 2359,
+      "verticalRuns": 330
+    },
+    {
+      "radius": 8,
+      "blocks": 2455,
+      "verticalRuns": 386
+    },
+    {
+      "taper": 3,
+      "blocks": 1799,
+      "verticalRuns": 290
+    },
+    {
+      "thickness": 1,
+      "blocks": 1232,
+      "verticalRuns": 257
+    },
+    {
+      "roof": 13,
+      "blocks": 2168,
+      "verticalRuns": 322
+    }
+  ],
+  "walls": [
+    {
+      "style": 0,
+      "horizontalPairs": 144,
+      "sameMaterialPairs": 144
+    },
+    {
+      "style": 1,
+      "horizontalPairs": 144,
+      "sameMaterialPairs": 31
+    },
+    {
+      "style": 2,
+      "horizontalPairs": 144,
+      "sameMaterialPairs": 144
+    },
+    {
+      "style": 3,
+      "horizontalPairs": 144,
+      "sameMaterialPairs": 115
+    },
+    {
+      "style": 4,
+      "horizontalPairs": 144,
+      "sameMaterialPairs": 121
+    }
+  ],
+  "gateRevisions": [
+    {
+      "bounds": {
+        "from": {
+          "x": -1,
+          "y": 0,
+          "z": -1
+        },
+        "to": {
+          "x": 11,
+          "y": 5,
+          "z": 1
+        }
+      },
+      "designed": 85,
+      "already": 75,
+      "pending": 18,
+      "runs": 6,
+      "updated": 18,
+      "protectedCount": 1,
+      "protectedExamples": [
+        {
+          "k": "1,0,0",
+          "found": "waxed_copper_block",
+          "before": "stone_bricks",
+          "want": "stone_bricks"
+        }
+      ]
+    },
+    {
+      "bounds": {
+        "from": {
+          "x": -1,
+          "y": 0,
+          "z": -1
+        },
+        "to": {
+          "x": 11,
+          "y": 8,
+          "z": 1
+        }
+      },
+      "designed": 85,
+      "already": 57,
+      "pending": 54,
+      "runs": 54,
+      "updated": 54,
+      "protectedCount": 1,
+      "protectedExamples": [
+        {
+          "k": "1,0,0",
+          "found": "waxed_copper_block",
+          "before": "stone_bricks",
+          "want": "stone_bricks"
+        }
+      ]
+    },
+    {
+      "bounds": {
+        "from": {
+          "x": -1,
+          "y": 0,
+          "z": -1
+        },
+        "to": {
+          "x": 11,
+          "y": 10,
+          "z": 1
+        }
+      },
+      "designed": 107,
+      "already": 30,
+      "pending": 109,
+      "runs": 97,
+      "updated": 109,
+      "protectedCount": 1,
+      "protectedExamples": [
+        {
+          "k": "1,0,0",
+          "found": "waxed_copper_block",
+          "before": "stone_bricks",
+          "want": "tuff"
+        }
+      ]
+    }
+  ],
+  "road": {
+    "grades": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "changes": 91,
+    "clearedVegetation": 0,
+    "gaps": [],
+    "updated": 91
+  }
+}

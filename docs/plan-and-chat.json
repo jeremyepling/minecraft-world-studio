@@ -1,0 +1,60 @@
+{
+  "plan": "saved\n# plan studio_gate_sample · 1×2×3 (x×y×z) · -68 190 32 → -68 191 34 · 5 blocks · 1 must-be-empty\nmaterials: stone_bricks×4 stone_brick_stairs×1\nmissing from inventory: stone_bricks×4 stone_brick_stairs×1\nno warnings",
+  "before": "# verify studio_gate_sample · 5 blocks, 1 must-be-empty cells · -68 190 32 → -68 191 34\nok 1/6 · missing 5 · wrong block 0 · wrong state 0 · obstructed 0\nmissing: -68 190 32 stone_bricks · -68 190 34 stone_bricks · -68 191 32 stone_bricks · -68 191 33 stone_brick_stairs[facing=east,half=bottom] · -68 191 34 stone_bricks\nfix these, then verify again (build_structure fixes the plan cells by itself)",
+  "job": "job #1 build [done] 0s — studio_gate_sample (set)\nresult: wrote 5/5 · cleared 0/0\n# verify studio_gate_sample · 5 blocks, 1 must-be-empty cells · -68 190 32 → -68 191 34\nok 6/6 · missing 0 · wrong block 0 · wrong state 0 · obstructed 0\nthe build matches the plan",
+  "jobStatus": "job #1 build [done] 0s — studio_gate_sample (set)\nresult: wrote 5/5 · cleared 0/0\n# verify studio_gate_sample · 5 blocks, 1 must-be-empty cells · -68 190 32 → -68 191 34\nok 6/6 · missing 0 · wrong block 0 · wrong state 0 · obstructed 0\nthe build matches the plan",
+  "after": "# verify studio_gate_sample · 5 blocks, 1 must-be-empty cells · -68 190 32 → -68 191 34\nok 6/6 · missing 0 · wrong block 0 · wrong state 0 · obstructed 0\nthe build matches the plan",
+  "blocks": [
+    {
+      "x": -68,
+      "y": 190,
+      "z": 32,
+      "id": "minecraft:stone_bricks",
+      "state": "minecraft:stone_bricks"
+    },
+    {
+      "x": -68,
+      "y": 190,
+      "z": 34,
+      "id": "minecraft:stone_bricks",
+      "state": "minecraft:stone_bricks"
+    },
+    {
+      "x": -68,
+      "y": 191,
+      "z": 32,
+      "id": "minecraft:stone_bricks",
+      "state": "minecraft:stone_bricks"
+    },
+    {
+      "x": -68,
+      "y": 191,
+      "z": 33,
+      "id": "minecraft:stone_brick_stairs",
+      "state": "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]"
+    },
+    {
+      "x": -68,
+      "y": 191,
+      "z": 34,
+      "id": "minecraft:stone_bricks",
+      "state": "minecraft:stone_bricks"
+    }
+  ],
+  "playerChat": {
+    "sent": true,
+    "asCommand": false
+  },
+  "overlay": {
+    "shown": true,
+    "length": 38
+  },
+  "privateMessage": {
+    "command": "tellraw WorldStudio {\"text\":\"World Studio private test.\"}",
+    "success": true,
+    "resultValue": 1,
+    "output": []
+  },
+  "chatReadback": true,
+  "eventReadback": true
+}

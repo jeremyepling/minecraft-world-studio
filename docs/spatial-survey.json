@@ -1,0 +1,182 @@
+{
+  "view": {
+    "x": -15.5,
+    "y": 100,
+    "z": 7.5,
+    "yaw": 0,
+    "pitch": 0,
+    "mode": "creative"
+  },
+  "ray": {
+    "dimension": "minecraft:overworld",
+    "hitType": "block",
+    "distance": 56.5,
+    "block": {
+      "x": -16,
+      "y": 101,
+      "z": 64,
+      "id": "minecraft:grass_block",
+      "air": false,
+      "liquid": false,
+      "properties": {
+        "snowy": "false"
+      }
+    },
+    "hitPos": {
+      "x": -15.5,
+      "y": 101.62,
+      "z": 64
+    },
+    "face": "north"
+  },
+  "observe": "observed 25 chunks (25 new) around -15 100 8 overworld · map knows 25 chunks here\nnew places: #3 spawner @ -15 37 16 (64m) · #4 spawner @ -32 35 -6 (68m) · #5 chest @ -9 6 5 (94m) · #6 spawner @ -7 6 8 (94m) · #7 chest @ -6 6 5 (95m)\nores in view: coal_ore×3877 · copper_ore×2556 (nearest ~-8 8, 8m) · iron_ore×1367 (nearest ~-8 8, 8m) · deepslate_redstone_ore×823 (nearest ~-8 8, 8m) · deepslate_diamond_ore×633 (nearest ~-8 8, 8m) · deepslate_gold_ore×604 (nearest ~-8 8, 8m) · deepslate_iron_ore×540 (nearest ~-8 8, 8m) · deepslate_lapis_ore×340 (nearest ~-8 8, 8m) · lapis_ore×268 (nearest ~-8 8, 8m) · deepslate_copper_ore×128 (nearest ~-24 -8, 18m)\nwood: 785 log blocks\nfound: oak_leaves @ -17 97 10 (4m) · oak_leaves @ -16 97 11 (5m) · oak_leaves @ -16 96 10 (5m) · oak_leaves @ -15 96 10 (5m) · oak_leaves @ -17 97 11 (5m) · oak_leaves @ -17 96 10 (5m, buried) · oak_leaves @ -18 97 11 (5m) · oak_leaves @ -16 95 9 (5m) · oak_leaves @ -18 96 10 (5m) · oak_leaves @ -16 96 11 (5m, buried) · oak_leaves @ -15 96 11 (5m) · oak_leaves @ -17 95 9 (5m) +12 more",
+  "map": "north ↑ · 1 char = 1 chunk (16×16) · top-left block -48 -32\n$$$$$\n$$$$$\n$$@$$\n$$$$$\n$$$$$\n$ rare ores · @ you",
+  "heights": [
+    {
+      "x": -20,
+      "z": 4,
+      "hit": {
+        "x": -20,
+        "y": 91,
+        "z": 4,
+        "id": "minecraft:grass_block",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "snowy": "false"
+        }
+      }
+    },
+    {
+      "x": -20,
+      "z": 8,
+      "hit": {
+        "x": -20,
+        "y": 93,
+        "z": 8,
+        "id": "minecraft:leaf_litter",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "facing": "east",
+          "segment_amount": "3"
+        }
+      }
+    },
+    {
+      "x": -20,
+      "z": 12,
+      "hit": {
+        "x": -20,
+        "y": 92,
+        "z": 12,
+        "id": "minecraft:grass_block",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "snowy": "false"
+        }
+      }
+    },
+    {
+      "x": -16,
+      "z": 4,
+      "hit": {
+        "x": -16,
+        "y": 87,
+        "z": 4,
+        "id": "minecraft:grass_block",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "snowy": "false"
+        }
+      }
+    },
+    {
+      "x": -16,
+      "z": 8,
+      "hit": {
+        "x": -16,
+        "y": 97,
+        "z": 8,
+        "id": "minecraft:birch_leaves",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "distance": "2",
+          "persistent": "false",
+          "waterlogged": "false"
+        }
+      }
+    },
+    {
+      "x": -16,
+      "z": 12,
+      "hit": {
+        "x": -16,
+        "y": 96,
+        "z": 12,
+        "id": "minecraft:oak_leaves",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "distance": "2",
+          "persistent": "false",
+          "waterlogged": "false"
+        }
+      }
+    },
+    {
+      "x": -12,
+      "z": 4,
+      "hit": {
+        "x": -12,
+        "y": 93,
+        "z": 4,
+        "id": "minecraft:oak_leaves",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "distance": "3",
+          "persistent": "false",
+          "waterlogged": "false"
+        }
+      }
+    },
+    {
+      "x": -12,
+      "z": 8,
+      "hit": {
+        "x": -12,
+        "y": 93,
+        "z": 8,
+        "id": "minecraft:oak_leaves",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "distance": "3",
+          "persistent": "false",
+          "waterlogged": "false"
+        }
+      }
+    },
+    {
+      "x": -12,
+      "z": 12,
+      "hit": {
+        "x": -12,
+        "y": 93,
+        "z": 12,
+        "id": "minecraft:oak_leaves",
+        "air": false,
+        "liquid": false,
+        "properties": {
+          "distance": "3",
+          "persistent": "false",
+          "waterlogged": "false"
+        }
+      }
+    }
+  ]
+}
