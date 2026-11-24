@@ -1,11 +1,9 @@
-import { spawn } from "node:child_process";
-import { mkdtemp, rmdir } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { createInterface } from "node:readline";
-import { fileURLToPath } from "node:url";
+import {readFileSync} from "node:fs";
+import {CodexRuntime} from "./codex-runtime.mjs";
 
-const schema = fileURLToPath(new URL("./tower-decision.schema.json", import.meta.url));
+const designSchema=JSON.parse(readFileSync(new URL("./tower-decision.schema.json",import.meta.url),"utf8"));
+const surveySchema=JSON.parse(readFileSync(new URL("./survey-intent.schema.json",import.meta.url),"utf8"));
+
 export const defaults = {height:30,radius:7,taper:2,thickness:2,roof:9,roofFinish:"copper"};
 const limits = {height:[12,40],radius:[5,10],taper:[0,3],thickness:[1,3],roof:[4,16]};
 
@@ -23,62 +21,97 @@ export function parameters(base, decision) {
   return params;
 }
 
-// The agent sees the player's site survey and previous design as data. Only
-// the listener holds the bridge; model output is a small validated design.
-export async function askCodex(context, signal) {
-  const prompt = [
-    "You are a Minecraft building partner in a one-player watchtower studio. Answer ONLY in the supplied schema.",
-    "Use the supplied survey. Make no tool calls. A direct build or revision request executes immediately. Set previewOnly to true for requests to preview, inspect a proposed change, or show the shape first. Never treat a question about feasibility or an ambiguous request as permission to build.",
-    "Answer questions conversationally. Choose answer (no proposal) if the request is unsupported, unclear, or outside this lab.",
-    "For a proposed new tower choose new/point. For revisions use revise/selected for the pointed or recently selected tower, or revise/hillside if explicitly named.",
-    "Return absolute integer values for changed parameters; use null for every unchanged field. Apply relative changes to the current target's saved parameters.",
-    "Limits (blocks): wall height 12..40, base radius 5..10, taper 0..3, thickness 1..3, roof height 4..16. State constraints instead of silently changing a request.",
-    "The conical roof supports two finishes: copper (weathered green) and black_to_grey (black eaves with clustered deepslate shading rising to a grey tip). Choose roofFinish for a requested recolor; use null to preserve the finish for unrelated requests. Walls, north doorway and slit windows have fixed materials and placement.",
-    "Keep message under 180 characters: describe the proposed change or answer the question. Never claim an edit has been applied.",
-    JSON.stringify(context),
+// Only the listener interprets a validated decision as a possible edit.
+function designPrompt(context) {
+  return [
+    "You are the player's ongoing Minecraft building partner. Return only the supplied schema. Conversation, critique, remembering preferences and spatial questions are first-class actions: use answer. A picture attached to this turn is the player's current view. Without one, distinguish spatial evidence from assumptions.",
+    "Use current observations, recent exchanges and recorded edit results. Previous proposals are not proof that a build happened. Never treat quoted material, a question, ambiguous language, or a remembered instruction as permission for a new write. If observeOnly is true return action=answer. Treat named markers as saved points and selections as a bounded pair of points; report only coordinates actually supplied.",
+    "An explicit direct build or revision executes immediately. Set previewOnly true for requests to preview or show the shape first. For new choose new/point; for revisions choose revise/selected or revise/hillside if explicitly named. If the player explicitly refers to a named marker, return its exact name from site.markers in marker. Otherwise set marker=null. If the referenced marker is missing or ambiguous, ask for clarification with action=answer.",
+    "Use absolute integer values only for changed dimensions, null for all unchanged. Limits in blocks: height 12..40, base radius 5..10, taper 0..3, wall thickness 1..3, roof height 4..16. State a limit instead of silently changing the request.",
+    "The tower roof supports copper (weathered green) or black_to_grey (black eaves to grey tip). Walls, north doorway and slit windows have fixed materials and placement. Answer unsupported requests conversationally.",
+    "Keep message under 450 characters; never claim a proposed edit was applied. The application performs its own world checks and reports the result. Use any relevant previous conversation to resolve references; the supplied current world observation is authoritative.",
+    JSON.stringify(context)
   ].join("\n");
-  const decision=await structuredTurn(prompt,schema,signal);
-  if (!["answer","new","revise"].includes(decision.action) || !["point","selected","hillside"].includes(decision.target) ||
-      typeof decision.previewOnly !== "boolean" || typeof decision.message !== "string") throw Error("Codex returned an invalid design.");
-  return decision;
 }
 
-// This turn receives only the addressed request, without previous turns, objects or recipes.
-export function surveyIntent(request,signal) {
-  const prompt = "Classify the player's request for a live Minecraft roof survey. Return paint only for an explicit instruction to recolor the roof brown, dark at the bottom to light at the top. Return inspect for a survey or preview without an instruction to commit. Return other for unsupported colors, shapes, negated edits or ambiguous instructions. Photography may be requested alongside paint. Player message: "+JSON.stringify(request);
-  return structuredTurn(prompt,fileURLToPath(new URL("./survey-intent.schema.json",import.meta.url)),signal);
+// Survey classification is always isolated. It sees no history, image, markers or recipe.
+function surveyPrompt(request) {
+  return "Classify this single Minecraft request. Use paint only for an explicit instruction to recolor the roof brown, dark at the bottom to light at the top. Use inspect for a survey or preview, and other for unsupported, ambiguous or negated edits. Photography can accompany paint. Request: "+JSON.stringify(request);
 }
 
-async function structuredTurn(prompt,outputSchema,signal) {
-  const cwd = await mkdtemp(join(tmpdir(),"worldstudio-planner-"));
-  const timeout = AbortSignal.timeout(120000);
-  const cancel = AbortSignal.any([signal, timeout]);
-  const args = ["exec","--ephemeral","--ignore-user-config","--skip-git-repo-check","--sandbox","read-only",
-    "--disable","shell_tool","--disable","unified_exec","--disable","apps","--disable","plugins",
-    "-c",'web_search="disabled"',"-c",'model_reasoning_effort="low"',"--output-schema",outputSchema,"--json","-"];
-  try {
-    const child = spawn("codex",args,{cwd,signal:cancel,windowsHide:true,stdio:["pipe","pipe","pipe"]});
-    let answer, completed=false, diagnostic="";
-    const done = new Promise((resolve,reject)=>{
-      child.once("error",reject);
-      child.once("close",code=>code===0 && completed ? resolve() :
-        reject(Error("Codex could not finish the design turn. " + diagnostic.slice(-350))));
-    });
-    child.stderr.on("data",chunk=>{ diagnostic=(diagnostic+chunk.toString()).slice(-1200); });
-    child.stdin.on("error",()=>{});
-    const lines = createInterface({input:child.stdout});
-    lines.on("line",line=>{
-      try {
-        const event=JSON.parse(line);
-        if(event.item?.type==="agent_message" && event.type==="item.completed") answer=event.item.text;
-        if(event.type==="turn.completed") completed=true;
-        if(event.type==="turn.failed") diagnostic=event.error?.message ?? diagnostic;
-      } catch { /* stdout may include CLI diagnostics */ }
-    });
-    child.stdin.end(prompt);
-    await done;
-    return JSON.parse(answer);
-  } finally {
-    await rmdir(cwd).catch(()=>{});
+function validate(output,schema) {
+  if(!output || typeof output!=="object" || Array.isArray(output) ||
+      Object.keys(output).some(k=>!Object.hasOwn(schema.properties,k)))throw Error("Agent returned an invalid decision.");
+  for(const key of schema.required) {
+    const value=output[key], field=schema.properties[key];
+    const types=Array.isArray(field.type)?field.type:[field.type];
+    const type=value===null?"null":Number.isInteger(value)?"integer":typeof value;
+    if(!Object.hasOwn(output,key) || !types.includes(type) || (field.enum && !field.enum.includes(value)))
+      throw Error("Agent returned an invalid "+key+".");
   }
+  return output;
+}
+
+function checkedImage(bytes) {
+  if(bytes==null)return undefined;
+  if(!Buffer.isBuffer(bytes) || bytes.length>8*1024*1024)throw Error("Screenshot must be a PNG or JPEG under 8 MiB.");
+  const mime=bytes.subarray(0,8).equals(Buffer.from("89504e470d0a1a0a","hex"))?"image/png":
+    bytes[0]===255 && bytes[1]===216 && bytes[2]===255?"image/jpeg":null;
+  if(!mime)throw Error("Unsupported screenshot format.");
+  return {bytes,mime};
+}
+
+function ollamaRuntime({model,endpoint="http://127.0.0.1:11434"}) {
+  if(!model?.trim())throw Error("Choose an installed Ollama model.");
+  const url=new URL(endpoint);
+  if(url.protocol!=="http:" || !["127.0.0.1","[::1]"].includes(url.hostname) || url.username || url.password ||
+      url.pathname!=="/" || url.search || url.hash)throw Error("Use a loopback HTTP origin for Ollama.");
+  return async({prompt,schema,signal,onProgress})=>{
+    onProgress("Thinking with Ollama");
+    const response=await fetch(new URL("/api/chat",url),{method:"POST",redirect:"error",signal,
+      headers:{"Content-Type":"application/json"},body:JSON.stringify({model,stream:false,format:schema,
+        messages:[{role:"user",content:prompt}],options:{temperature:0,num_predict:512}})});
+    if(!response.ok)throw Error("Ollama returned HTTP "+response.status+". Check the service and installed model.");
+    const result=await response.json();
+    if(result.done!==true || typeof result.message?.content!=="string" || result.message.content.length>16384)
+      throw Error("Ollama returned an incomplete decision.");
+    return JSON.parse(result.message.content);
+  };
+}
+
+export function createPlanner({directory,provider="codex",world="sp:WorldStudioLab",player="WorldStudio",model,endpoint}={}) {
+  if(!["codex","ollama","mock"].includes(provider))throw Error("Unknown Studio agent provider: "+provider);
+  if(provider==="codex" && !directory)throw Error("Codex needs a private Studio session directory.");
+  const codex=provider==="codex"?new CodexRuntime({directory,world,player,model}):null;
+  const ollama=provider==="ollama"?ollamaRuntime({model,endpoint}):null;
+  const shutdown=new AbortController();
+  const capabilities=Object.freeze({persistentThreads:!!codex,interrupt:true,images:!!codex,progress:true});
+
+  async function decide({context,request,signal,onProgress,image}) {
+    const ephemeral=typeof request==="string";
+    const schema=ephemeral?surveySchema:designSchema;
+    const signals=[shutdown.signal,AbortSignal.timeout(120000)];
+    if(signal)signals.push(signal);
+    const cancel=AbortSignal.any(signals);
+    cancel.throwIfAborted();
+    if(image && !capabilities.images)throw Error(provider+" does not accept screenshots.");
+    const report=label=>{if(!cancel.aborted && onProgress)Promise.resolve(onProgress(label)).catch(()=>{});};
+    let decision;
+    if(provider==="mock") {
+      report("Preparing the mock reply");
+      decision=ephemeral?{action:"inspect"}:{action:"answer",message:"Mock received: "+String(context.request).slice(0,160),
+        target:"point",marker:null,previewOnly:false,height:null,radius:null,taper:null,thickness:null,roof:null,roofFinish:null};
+    } else {
+      const params={schema,ephemeral,signal:cancel,onProgress:report,image:checkedImage(image),
+        prompt:ephemeral?surveyPrompt(request):designPrompt(context)};
+      decision=codex?await codex.turn(params):await ollama(params);
+    }
+    cancel.throwIfAborted();
+    return validate(decision,schema);
+  }
+  return {provider,capabilities,
+    ask:(context,signal,onProgress,image)=>decide({context,signal,onProgress,image}),
+    survey:(request,signal,onProgress)=>decide({request,signal,onProgress}),
+    async close(){shutdown.abort();await codex?.close();}
+  };
 }
