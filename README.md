@@ -12,11 +12,19 @@ From this directory in PowerShell 7, start the installed client. The launcher us
 .\scripts\Start-Client.ps1
 ```
 
-Open **this repository** as a Codex project, or run `codex` from a second terminal in the repository. In a new conversation, try:
+For in-game collaboration, start the listener from a second PowerShell terminal.
+
+```powershell
+.\scripts\Start-Chat.ps1 -Background
+```
+
+When **Studio ready** appears in Minecraft, try `@studio make the hillside watchtower roof two blocks taller`. Inspect the particle guide, then use the proposal ID to approve or reject it. Use `@studio undo` for a checked reversal. [Chat commands and recovery](docs/in-game-building.md)
+
+For the full MCP toolset, open **this repository** as a Codex project, or run `codex` from a second terminal in the repository. In a new conversation, try:
 
 > Use World Studio to inspect my position and the block I’m looking at. Show me a short in-game message describing the site. Wait for me before building.
 
-Start with `agent_brief` and `get_self`. Check for `sp:WorldStudioLab`, the Overworld and Creative mode. For a player-only reply, use `show_message`. In-game messages are readable during an active Codex turn. Starting a Codex turn by typing in Minecraft remains a development item.
+Start with `agent_brief` and `get_self`. Check for `sp:WorldStudioLab`, the Overworld and Creative mode. For a player-only reply, use `show_message`. In-game messages are readable during an active Codex turn. The separate listener starts a design turn when the local player addresses `@studio`.
 
 Use `send_chat` with the normal WorldEdit command text when the edit should use the player's clipboard, selection or history. For an AI-owned WorldEdit session, the console route worked after an explicit world override. [Exact commands and readback](docs/console-worldedit.json) Check block states afterward. For the gallery fixtures start in their empty reserved plots on a fresh save. Several intentionally reject a second run over the completed build.
 

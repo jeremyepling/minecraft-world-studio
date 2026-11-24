@@ -94,6 +94,8 @@ function runs(cells) {
   return out;
 }
 const next = design(a);
+// Host-side approval planning uses these same skill voxels without touching a world.
+if (a.action === "geometry") return runs(next).map(r => [r.x, r.y, r.z, r.top, r.id]);
 if (a.action === "describe") return {blocks: next.size, verticalRuns: runs(next).length};
 const prev = a.previous ? design({...a, ...a.previous, sample:a.sample}) : new Map();
 const {x: ox, y: oy, z: oz} = a.origin;

@@ -18,6 +18,8 @@ The installer verifies each mod digest and the PortableMC 5.0.6 Windows archive,
 
 On a fresh install choose **Singleplayer → Create New World** (an empty instance opens creation directly). Name it **WorldStudioLab**, select **Creative**, confirm **Allow Commands: ON** and choose **Create New World**. For the same terrain, select the **World** tab, retain the default world type and enter the seed `-8552018580008125303`. This value was read from the running save with the vanilla seed command. Choosing another seed changes the road and terrain results. Axiom's first-run welcome screen can pause the integrated server. Dismiss it before timing edits. Use this save exclusively for the tests. Subsequent launches request this save automatically.
 
+To request builds directly in game, run `.\scripts\Start-Chat.ps1 -Background` with the lab open and a signed-in Codex CLI. [In-game building](in-game-building.md)
+
 Use **Esc → Save and Quit to Title → Quit Game** to stop. For a backup, close the client fully and copy the entire local/instance/saves/WorldStudioLab directory into a new private local/backups folder. Keep all dimension and player subdirectories. To verify restoration without affecting current work, copy the backup into a new, distinct save folder while the client is closed, then open that copy intentionally and check landmarks. A copy has a different MCPFabric world identity. The Studio evaluation scripts pin sp:WorldStudioLab.
 
 ## Bridge and permissions

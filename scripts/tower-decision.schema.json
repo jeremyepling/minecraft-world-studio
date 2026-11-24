@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "action",
+    "target",
+    "message",
+    "height",
+    "radius",
+    "taper",
+    "thickness",
+    "roof"
+  ],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "answer",
+        "revise",
+        "new"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "enum": [
+        "point",
+        "selected",
+        "hillside"
+      ]
+    },
+    "message": {
+      "type": "string"
+    },
+    "height": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "radius": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "taper": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "thickness": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "roof": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  }
+}

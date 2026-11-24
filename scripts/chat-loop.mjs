@@ -1,0 +1,252 @@
+import { createServer } from "node:net";
+import { createHash, randomBytes } from "node:crypto";
+import { existsSync, realpathSync, unlinkSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { setTimeout as sleep } from "node:timers/promises";
+import { stripPrefix } from "../local/server/server/channel.js";
+import { connect } from "../experiments/client.mjs";
+import { askCodex, defaults, parameters } from "./studio-planner.mjs";
+import { StudioState } from "./studio-state.mjs";
+import { previewTower, applyTower, reverseTower } from "./tower.mjs";
+
+const WORLD="sp:WorldStudioLab", DIM="minecraft:overworld";
+const hillside={origin:{x:9,y:96,z:86},params:{...defaults,roof:10},exclude:[]};
+const argv=process.argv.slice(2);
+if(argv.length && !(argv.length===2 && argv[0]==="--test-state" && /^[a-z0-9-]{1,48}$/i.test(argv[1]))) {
+  throw Error("Usage: node scripts/chat-loop.mjs [--test-state LABEL]");
+}
+const local=realpathSync(fileURLToPath(new URL("../local/",import.meta.url)));
+const dir=join(local,argv.length?"chat-loop-test-"+argv[1]:"chat-loop");
+// One listener per bridge, including fixtures. Windows releases the named pipe on exit.
+const lock=createServer(socket=>socket.destroy());
+const lockName="\\\\.\\pipe\\worldstudio-chat-"+createHash("sha256").update(local.toLowerCase()).digest("hex").slice(0,20);
+await new Promise((resolve,reject)=>{ lock.once("error",()=>reject(Error("Another World Studio listener is active."))); lock.listen(lockName,resolve); });
+const store=new StudioState(dir), state=store.data;
+const stopFile=join(dir,"stop.request");
+if(existsSync(stopFile)) unlinkSync(stopFile);
+if(state.active) store.finish(null);
+const c=await connect();
+let busy, stopping=false, online=false, cursor=0;
+
+const compact = txt => String(txt).replace(/[\u0000-\u001f\u007f§]/g," ").trim();
+async function say(text) {
+  text=compact(text).slice(0,490);
+  console.log(text);
+  await c.tool("show_message",{text});
+}
+
+async function context() {
+  const [status,screen]=await Promise.all([c.tool("get_status"),c.tool("get_screen")]);
+  if(!screen.inWorld || screen.lastWorldId!==WORLD || !status.integratedServer || status.playerCount!==1)
+    throw Error("Open WorldStudioLab in singleplayer.");
+  const self=await c.tool("get_self");
+  if(self.dimension!==DIM || self.gameMode!=="creative" || status.aiPaused || screen.paused)
+    throw Error("Resume the lab in Creative mode in the Overworld.");
+  return self;
+}
+function contains(t,p) {
+  const o=t.origin, n=t.params;
+  return p && Math.abs(p.x-o.x)<=n.radius+1 && Math.abs(p.z-o.z)<=n.radius+1 &&
+    p.y>=o.y && p.y<o.y+n.height+n.roof;
+}
+async function survey() {
+  const self=await context();
+  const ray=await c.tool("raycast",{origin:{x:self.x,y:self.y+1.62,z:self.z},yaw:self.yaw,pitch:self.pitch,
+    maxDistance:96,includeEntities:false,dimension:DIM});
+  if(!state.towers.hillside) {
+    // Adopt only the original lab landmark, identified by its actual copper crown.
+    const crown=await c.tool("get_block",{x:9,y:135,z:86,dimension:DIM}).catch(()=>null);
+    const brim=await c.tool("get_block",{x:15,y:126,z:86,dimension:DIM}).catch(()=>null);
+    if([crown,brim].every(b=>b?.id==="minecraft:waxed_weathered_cut_copper")) {
+      state.towers.hillside=hillside;
+      store.save();
+    }
+  }
+  const hit=ray.hitType==="block"?ray.block:null;
+  const pointed=Object.keys(state.towers).find(key=>contains(state.towers[key],hit));
+  return {hit,selected:pointed??state.selected,player:{x:self.x,y:self.y,z:self.z,yaw:self.yaw,pitch:self.pitch}};
+}
+
+function proposalText(p) {
+  const {origin:o,next:n,count,protectedCount}=p.plan;
+  return `Proposal ${p.id} at ${o.x} ${o.y} ${o.z}. ${p.summary} Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}; roof ${n.roof}. ${count} cells to change, ${protectedCount} protected. @studio approve ${p.id} or @studio reject ${p.id}.`;
+}
+async function outline(p) {
+  await context();
+  // Particle positions are a read-only visual guide for the massing. No blocks occupy the outline.
+  const code=`const {origin:o,next:n}=mc.args;
+    const tiers=[[0,n.radius],[n.height-1,n.radius-n.taper],[n.height,n.radius-n.taper+1],[n.height+n.roof-1,0]];
+    for(const [dy,r] of tiers) {
+      const samples=r?16:1;
+      for(let i=0;i<samples;i++) {
+        const angle=2*Math.PI*i/samples;
+        const x=(o.x+.5+r*Math.cos(angle)).toFixed(2),z=(o.z+.5+r*Math.sin(angle)).toFixed(2);
+        await mc.run_command({command:"execute in minecraft:overworld run particle minecraft:end_rod "+x+" "+(o.y+dy+.6)+" "+z+" 0 .08 0 0 2 force WorldStudio"});
+      }
+    }`;
+  await c.tool("run_script",{code,args:{origin:p.plan.origin,next:p.plan.next}});
+}
+
+// Publishing a final HUD reply is the hand-off to the next player input.
+function acceptNextInput(signal) {
+  if(busy?.abort.signal===signal) busy=null;
+}
+
+async function design(request,signal) {
+  const site=await survey();
+  const prior=state.pending;
+  const objects=Object.fromEntries(Object.entries(state.towers).map(([key,t])=>[key,{origin:t.origin,params:t.params}]));
+  await say("Designing with Codex. You can type @studio cancel.");
+  const decision=await askCodex({request,site,towers:objects,defaultNewTower:defaults,recent:state.turns,
+    pending:prior?{key:prior.key,origin:prior.plan.origin,params:prior.plan.next}:null},signal);
+  signal.throwIfAborted();
+  await context();
+  const summary=compact(decision.message).slice(0,170);
+  state.turns=[...state.turns,{request,reply:summary}].slice(-4);
+  if(decision.action==="answer") { store.save(); await say(summary||"Please describe the tower or revision.");return; }
+  if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before proposing another edit.");
+  let key, before, origin, base;
+  if(decision.action==="new") {
+    if(!site.hit) throw Error("Point at solid ground within 96 blocks for a new tower.");
+    if(Object.values(state.towers).some(t=>contains(t,site.hit))) throw Error("Aim at the ground for a new tower, or ask to revise this one.");
+    origin={x:site.hit.x,y:site.hit.y+1,z:site.hit.z};
+    key="tower-"+[origin.x,origin.y,origin.z].join("_"); before=null; base=defaults;
+  } else {
+    key=decision.target==="hillside"?"hillside":site.selected??prior?.key;
+    before=state.towers[key]??null;
+    if(prior && prior.key===key) { origin=prior.plan.origin; base=prior.plan.next; }
+    else if(before) { origin=before.origin;base=before.params; }
+    else throw Error("Point at a known tower or ask for a new tower on the ground.");
+  }
+  const next=parameters(base,decision);
+  // Keep an independently owned tower out of this object's editing footprint.
+  for(const [other,t] of Object.entries(state.towers)) {
+    if(other===key) continue;
+    const radius=next.radius+t.params.radius+2;
+    if(Math.abs(origin.x-t.origin.x)<=radius && Math.abs(origin.z-t.origin.z)<=radius &&
+      origin.y<t.origin.y+t.params.height+t.params.roof && origin.y+next.height+next.roof>t.origin.y)
+      throw Error("That footprint overlaps another Studio tower. Select a different site.");
+  }
+  const plan=await previewTower(c,origin,before?.params??null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
+  signal.throwIfAborted();
+  if(!plan.count) { state.pending=null;store.save();await say(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
+  const p={id:randomBytes(4).toString("hex"),key,before,plan,summary};
+  await outline(p).catch(e=>console.error("Particle guide unavailable:",e.message));
+  signal.throwIfAborted();
+  state.pending=p;state.selected=key;store.save();
+  acceptNextInput(signal);
+  await say(proposalText(p));
+}
+
+async function edit(direction,entry,signal) {
+  await context();
+  const plan=direction==="apply"?entry.plan:reverseTower(entry.applied);
+  signal.throwIfAborted();
+  store.begin(direction,entry);
+  let receipt,result;
+  try { result=await applyTower(c,plan,store.callbacks(signal)); }
+  finally { receipt=store.finish(result); }
+  acceptNextInput(signal);
+  const verb=direction==="apply"?"Applied":"Undid";
+  await say(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.`);
+}
+function start(label,work) {
+  const abort=new AbortController();
+  const task={label,abort};
+  busy=task;
+  task.done=work(abort.signal).catch(async e=>{
+    console.error(label,e.message);
+    const advice=state.history.at(-1)?.partial?" Type @studio undo to recover confirmed writes.":"";
+    const unknown=state.lastUncertain;
+    const detail=unknown?` Inspect the uncertain column at ${unknown.run.x} ${unknown.run.y} ${unknown.run.z}.`:"";
+    const error=abort.signal.aborted?"Cancelled.":e.message.startsWith("Codex could not")?"Codex could not finish the design turn. Check the listener log.":e.message;
+    await say((error+advice+detail).slice(0,450)).catch(()=>{});
+  }).finally(()=>{ if(busy===task)busy=null; });
+}
+function recoveryNote() {
+  const messages=[];
+  if(state.history.at(-1)?.partial) messages.push("An interrupted revision has confirmed writes. Use @studio undo.");
+  const r=state.lastUncertain?.run;
+  if(r) messages.push("An unacknowledged column is protected. Inspect "+r.x+" "+r.y+" "+r.z+" through y="+r.top+".");
+  return messages.join(" ");
+}
+async function handle(input) {
+  const body=input.trim();
+  const cmd=body.toLowerCase();
+  if(cmd==="status" || cmd==="help") {
+    await say(busy ? "Working: "+busy.label : state.pending ? proposalText(state.pending) :
+      recoveryNote() || "Studio ready. Point and ask @studio build a watchtower here, or @studio make the hillside roof two blocks taller. Use @studio undo after a revision.");
+    return;
+  }
+  if(cmd==="cancel" || cmd==="stop") {
+    if(busy) {busy.abort.abort();await say("Stopping the current request.");}
+    else {state.pending=null;store.save();await say("Cancelled. No pending design.");}
+    return;
+  }
+  if(busy) {await say("One request is active. Use @studio status or @studio cancel.");return;}
+  const [verb,id,...extra]=cmd.split(/\s+/);
+  if(["approve","reject"].includes(verb)) {
+    if(!state.pending || id!==state.pending.id || extra.length) {
+      await say("That proposal ID is not current. Type @studio status.");return;
+    }
+    if(verb==="reject") {state.pending=null;store.save();await say("Rejected "+id+". No blocks changed.");return;}
+    const p=state.pending;
+    start("applying "+id,s=>edit("apply",p,s));return;
+  }
+  if(cmd==="undo") {
+    const last=state.history.at(-1);
+    if(!last){await say("No Studio revision to undo.");return;}
+    start("undoing "+last.id,s=>edit("undo",last,s));return;
+  }
+  if(cmd==="preview") {
+    if(state.pending) start("showing the proposal",async signal=>{
+      const p=state.pending;
+      await outline(p);
+      signal.throwIfAborted();
+      acceptNextInput(signal);
+      await say(proposalText(p));
+    });
+    else await say("No pending design.");
+    return;
+  }
+  start("designing",s=>design(body,s));
+}
+
+function shutdown() { stopping=true;busy?.abort.abort(); }
+process.on("SIGINT",shutdown);
+process.on("SIGTERM",shutdown);
+try {
+  while(!stopping && !existsSync(stopFile)) {
+    try {
+      if(!online) {
+        await context();
+        cursor=(await c.tool("poll_events",{limit:1})).lastId;
+        state.cursor=cursor;store.save(); online=true;
+        await say(("Studio ready. Type @studio followed by a request. Use @studio status for help. "+recoveryNote()).trim());
+      }
+      const batch=await c.tool("poll_events",{types:["chat","left_world"],sinceId:cursor,limit:500});
+      if(batch.lastId<cursor) { online=false;busy?.abort.abort();continue; }
+      for(const e of batch.events) {
+        if(e.id<=cursor) continue;
+        cursor=e.id;
+        if(e.type==="left_world") {online=false;busy?.abort.abort();break;}
+        const d=e.data;
+        if(e.type!=="chat" || d?.kind!=="chat" || d.self!==true || d.sender!=="WorldStudio" || typeof d.text!=="string") continue;
+        const input=stripPrefix(d.text,"@studio");
+        if(!input) continue;
+        // Consume before dispatch. A crash during handling cannot reapprove a write.
+        state.cursor=cursor;store.save();
+        await handle(input);
+      }
+      await sleep(300);
+    } catch(e) {
+      if(online) {console.error("Studio disconnected:",e.message);busy?.abort.abort();}
+      online=false;
+      await sleep(1200);
+    }
+  }
+} finally {
+  shutdown();await busy?.done;await c.close();lock.close();
+  if(existsSync(stopFile))unlinkSync(stopFile);
+}
