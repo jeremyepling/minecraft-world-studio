@@ -1,5 +1,7 @@
 # Known limitations
 
+* **Marker visibility.** The menu saves names and coordinates. White sparkles appear briefly when marking, moving or locating a point. To see one again, use **J → Saved markers → Locate**. The picker reads the session on opening and the Studio listener handles its commands. [Menu guide](collaborate.md)
+
 * **Conversation and providers.** The Codex adapter requires a signed-in CLI and model access. The local Ollama adapter needs a running service and a compatible installed model. Vision is available on the Codex path. The mock adapter returns test responses. [Provider capabilities](agent-providers.md)
 * **Spatial selection.** Markers and two-point selections are private to this lab and player. A region limits direct build writes. A marker stores a coordinate; a later block at that coordinate can differ. The independent roof survey supports a distinct tapered cap of eligible full blocks and stops on ambiguity. General architecture recognition and GIS planning are future work. [Survey](../scripts/survey-roof.mjs)
 * **Creative control.** A particle outline shows massing. Checked writes and undo protect divergent states. Comparing block states cannot identify who placed a matching block. Interrupted multi-column work can be partial. Transactions, redo and ghost-block alternatives are future work. A surveyed recolor has its own undo receipt and does not update the recipe. [Recovery](in-game-building.md)

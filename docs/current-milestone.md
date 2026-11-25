@@ -5,7 +5,7 @@
 | Experience | Implementation |
 | --- | --- |
 | Keep a conversation | Codex App Server keeps a dedicated thread. Studio resumes it across listener restarts. It also saves provider-independent messages and world references in private storage. |
-| Refer to the world | A view ray identifies the pointed block. Name and highlight markers, select a point or two corners, refer to a saved marker in a request, or explicitly attach the current framebuffer for a read-only critique. |
+| Refer to the world | Press **J** for the rebindable Studio menu. Save a crosshair target, locate it by its white sparkles, select a point or two corners, or attach the current framebuffer for a read-only critique. Chat commands remain available. |
 | Control the work | Direct build requests retain checked writes and undo. Explicit previews are read-only. The HUD reports activity and block progress. Cancel or redirect an active turn from chat or recognized speech. |
 | Choose input and output | Text is available throughout. F8 push-to-talk and spoken replies are independently opt-in. The Windows helper checks the focused Studio instance and lab authorization. |
 | Choose an agent | Codex is the default. The mock adapter supports offline tests. The Ollama adapter accepts a compatible installed local model through loopback. Image-capable turns currently use Codex. |

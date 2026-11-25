@@ -8,7 +8,7 @@ For project direction, start with the [product vision](docs/product-vision.md), 
 
 ## Open the lab
 
-Double-click **World Studio.cmd** to open the lab and its chat listener. Try `@studio help`, or aim at a block and type `@studio mark River Gate`. [In-game conversation, markers and voice](docs/collaborate.md)
+Double-click **World Studio.cmd** to open the lab and its chat listener. Aim at a block, press **J**, choose **Mark this block**, and give it a name. Press **J → Saved markers** to find it again. [In-game menu, chat and voice](docs/collaborate.md)
 
 For a client-only launch from PowerShell 7, use the private `WorldStudioLab` save and local player `WorldStudio`.
 

@@ -92,6 +92,32 @@ async function viewRay() {
     maxDistance:96,includeEntities:false,dimension:DIM});
   return {hit:ray.hitType==="block"?ray.block:null,player:{x:self.x,y:self.y,z:self.z,yaw:self.yaw,pitch:self.pitch}};
 }
+async function highlight(point) {
+  const pos=[point.x+0.5,point.y+1.2,point.z+0.5].join(" ");
+  const r=await c.tool("run_command",{command:"execute in minecraft:overworld run particle minecraft:end_rod "+pos+" .18 .45 .18 .015 32 force WorldStudio"});
+  return r.success;
+}
+
+async function saveMarker(name,hit,move) {
+  const point=session.mark(name,hit,move);
+  const lit=await highlight(point).catch(()=>false);
+  await say("Marked "+point.name+" at "+coordinates(point)+" ("+point.block+")."+(lit?"":" Highlight unavailable."));
+}
+
+async function menuMarker(body) {
+  const match=body.match(/^menu (mark|move) (-?\d+) (-?\d+) (-?\d+) (.+)$/i);
+  if(!match)throw Error("Reopen the Studio menu and choose a block and marker name.");
+  const [,action,rawX,rawY,rawZ,name]=match;
+  const [x,y,z]=[rawX,rawY,rawZ].map(Number);
+  const self=await context();
+  // Measure to the nearest point on the captured block, including faces at maximum reach.
+  const distance=(eye,min)=>Math.max(min-eye,0,eye-min-1);
+  if(Math.hypot(distance(self.x,x),distance(self.y+(self.sneaking?1.27:1.62),y),distance(self.z,z))>96)
+    throw Error("The marked block is now out of range. Aim at it and reopen the menu.");
+  const block=await c.tool("get_block",{x,y,z,dimension:DIM});
+  if(!block.id || block.air || block.id==="minecraft:air")throw Error("That block is now empty. Aim again.");
+  await saveMarker(name,{x,y,z,id:block.id},action.toLowerCase()==="move");
+}
 async function survey() {
   const view=await viewRay();
   if(!state.towers.hillside) {
@@ -341,10 +367,8 @@ async function handle(input) {
     await say(`Looking at ${hit?hit.id+" at "+coordinates(hit):"open space"}. Selection: ${selectionName(session.data.selection)}.`);return;
   }
   const mark=body.match(/^(mark|move marker)\s+(.+)$/i);
-  if(mark) {
-    const point=session.mark(mark[2],(await viewRay()).hit,mark[1].toLowerCase()==="move marker");
-    await say("Marked "+point.name+" at "+coordinates(point)+" ("+point.block+").");return;
-  }
+  if(mark)return saveMarker(mark[2],(await viewRay()).hit,mark[1].toLowerCase()==="move marker");
+  if(/^menu\s+(mark|move)\b/i.test(body))return menuMarker(body);
   if(/^markers(?:\s+\d+)?$/.test(cmd)) {
     const page=Number(cmd.split(/\s+/)[1]??1);
     const all=session.data.markers, pages=Math.max(1,Math.ceil(all.length/5));
@@ -365,9 +389,7 @@ async function handle(input) {
   const locate=body.match(/^locate\s+(.+)$/i);
   if(locate) {
     const m=session.marker(locate[1]);
-    const pos=[m.x+0.5,m.y+1.2,m.z+0.5].join(" ");
-    const r=await c.tool("run_command",{command:"execute in minecraft:overworld run particle minecraft:end_rod "+pos+" .18 .45 .18 .015 32 force WorldStudio"});
-    if(!r.success)throw Error("The marker could not be highlighted. Its coordinates are "+coordinates(m)+".");
+    if(!await highlight(m))throw Error("The marker could not be highlighted. Its coordinates are "+coordinates(m)+".");
     await say("Marker "+m.name+" at "+coordinates(m)+".");return;
   }
   if(/^survey\b/i.test(body)) {

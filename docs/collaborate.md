@@ -10,6 +10,17 @@ Double-click **World Studio.cmd** in the installed project. Enter the disposable
 4. Try `@studio voice on`, close chat, then hold **F8**, speak a short request and release. The HUD echoes the recognized words. For audible answers, use `@studio spoken on`. Both start off. [Voice configuration and controls](voice.md)
 5. Ask `@studio status` while a job runs. Use `@studio redirect <new request>` to interrupt it and start the replacement when it settles. Use `@studio cancel` to stop. If a build has already written blocks, `@studio undo` reverses its confirmed writes where their states still match.
 
+### Using the menu
+
+Press **J** while looking around the lab. To change the shortcut, open **Options → Controls → Key Binds → World Studio → Open World Studio menu**.
+
+* **Mark this block** remembers the block under your crosshair when you opened the menu, up to 96 blocks away. Enter a name and choose **Save marker**. A short burst of white end-rod sparkles appears just above the block. The name and coordinates persist after the sparkles fade.
+* **Saved markers** lists your points by name. Pick one and choose **Locate** to replay its sparkles, **Use this point** to target it for builds, or **Move here** to assign it to the block you aimed at before opening the menu.
+* For a bounded edit, pick a saved point, choose **Select region to…**, then pick the opposite corner. **Clear selection** returns to crosshair targeting.
+* **Ask Studio…** opens chat with the prefix filled in. **Inspect view** sends the current view for critique. **Studio status** and **Cancel request** work while the agent is busy.
+
+[Menu screenshot](../screenshots/studio-marker-menu.png) · [Marker sparkles above a riverbank](../screenshots/marker-sparkles.png)
+
 ### Reference locations
 
 | Chat | What happens |
@@ -17,7 +28,7 @@ Double-click **World Studio.cmd** in the installed project. Enter the disposable
 | `@studio where` | Identify the block under the crosshair, its coordinates and the active selection. |
 | `@studio mark River Gate` | Name the current ray hit (within 96 blocks). |
 | `@studio markers` or `@studio markers 2` | List saved points in pages. |
-| `@studio locate River Gate` | Draw a temporary particle at the point. |
+| `@studio locate River Gate` | Show a burst of 32 white end-rod particles just above the point. |
 | `@studio select River Gate` | Use that point as the working location for building requests. The edit resolves the current block at that position. |
 | `@studio select North to South` | Use two saved markers as opposite corners of an inclusive region. A build crossing this boundary stops. Undo follows the recorded edit. |
 | `@studio select clear` | Return to crosshair targeting. |

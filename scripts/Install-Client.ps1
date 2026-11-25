@@ -54,3 +54,4 @@ if (!(Test-Path -LiteralPath $options)) {
 }
 & $exe --main-dir $game start fabric:26.3:0.20.1 --dry --mc-dir $instance --jvm $Java --username WorldStudio --disable-multiplayer
 if ($LASTEXITCODE) {throw "PortableMC installation failed with exit $LASTEXITCODE"}
+& (Join-Path $PSScriptRoot 'Build-StudioMenu.ps1') -Java $Java

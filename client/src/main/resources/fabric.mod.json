@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "worldstudio_menu",
+  "version": "0.1.0",
+  "name": "World Studio Menu",
+  "description": "In-game controls for the Minecraft World Studio lab.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.worldstudio.menu.StudioMenuClient"]
+  },
+  "depends": {
+    "minecraft": "26.3",
+    "java": ">=25",
+    "fabricloader": ">=0.20.1",
+    "fabric-api": "*"
+  }
+}

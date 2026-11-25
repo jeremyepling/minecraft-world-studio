@@ -13,7 +13,7 @@ Addressed chat reaches a local listener and a persistent agent runtime. The list
 
 ## Boundaries for Milestone 1
 
-The current path is Minecraft chat or authorized push-to-talk → local listener → runtime turn with world context → local survey and checked executor → Minecraft readback and HUD reply. Studio owns the edit receipt. WorldEdit uses its own history. [Current milestone](current-milestone.md) · [Technical decisions](decisions.md)
+The native client menu submits addressed chat from the lab player. For a new marker it includes the block under the crosshair when the menu opened. The listener checks the world, range and live block before saving the point. The picker reads the scoped Studio session when opened. Menu, typed and spoken requests share the same dispatcher, edit receipts and HUD replies. WorldEdit uses its own history. [Current milestone](current-milestone.md) · [Technical decisions](decisions.md)
 
 | Responsibility | Direction as the collaboration loop grows |
 | --- | --- |

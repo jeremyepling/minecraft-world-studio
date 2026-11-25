@@ -22,6 +22,10 @@ To request builds directly in game, run `.\scripts\Start-Chat.ps1 -Background` w
 
 Use **Esc → Save and Quit to Title → Quit Game** to stop. For a backup, close the client fully and copy the entire local/instance/saves/WorldStudioLab directory into a new private local/backups folder. Keep all dimension and player subdirectories. To verify restoration without affecting current work, copy the backup into a new, distinct save folder while the client is closed, then open that copy intentionally and check landmarks. A copy has a different MCPFabric world identity. The Studio evaluation scripts pin sp:WorldStudioLab.
 
+## Updating the in-game menu
+
+The installer builds the client-only World Studio menu with JDK 25 using the pinned game's libraries. To update the menu in an existing installation, run `./scripts/Build-StudioMenu.ps1` in PowerShell 7, then fully quit Minecraft and reopen **World Studio.cmd**. If upgrading a running Studio listener, use `./scripts/Start-Chat.ps1 -Stop` while it is idle and wait for it to exit before relaunching.
+
 ## Bridge and permissions
 
 The client listens on 127.0.0.1:25639. Only its local/instance/config/mcpfabric.config.json supplies this project's bearer credentials. Automatic discovery is disabled. Local files under local/ contain secrets and should stay private. After starting Codex in the project, ask for agent_brief and get_self and verify the disposable world and player before an edit. Restarting restores the same save identity and credentials. The creative command path has owner-level privileges. The players_admin approval group gates native player administration, including message_player and teleport_player. show_message displays a local notification without that gate. A vanilla command can independently perform administrative operations. Treat the fixed world/port and private token as the boundary for this disposable installation.
