@@ -1,6 +1,7 @@
 import { createServer } from "node:net";
 import { createHash, randomBytes } from "node:crypto";
 import { existsSync, realpathSync, unlinkSync } from "node:fs";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -11,7 +12,9 @@ import { createVoice } from "./studio-voice.mjs";
 import { StudioSession, coordinates, inside, selectionName } from "./studio-session.mjs";
 import { surveyBrownRoof } from "./survey-roof.mjs";
 import { StudioState } from "./studio-state.mjs";
-import { previewTower, applyTower, reverseTower, recordedParameters } from "./tower.mjs";
+import { previewTower, previewBridge, applyDesign, reverseDesign, recordedParameters, designRuns, boundsOf } from "./tower.mjs";
+import {bridgeParameters,bridgeDefaults} from "../packages/geometry/bridge.ts";
+import {exportSchematic} from "./schematic.mjs";
 
 const WORLD="sp:WorldStudioLab", DIM="minecraft:overworld";
 const hillside={origin:{x:9,y:96,z:86},params:{...defaults,roof:10},exclude:[]};
@@ -131,7 +134,9 @@ async function survey() {
   }
   const s=session.data.selection;
   const anchor=s && !s.to?session.marker(s.from):null;
-  const pointed=Object.keys(state.towers).find(key=>contains(state.towers[key],anchor??view.hit));
+  const point=anchor??view.hit;
+  const pointed=Object.keys(state.towers).find(key=>contains(state.towers[key],point)) ??
+    Object.keys(state.bridges).find(key=>point && inside(state.bridges[key].bounds,point));
   const previous=state.history.at(-1);
   const lastEdit=previous?{id:previous.id,kind:previous.kind??"tower",object:previous.key??null,
     bounds:previous.plan.bounds,count:previous.plan.count,partial:previous.partial}:null;
@@ -141,10 +146,24 @@ async function survey() {
 
 function previewText(p) {
   const {origin:o,next:n,count,protectedCount}=p.plan;
+  if(p.kind==="bridge")return `Bridge preview between ${p.banks.join(" and ")}. Width ${n.width}, arch rise ${n.arch}, bend ${n.bend}. ${count} cells would change, ${protectedCount} protected.`;
   return `Preview at ${o.x} ${o.y} ${o.z}. Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}. Roof ${n.roof} high. Entrance faces ${n.entrance}. ${count} cells would change, ${protectedCount} protected. ${p.summary}`.trim();
 }
 async function outline(p) {
   await context();
+  if(p.kind==="bridge") {
+    // Sample deck heights from the actual proposed voxel geometry to show both banks and the arc.
+    const deck=new Map();
+    for(const r of designRuns("bridge",p.plan.origin,p.plan.next)) {
+      const k=r.x+","+r.z;
+      if(!deck.has(k) || deck.get(k).y<r.top)deck.set(k,{x:r.x,y:r.top,z:r.z});
+    }
+    const sorted=[...deck.values()].sort((a,b)=>a.x-b.x || a.z-b.z);
+    const step=Math.max(1,Math.ceil(sorted.length/60));
+    const points=sorted.filter((_,i)=>i%step===0);
+    await c.tool("run_script",{args:{points},code:`for(const p of mc.args.points)await mc.run_command({command:"execute in minecraft:overworld run particle minecraft:end_rod "+(p.x+.5)+" "+(p.y+1.1)+" "+(p.z+.5)+" 0 0 0 0 1 force WorldStudio"});`});
+    return;
+  }
   // Particle positions are a read-only visual guide for the massing. No blocks occupy the outline.
   const code=`const {origin:o,next:n}=mc.args;
     const tiers=[[0,n.radius],[n.height-1,n.radius-n.taper],[n.height,n.radius-n.taper+1],[n.height+n.roof-1,0]];
@@ -175,7 +194,8 @@ async function design(request,signal,previewOnly,observeOnly=false) {
     if(!Buffer.isBuffer(image))throw Error("Minecraft did not return a screenshot.");
   }
   const recent=session.recent.slice(0,-1);
-  const decision=await planner.ask({request,site,towers:objects,defaultNewTower:defaults,recent,
+  const bridges=Object.fromEntries(Object.entries(state.bridges).map(([key,b])=>[key,{banks:b.banks,origin:b.origin,params:b.params}]));
+  const decision=await planner.ask({request,site,towers:objects,bridges,defaultNewBridge:bridgeDefaults,defaultNewTower:defaults,recent,
     observeOnly,previewOnly},signal,activity,image);
   signal.throwIfAborted();
   await context();
@@ -184,6 +204,73 @@ async function design(request,signal,previewOnly,observeOnly=false) {
     acceptNextInput(signal);await reply(summary||"Please describe the tower or revision.");return;
   }
   if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before proposing another edit.");
+  const isBridge=decision.action==="new_bridge" || decision.action==="revise_bridge";
+  const p=isBridge?await planBridge(site,decision):await planTower(site,objects,decision);
+  const {plan}=p;
+  signal.throwIfAborted();
+  checkSelection(plan);
+  if(!plan.count) { lastPreview=null;acceptNextInput(signal);await reply(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
+  p.id=randomBytes(4).toString("hex");
+  p.summary=summary;
+  if(previewOnly || decision.previewOnly) {
+    await outline(p);
+    signal.throwIfAborted();
+    lastPreview=p;
+    acceptNextInput(signal);
+    await reply(previewText(p));return;
+  }
+  busy.label="applying "+p.id;
+  lastPreview=null;
+  await say(`Applying ${plan.count} block changes at ${coordinates(plan.origin)}. ${plan.protectedCount} protected. Use @studio cancel to stop.`);
+  await edit("apply",p,signal);
+}
+
+function intersects(a,b) {
+  return ["x","y","z"].every(k=>a.from[k]<=b.to[k] && a.to[k]>=b.from[k]);
+}
+
+function towerBounds(t) {
+  const {origin:o,params:n}=t,r=n.radius+1;
+  return {from:{x:o.x-r,y:o.y,z:o.z-r},to:{x:o.x+r,y:o.y+n.height+n.roof-1,z:o.z+r}};
+}
+
+async function planBridge(site,d) {
+  const revising=d.action==="revise_bridge";
+  if(Boolean(d.fromMarker)!==Boolean(d.toMarker))throw Error("Name both bank markers.");
+  let key=site.selected,before,origin,banks,base;
+  if(d.fromMarker && d.toMarker) {
+    const names=[d.fromMarker,d.toMarker].map(name=>name.trim().toLowerCase());
+    if(names[0]===names[1])throw Error("Choose two distinct bank markers.");
+    const found=Object.entries(state.bridges).find(([,b])=>b.banks.every(name=>names.includes(name.toLowerCase())));
+    key=found?.[0];
+  }
+  if(revising) {
+    before=state.bridges[key];
+    if(!before)throw Error("Aim at a registered bridge or name its two banks.");
+    ({origin,banks,params:base}=before);
+  } else {
+    if(!d.fromMarker || !d.toMarker)throw Error("Mark both banks and name them in the bridge request.");
+    if(key)throw Error("A bridge already connects those bank names. Ask for a revision.");
+    const a=session.marker(d.fromMarker), b=session.marker(d.toMarker);
+    for(const m of [a,b]) {
+      const block=await c.tool("get_block",{x:m.x,y:m.y,z:m.z,dimension:DIM});
+      if(!block.id || block.air || block.id==="minecraft:air")throw Error("The bank at "+m.name+" is empty. Move the marker to its landing.");
+    }
+    origin={x:a.x,y:a.y+1,z:a.z};
+    banks=[a.name,b.name];
+    key="bridge-"+randomBytes(6).toString("hex");
+    base={...bridgeDefaults,dx:b.x-a.x,dy:b.y-a.y,dz:b.z-a.z};before=null;
+  }
+  const next=bridgeParameters({...base,width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend});
+  const plan=await previewBridge(c,origin,before?.params??null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
+  const designBounds=boundsOf(designRuns("bridge",origin,next));
+  if(Object.values(state.towers).some(t=>intersects(towerBounds(t),designBounds)) ||
+      Object.entries(state.bridges).some(([k,b])=>k!==key && intersects(b.bounds,designBounds)))
+    throw Error("The proposed bridge overlaps another registered build.");
+  return {kind:"bridge",key,banks,designBounds,before,plan};
+}
+
+async function planTower(site,objects,decision) {
   const anchor=decision.marker?session.marker(decision.marker):
     (site.selection && !site.selection.to?session.marker(site.selection.from):null);
   if(anchor) {
@@ -214,23 +301,8 @@ async function design(request,signal,previewOnly,observeOnly=false) {
       throw Error("That footprint overlaps another Studio tower. Select a different site.");
   }
   const plan=await previewTower(c,origin,before?base:null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
-  signal.throwIfAborted();
-  checkSelection(plan);
-  if(!plan.count) { lastPreview=null;store.save();await reply(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
-  const p={id:randomBytes(4).toString("hex"),key,before,plan,summary};
-  if(previewOnly || decision.previewOnly) {
-    await outline(p);
-    signal.throwIfAborted();
-    lastPreview=p;
-    store.save();
-    acceptNextInput(signal);
-    await reply(previewText(p));
-    return;
-  }
-  busy.label="applying "+p.id;
-  lastPreview=null;
-  await say(`Applying ${plan.count} block changes at ${coordinates(origin)}${anchor?" using marker "+anchor.name:""}. ${plan.protectedCount} protected. Use @studio cancel to stop.`);
-  await edit("apply",p,signal);
+  if(Object.values(state.bridges).some(b=>intersects(b.bounds,plan.bounds)))throw Error("The tower footprint overlaps a registered bridge.");
+  return {key,before,plan};
 }
 
 function checkSelection(plan) {
@@ -241,13 +313,13 @@ function checkSelection(plan) {
 
 async function edit(direction,entry,signal) {
   await context();
-  const plan=direction==="apply"?entry.plan:reverseTower(entry.applied);
+  const plan=direction==="apply"?entry.plan:reverseDesign(entry.applied);
   signal.throwIfAborted();
   store.begin(direction,entry);
   let receipt,result;
   const callbacks=store.callbacks(signal);
   let written=0;
-  try { result=await applyTower(c,plan,{...callbacks,surveyed:entry.kind==="survey",onProgress:async event=>{
+  try { result=await applyDesign(c,plan,{...callbacks,surveyed:entry.kind==="survey",onProgress:async event=>{
     await callbacks.onProgress(event);
     if(event.changed)written+=event.run.top-event.run.y+1;
     activity(`${direction==="undo"?"Undoing":"Applying"} ${entry.id}: ${written} of ${plan.count} blocks`);
@@ -318,7 +390,7 @@ async function handle(input) {
   if(!body)return;
   const cmd=body.toLowerCase();
   if(cmd==="help") {
-    await say("Ask @studio a question or request a build. Commands: mark NAME, markers, select NAME, select A to B, where, look QUESTION, voice on/off, spoken on/off, provider, session, history, status, cancel, redirect REQUEST, preview and undo.");
+    await say("Ask @studio a question or request a build. Commands include mark NAME, markers, select NAME, select A to B, where, look QUESTION, export schematic, voice on/off, spoken on/off, provider, session, history, status, cancel, redirect REQUEST, preview and undo.");
     return;
   }
   if(cmd==="status" || cmd==="session") {
@@ -344,6 +416,27 @@ async function handle(input) {
   const speech=cmd.match(/^(voice|spoken)(?:\s+(on|off|status))?$/);
   if(speech) {await say(await voice.configure(speech[1],speech[2]??"status"));return;}
   if(busy) {await say("One request is active. Use @studio status, @studio cancel or @studio redirect <request>.");return;}
+  if(cmd==="export schematic" || cmd==="export preview schematic") {
+    if(state.history.at(-1)?.partial)throw Error("Undo the interrupted revision before exporting a design.");
+    let kind,params,origin;
+    if(cmd==="export preview schematic") {
+      if(!lastPreview)throw Error("Preview a build first to export that design.");
+      kind=lastPreview.kind??"tower";params=lastPreview.plan.next;origin=lastPreview.plan.origin;
+    } else {
+      const key=(await survey()).selected;
+      const bridge=state.bridges[key],object=bridge??state.towers[key];
+      if(!object)throw Error("Aim at a registered tower or bridge to export its design.");
+      kind=bridge?"bridge":"tower";origin=object.origin;
+      params=bridge?object.params:recordedParameters(key,object,state.history);
+    }
+    const name="studio_"+kind+"_"+randomBytes(5).toString("hex");
+    const folder=join(local,"instance","config","worldedit","schematics");
+    const bytes=exportSchematic(designRuns(kind,origin,params),origin);
+    await mkdir(folder,{recursive:true});
+    await writeFile(join(folder,name+".schem"),bytes,{flag:"wx"});
+    await say("Exported the generated "+kind+" design. Load it with //schem load "+name+".schem, then use //paste -a at your chosen placement point. WorldEdit records its own undo.");
+    return;
+  }
   if(cmd==="provider" || cmd.startsWith("provider ")) {
     const [name,model,...extra]=body.slice(8).trim().split(/\s+/);
     if(!name) {await say("Provider: "+planner.provider+". Available: codex, mock, ollama MODEL.");return;}

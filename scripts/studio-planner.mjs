@@ -31,6 +31,7 @@ function designPrompt(context) {
     "An explicit direct build or revision executes immediately. Set previewOnly true for requests to preview or show the shape first. For new choose new/point; for revisions choose revise/selected or revise/hillside if explicitly named. If the player explicitly refers to a named marker, return its exact name from site.markers in marker. Otherwise set marker=null. If the referenced marker is missing or ambiguous, ask for clarification with action=answer.",
     "Use absolute integer values only for changed dimensions, null for all unchanged. Limits in blocks: height 12..40, base radius 5..10, taper 0..3, wall thickness 1..3, roof height 4..16. State a limit instead of silently changing the request.",
     "Wall-top radius equals base radius minus taper. To widen only the base while keeping the crown and roof the same width, increase base radius and taper by the same number of blocks within the limits.",
+    "For a curved stone bridge use new_bridge with both exact saved endpoint names in fromMarker and toMarker. If either is unclear, answer and ask. For a bridge revision use revise_bridge; provide both bank names if named, otherwise use the selected bridge. Use null for unrelated fields. The bridge spans 6..48 blocks horizontally. Width is an odd total of 3..9 blocks, arch is deck rise above the middle of the bank-to-bank line in blocks (1..8), and bend is signed sideways midpoint offset (-8..8). Set absolute values only for requested changes. A relative change uses the saved bridge parameters. Two bank markers are endpoints; a selected editing region still limits every write.",
     "The tower roof supports copper (weathered green), black_to_grey and brown_to_tan. Preserve the current finish on dimensional revisions. The arched entrance can face north, east, south or west; older towers default to north. For an entrance revision, resolve 'opposite' from the selected tower's current entrance, or a pointed side from the hit relative to its center. If the side is ambiguous, ask. Set entrance=null when unchanged. Slit windows and wall materials stay fixed. Answer unsupported requests conversationally.",
     "Keep message under 450 characters; never claim a proposed edit was applied. The application performs its own world checks and reports the result. Use any relevant previous conversation to resolve references; the supplied current world observation is authoritative.",
     JSON.stringify(context)
@@ -103,7 +104,8 @@ export function createPlanner({directory,provider="codex",world="sp:WorldStudioL
     if(provider==="mock") {
       report("Preparing the mock reply");
       decision=ephemeral?{action:"inspect"}:{action:"answer",message:"Mock received: "+String(context.request).slice(0,160),
-        target:"point",marker:null,previewOnly:false,height:null,radius:null,taper:null,thickness:null,roof:null,roofFinish:null,entrance:null};
+        target:"point",marker:null,previewOnly:false,height:null,radius:null,taper:null,thickness:null,roof:null,roofFinish:null,entrance:null,
+        fromMarker:null,toMarker:null,width:null,arch:null,bend:null};
     } else {
       const params={schema,ephemeral,signal:cancel,onProgress:report,image:checkedImage(image),
         prompt:ephemeral?surveyPrompt(request):designPrompt(context)};

@@ -1,0 +1,278 @@
+{
+  "case": "architecture-backends",
+  "phase": "pass",
+  "params": {
+    "dx": 16,
+    "dy": 0,
+    "dz": 0,
+    "width": 3,
+    "arch": 2,
+    "bend": 3
+  },
+  "methodology": "One local run per method. Each starts from the same independently checked plot. Both survey a guarded delta and verify the full plotted volume. WorldEdit pastes changed solids using -a -o; explicit removals use guarded fill. End-to-end includes plan, prepare/write/load/paste and independent readback. No model calls.",
+  "modelCalls": 0,
+  "trials": [
+    {
+      "design": "bridge",
+      "method": "guarded-fills",
+      "phase": "fresh",
+      "independentVolume": 9234,
+      "planMs": 57.44,
+      "changedCells": 172,
+      "guardedRuns": 128,
+      "applyMs": 8674.09,
+      "readbackMs": 32.84,
+      "endToEndMs": 8766.62,
+      "callsByTool": {
+        "get_status": 131,
+        "get_screen": 131,
+        "get_self": 131,
+        "get_blocks_region": 12,
+        "run_command": 128
+      },
+      "mcpCalls": 533,
+      "undoAndReadbackMs": 8707.76,
+      "undoCallsByTool": {
+        "get_status": 130,
+        "get_screen": 130,
+        "get_self": 130,
+        "get_blocks_region": 10,
+        "run_command": 128
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "bridge",
+      "method": "guarded-fills",
+      "phase": "width-3-to-5",
+      "independentVolume": 9234,
+      "planMs": 65.76,
+      "changedCells": 175,
+      "guardedRuns": 141,
+      "applyMs": 9536.82,
+      "readbackMs": 32.75,
+      "endToEndMs": 9637.08,
+      "callsByTool": {
+        "get_status": 144,
+        "get_screen": 144,
+        "get_self": 144,
+        "get_blocks_region": 12,
+        "run_command": 141
+      },
+      "mcpCalls": 585,
+      "preexistingManualEditPreserved": true,
+      "undoPreservedLaterEdit": true,
+      "undoAndReadbackMs": 9569.16,
+      "undoCallsByTool": {
+        "get_status": 143,
+        "get_screen": 143,
+        "get_self": 143,
+        "get_blocks_region": 10,
+        "run_command": 141
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "bridge",
+      "method": "worldedit-schematic",
+      "phase": "fresh",
+      "independentVolume": 9234,
+      "planMs": 67.92,
+      "changedCells": 172,
+      "guardedRuns": 128,
+      "clearedWithGuards": 0,
+      "pastedSolidCells": 172,
+      "encodeWriteMs": 2.61,
+      "schematicBytes": 347,
+      "loadMs": 98.36,
+      "pasteMs": 92.56,
+      "applyMs": 194.22,
+      "readbackMs": 28.56,
+      "endToEndMs": 291.81,
+      "callsByTool": {
+        "get_status": 1,
+        "get_screen": 1,
+        "get_self": 1,
+        "get_blocks_region": 8,
+        "send_chat": 2
+      },
+      "mcpCalls": 13,
+      "undoAndReadbackMs": 225.73,
+      "undoCallsByTool": {
+        "send_chat": 1,
+        "get_blocks_region": 6
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "bridge",
+      "method": "worldedit-schematic",
+      "phase": "width-3-to-5",
+      "independentVolume": 9234,
+      "planMs": 43.17,
+      "changedCells": 175,
+      "guardedRuns": 141,
+      "clearedWithGuards": 16,
+      "pastedSolidCells": 159,
+      "encodeWriteMs": 1.34,
+      "schematicBytes": 363,
+      "loadMs": 105.75,
+      "pasteMs": 93.47,
+      "applyMs": 1396.63,
+      "readbackMs": 46.67,
+      "endToEndMs": 1486.92,
+      "callsByTool": {
+        "get_status": 19,
+        "get_screen": 19,
+        "get_self": 19,
+        "get_blocks_region": 10,
+        "run_command": 16,
+        "send_chat": 2
+      },
+      "mcpCalls": 85,
+      "preexistingManualEditPreserved": true,
+      "undoPreservedLaterEdit": false,
+      "undoAndReadbackMs": 1982.14,
+      "undoCallsByTool": {
+        "send_chat": 1,
+        "get_status": 18,
+        "get_screen": 18,
+        "get_self": 18,
+        "get_blocks_region": 8,
+        "run_command": 16
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "tower",
+      "method": "guarded-fills",
+      "phase": "fresh",
+      "independentVolume": 9234,
+      "planMs": 149.68,
+      "changedCells": 375,
+      "guardedRuns": 153,
+      "applyMs": 31003.84,
+      "readbackMs": 29.58,
+      "endToEndMs": 31184.26,
+      "callsByTool": {
+        "get_status": 156,
+        "get_screen": 156,
+        "get_self": 156,
+        "get_blocks_region": 18,
+        "run_command": 153
+      },
+      "mcpCalls": 639,
+      "undoAndReadbackMs": 31007.72,
+      "undoCallsByTool": {
+        "get_status": 155,
+        "get_screen": 155,
+        "get_self": 155,
+        "get_blocks_region": 14,
+        "run_command": 153
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "tower",
+      "method": "guarded-fills",
+      "phase": "turn-doorway",
+      "independentVolume": 9234,
+      "planMs": 170.8,
+      "changedCells": 27,
+      "guardedRuns": 14,
+      "applyMs": 3189.43,
+      "readbackMs": 25.9,
+      "endToEndMs": 3387.64,
+      "callsByTool": {
+        "get_status": 17,
+        "get_screen": 17,
+        "get_self": 17,
+        "get_blocks_region": 14,
+        "run_command": 14
+      },
+      "mcpCalls": 79,
+      "preexistingManualEditPreserved": true,
+      "undoPreservedLaterEdit": true,
+      "undoAndReadbackMs": 3202.25,
+      "undoCallsByTool": {
+        "get_status": 16,
+        "get_screen": 16,
+        "get_self": 16,
+        "get_blocks_region": 10,
+        "run_command": 14
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "tower",
+      "method": "worldedit-schematic",
+      "phase": "fresh",
+      "independentVolume": 9234,
+      "planMs": 174.29,
+      "changedCells": 375,
+      "guardedRuns": 153,
+      "clearedWithGuards": 0,
+      "pastedSolidCells": 375,
+      "encodeWriteMs": 1.58,
+      "schematicBytes": 433,
+      "loadMs": 224.66,
+      "pasteMs": 200.57,
+      "applyMs": 427.24,
+      "readbackMs": 35.11,
+      "endToEndMs": 638.19,
+      "callsByTool": {
+        "get_status": 1,
+        "get_screen": 1,
+        "get_self": 1,
+        "get_blocks_region": 10,
+        "send_chat": 2
+      },
+      "mcpCalls": 15,
+      "undoAndReadbackMs": 233.65,
+      "undoCallsByTool": {
+        "send_chat": 1,
+        "get_blocks_region": 6
+      },
+      "undoVerified": true
+    },
+    {
+      "design": "tower",
+      "method": "worldedit-schematic",
+      "phase": "turn-doorway",
+      "independentVolume": 9234,
+      "planMs": 137.54,
+      "changedCells": 27,
+      "guardedRuns": 14,
+      "clearedWithGuards": 13,
+      "pastedSolidCells": 14,
+      "encodeWriteMs": 1.49,
+      "schematicBytes": 232,
+      "loadMs": 225,
+      "pasteMs": 201.38,
+      "applyMs": 2216.73,
+      "readbackMs": 28.87,
+      "endToEndMs": 2384.59,
+      "callsByTool": {
+        "get_status": 10,
+        "get_screen": 10,
+        "get_self": 10,
+        "get_blocks_region": 14,
+        "run_command": 7,
+        "send_chat": 2
+      },
+      "mcpCalls": 53,
+      "preexistingManualEditPreserved": true,
+      "undoPreservedLaterEdit": false,
+      "undoAndReadbackMs": 1965.69,
+      "undoCallsByTool": {
+        "send_chat": 1,
+        "get_status": 9,
+        "get_screen": 9,
+        "get_self": 9,
+        "get_blocks_region": 10,
+        "run_command": 7
+      },
+      "undoVerified": true
+    }
+  ]
+}

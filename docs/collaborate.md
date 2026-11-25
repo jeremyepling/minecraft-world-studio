@@ -23,6 +23,8 @@ Press **J** while looking around the lab. To change the shortcut, open **Options
 
 ### Reference locations
 
+To connect two points, mark each bank independently and use **Ask Studio…** to say **“Build a curved stone bridge between West Bank and East Bank.”** Later, ask for a wider deck or a taller arch. [Bridge dimensions, previews and schematics](current-milestone.md)
+
 | Chat | What happens |
 | --- | --- |
 | `@studio where` | Identify the block under the crosshair, its coordinates and the active selection. |

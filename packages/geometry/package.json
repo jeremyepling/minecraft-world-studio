@@ -4,6 +4,8 @@
   "type": "module",
   "exports": {
     "./voxels": "./voxels.ts",
-    "./tower": "./tower.ts"
+    "./tower": "./tower.ts",
+    "./paths": "./paths.ts",
+    "./bridge": "./bridge.ts"
   }
 }

@@ -1,5 +1,8 @@
 # Known limitations
 
+* **Bridge landings.** The two markers set the endpoints. The bridge does not route around obstructions, excavate the banks or search for a crossing. Existing occupied cells are protected by Studio, so a blocked approach can require a different landing. Bridges use full-block steps.
+* **WorldEdit copies.** Export produces generated block geometry for this lab’s 26.3 data version. Pasting with `//paste -a` skips air and can overwrite occupied blocks. The copy is independent of Studio's registered object and checked undo. Use it for fresh placements, and use Studio revisions where manual edits matter.
+
 * **Parametric revisions.** The registered tower supports cardinal doorways and a fixed slit-window layout. A complete matching brown repaint receipt can establish its roof finish. Unrecorded material changes stay protected overrides. The tower's particle preview outlines its massing; the preview text identifies the entrance direction. [Building controls](in-game-building.md)
 
 * **Marker visibility.** The menu saves names and coordinates. White sparkles appear briefly when marking, moving or locating a point. To see one again, use **J → Saved markers → Locate**. The picker reads the session on opening and the Studio listener handles its commands. [Menu guide](collaborate.md)

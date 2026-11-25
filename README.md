@@ -1,6 +1,6 @@
 # Minecraft World Studio
 
-A local creative building lab for Minecraft Java 26.3. The player builds in Axiom and talks to Codex through a project-scoped MCPFabric connection. WorldEdit supplies player-context bulk edits. The prototype includes a revisable watchtower, five stone texture samples, a collaborative gate fixture and timed editing trials.
+A local creative building lab for Minecraft Java 26.3. The player builds in Axiom and talks to Codex through a project-scoped MCPFabric connection. Studio can generate and revise towers and curved bridges, protect manual edits, and export designs to WorldEdit. The lab also includes five stone texture samples, a collaborative gate fixture and timed editing trials.
 
 ![Stone watchtower with a stepped copper roof above a winding hillside road in WorldStudioLab](screenshots/hillside-watchtower-and-road.png)
 
@@ -8,7 +8,7 @@ For project direction, start with the [product vision](docs/product-vision.md), 
 
 ## Open the lab
 
-For the first Milestone 2 build, try **“Make the hillside watchtower roof four blocks taller. Keep the walls and doorway exactly as they are.”** Follow with **“Move the entrance to the opposite side.”** [Parametric tower revisions](docs/current-milestone.md)
+For a curved bridge, mark both landings with **J → Mark this block**. Name them **West Bank** and **East Bank**, then use **J → Ask Studio…** and enter **“Build a curved stone bridge between West Bank and East Bank.”** Follow with **“Raise its arch by two blocks.”** [Bridge and tower workflows](docs/current-milestone.md)
 
 Double-click **World Studio.cmd** to open the lab and its chat listener. Aim at a block, press **J**, choose **Mark this block**, and give it a name. Press **J → Saved markers** to find it again. [In-game menu, chat and voice](docs/collaborate.md)
 

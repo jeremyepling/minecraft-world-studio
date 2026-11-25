@@ -3,12 +3,23 @@
 Use the standalone Fabric 26.3 lab for live checks. The tower geometry and adapter tests run directly from a checkout, including before Minecraft is installed. Run from the repository root with Node.js 22.16 or newer.
 
 ```powershell
-node --experimental-strip-types --test packages/geometry/tower.test.mjs scripts/tower.test.mjs scripts/studio-state.test.mjs scripts/studio-session.test.mjs scripts/studio-planner.test.mjs scripts/studio-voice.test.mjs
+node --experimental-strip-types --test packages/geometry/bridge.test.mjs packages/geometry/tower.test.mjs scripts/schematic.test.mjs scripts/tower.test.mjs scripts/studio-state.test.mjs scripts/studio-session.test.mjs scripts/studio-planner.test.mjs scripts/studio-voice.test.mjs
 ```
 
 These tests exercise deterministic tower edits, material revisions, guarded writes, conflicts, lost acknowledgements, restart recovery and undo receipts. They can run with Minecraft closed.
 
 ## Direct chat fixture
+
+### Curved bridge and backend comparison
+
+In a separate installed lab copy, use a distinct authenticated loopback port, open the Creative Overworld, and start the listener. Use Node 22.16+ to run the cases one at a time. Both cases use the same initially empty test volume. The chat case creates and cleans up its named bank markers. The comparison uses the disposable player's WorldEdit clipboard and undo history.
+
+```powershell
+node --experimental-strip-types experiments/curved-bridge.mjs --lab-root <copied-project>
+node --experimental-strip-types benchmarks/bridge-backends.mjs --lab-root <copied-project>
+```
+
+The chat case records exact requests and checks the bank approaches, curvature, deck height, manual override, widths, screenshot views and undo. The benchmark records preparation, mutation and readback separately with tool counts for each backend. Both check the entire plotted volume. [Bridge instructions](current-milestone.md) · [Benchmark results](../benchmarks/README.md)
 
 ### Parametric tower revisions
 

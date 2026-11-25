@@ -5,6 +5,50 @@ export interface Voxel {
   z: number;
 }
 
+const key = (point: Voxel) => [point.x, point.y, point.z].join(",");
+
+/** Combine occupied cells, keeping the first shape's data at shared coordinates. */
+export function* union<T extends Voxel>(...shapes: Iterable<T>[]): Generator<T> {
+  const seen = new Set<string>();
+  for (const shape of shapes) for (const point of shape) {
+    const position = key(point);
+    if (seen.has(position)) continue;
+    seen.add(position);
+    yield point;
+  }
+}
+
+/** Keep occupied cells from the first shape that also belong to the mask. */
+export function* intersection<T extends Voxel>(shape: Iterable<T>, mask: Iterable<Voxel>): Generator<T> {
+  const occupied = new Set(Array.from(mask, key));
+  for (const point of shape) if (occupied.delete(key(point))) yield point;
+}
+
+export interface PlanPoint { x: number; z: number }
+
+/** Extrude a simple XZ polygon, sampling block centres and including its boundary. */
+export function* extrudePolygon(polygon: readonly PlanPoint[], bottom: number, height: number): Generator<Voxel> {
+  if (polygon.length < 3 || !Number.isSafeInteger(bottom) || !Number.isSafeInteger(height) || height < 1 ||
+      !Number.isSafeInteger(bottom + height - 1) || polygon.some(p => !Number.isFinite(p.x) || !Number.isFinite(p.z))) {
+    throw new RangeError("A polygon extrusion needs three or more finite vertices and a positive integer height.");
+  }
+  const xs = polygon.map(p => p.x), zs = polygon.map(p => p.z);
+  const minX = Math.ceil(Math.min(...xs)), maxX = Math.floor(Math.max(...xs));
+  const minZ = Math.ceil(Math.min(...zs)), maxZ = Math.floor(Math.max(...zs));
+  if (![minX,maxX,minZ,maxZ].every(Number.isSafeInteger)) throw new RangeError("Polygon is outside safe integer coordinates.");
+  for (let z = minZ; z <= maxZ; z++) for (let x = minX; x <= maxX; x++) {
+    let inside = false;
+    for (let i = 0; i < polygon.length; i++) {
+      const a = polygon[i], b = polygon[(i + 1) % polygon.length];
+      const cross = (x - a.x) * (b.z - a.z) - (z - a.z) * (b.x - a.x);
+      if (Math.abs(cross) < 1e-8 && x >= Math.min(a.x,b.x) && x <= Math.max(a.x,b.x) &&
+          z >= Math.min(a.z,b.z) && z <= Math.max(a.z,b.z)) { inside = true; break; }
+      if ((a.z > z) !== (b.z > z) && x < a.x + (z - a.z) * (b.x - a.x) / (b.z - a.z)) inside = !inside;
+    }
+    if (inside) for (let y = bottom; y < bottom + height; y++) yield {x,y,z};
+  }
+}
+
 export interface CircularLoft {
   bottom: number;
   height: number;
@@ -40,7 +84,12 @@ export function* circularLoft({bottom, height, radiusAt, thickness}: CircularLof
   }
 }
 
-/** Remove a volume defined by a predicate, leaving all other samples intact. */
-export function* subtract<T extends Voxel>(cells: Iterable<T>, contains: (point: T) => boolean): Generator<T> {
-  for (const cell of cells) if (!contains(cell)) yield cell;
+/** Remove an occupied voxel mask or a volume defined by a predicate. */
+export function* subtract<T extends Voxel>(cells: Iterable<T>, mask: Iterable<Voxel> | ((point: T) => boolean)): Generator<T> {
+  if (typeof mask === "function") {
+    for (const cell of cells) if (!mask(cell)) yield cell;
+  } else {
+    const removed = new Set(Array.from(mask, key));
+    for (const cell of cells) if (!removed.has(key(cell))) yield cell;
+  }
 }

@@ -1,5 +1,32 @@
 # Milestone 2 — Building fluency
 
+Completed November 25, 2026 on Fabric 26.3. Studio can build and revise a tower or a curved bridge from in-game chat, preserve hand edits during revisions and undo, and export either design to WorldEdit. The tower and bridge use the same geometry library and edit journal. [Matched backend timings and call counts](../benchmarks/README.md#fresh-structures-and-architectural-revisions)
+
+## Build a curved bridge
+
+Aim at solid ground at one landing, press **J → Mark this block**, and name it **West Bank**. Repeat at the other landing with **East Bank**. Leave the markers as named points. Selecting them as opposite corners would restrict the arch to that box.
+
+1. **J → Ask Studio…** and enter **“Preview a curved stone bridge between West Bank and East Bank, three blocks wide with a two-block arch.”** Particles show its path and the HUD reports the proposed change count.
+2. Ask **“Build a curved stone bridge between West Bank and East Bank, three blocks wide with a two-block arch.”**
+3. Ask **“Widen this bridge to five blocks”** or **“Raise this bridge’s arch by two blocks.”** Studio stores the span and dimensions, checks the old design against the world and applies the eligible differences. The two named landing blocks stay outside the design.
+4. Use **@studio undo** to reverse the latest Studio edit. A differing block placed by hand remains protected.
+
+The horizontal span is 6–48 blocks. Width is 3, 5, 7 or 9 blocks. Arch rise is 1–8 blocks and signed bend is −8 through +8 blocks at midspan. Positive bend offsets a west-to-east span toward the south. Steep spans require a lower arch or more distance between the banks. Moving a marker later leaves existing bridge geometry at its original coordinates.
+
+### Use WorldEdit for a fresh placement
+
+After a Studio preview, send **@studio export preview schematic** to save the full proposed design without applying it. To export an existing registered bridge or tower, aim at it and send **@studio export schematic**. Studio returns a unique filename in the instance’s WorldEdit schematics directory. In an empty destination, load the file with **//schem load FILENAME.schem**, then **//paste -a** to place its occupied blocks relative to your placement point. Use **//undo** for this paste.
+
+Exports contain the generated design. A hand-built addition stays in the original world. A WorldEdit paste has WorldEdit history and can replace occupied destination blocks. Studio chat revisions use the guarded editor and its own undo history.
+
+### In-game acceptance
+
+The Fabric 26.3 chat case previewed the bridge without writing, built 172 blocks, widened it from three blocks to five with 175 changes, then raised its arch two blocks with 284 changes. Each design request took one model turn. A sea lantern placed in the path of the widening survived. Three Studio undos restored the original 9,234-cell volume and edit history. WorldEdit loaded the exported design. An earlier planning request timed out before it wrote any blocks; the repeated case passed. [Chat and readback receipt](bridge-chat-results.json)
+
+| Initial deck | Wider deck | Raised arch |
+| --- | --- | --- |
+| ![Three-block deck](../screenshots/bridge-three-wide.png) | ![Five-block deck](../screenshots/bridge-five-wide.png) | ![Raised arch](../screenshots/bridge-raised.png) |
+
 ## First slice · Parametric tower revisions
 
 Open World Studio, press **J → Ask Studio…**, and ask **“Make the hillside watchtower roof four blocks taller. Keep its walls and doorway exactly as they are.”** To see its dimensions and estimated change count first, begin with **preview**.
@@ -18,9 +45,8 @@ The matching north views replay the verified designs in the disposable world wit
 | --- | --- |
 | ![Tower before raising the roof](../screenshots/parametric-tower-before.png) | ![Same tower with its roof four blocks taller](../screenshots/parametric-tower-raised.png) |
 
-## Remaining Milestone 2 work
+## Execution and verification
 
-1. Compare grouped, guarded fills with schematic placement on representative fresh builds and small revisions. Measure correctness, recoverability and elapsed time for each.
-2. Build a curved bridge between two saved markers. Use it to develop a second caller for shared geometry and test a width or arch-height revision in game.
+The [geometry SDK](../packages/geometry) includes circular lofts, quadratic Bézier curves, swept profiles, vertical polygon extrusion, union, intersection and subtraction. The tower and bridge share geometry operations, a common world adapter and the same guarded edit journal. [Acceptance procedure](testing.md) · [Backend trials](../benchmarks/README.md)
 
 [Milestone 1 implementation and human acceptance](milestone-1.md) · [Product roadmap](roadmap.md)

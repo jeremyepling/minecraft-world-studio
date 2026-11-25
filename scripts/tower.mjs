@@ -1,5 +1,6 @@
 import {towerCells, brownRoofMaterial} from "../packages/geometry/tower.ts";
 import {isSurveyMaterial} from "./survey-roof.mjs";
+import {bridgeCells} from "../packages/geometry/bridge.ts";
 
 const WORLD = "sp:WorldStudioLab";
 const DIM = "minecraft:overworld";
@@ -15,7 +16,7 @@ const volume = runs => runs.reduce((sum,r) => sum + length(r), 0);
 
 function validPoint({x,y,z}) {
   if (![x,y,z].every(Number.isSafeInteger) || Math.abs(x)>29999984 || Math.abs(z)>29999984 || y < -64 || y > 319)
-    throw Error("Tower coordinates exceed the Overworld build area.");
+    throw Error("Build coordinates exceed the Overworld build area.");
 }
 
 function checkRun(r,surveyed) {
@@ -25,7 +26,7 @@ function checkRun(r,surveyed) {
     ? (brownPlanks.has(r.after) && isSurveyMaterial(r.before)) || (brownPlanks.has(r.before) && isSurveyMaterial(r.after))
     : materials.has(r.before) && materials.has(r.after);
   if (r.top < r.y || r.top-r.y >= 56 || !allowed || r.before === r.after)
-    throw Error("Invalid tower edit in the journal.");
+    throw Error("Invalid block edit in the journal.");
 }
 
 async function checkSite(client) {
@@ -37,21 +38,20 @@ async function checkSite(client) {
   if (self.dimension !== DIM || self.gameMode !== "creative") throw Error("Enter the lab Overworld in Creative mode.");
 }
 
-function geometry(params, origin) {
+function geometry(params, origin, generate) {
   const cells = new Map();
   if (!params) return cells;
-  for (const cell of towerCells(params)) {
+  for (const cell of generate(params)) {
     const x=origin.x+cell.x, y=origin.y+cell.y, z=origin.z+cell.z;
-    const material=cell.material;
-    const id = "minecraft:"+material;
-    if (!materials.has(id) || id === AIR) throw Error("Unsupported tower material");
+    const id = "minecraft:"+cell.material;
+    if (!materials.has(id) || id === AIR) throw Error("Unsupported design material");
     validPoint({x,y,z});
     cells.set(cellKey(x,y,z),id);
   }
   return cells;
 }
 
-function boundsOf(runs) {
+export function boundsOf(runs) {
   if (!runs.length) return null;
   const from = {x:Infinity,y:Infinity,z:Infinity}, to = {x:-Infinity,y:-Infinity,z:-Infinity};
   for (const r of runs) {
@@ -104,17 +104,18 @@ async function scan(client,bounds) {
   validPoint(from);
   validPoint(to);
   const width=to.x-from.x+1, depth=to.z-from.z+1, height=to.y-from.y+1;
-  if (width < 1 || depth < 1 || height < 1 || width>23 || depth>23 || height>56) throw Error("Invalid tower footprint");
-  for (let y=from.y;y<=to.y;y+=4) {
-    const top=Math.min(y+3,to.y);
+  if (width < 1 || depth < 1 || height < 1 || width>64 || depth>64 || height>56) throw Error("Invalid build footprint");
+  const layers=Math.max(1,Math.min(4,Math.floor(4096/(width*depth))));
+  for (let y=from.y;y<=to.y;y+=layers) {
+    const top=Math.min(y+layers-1,to.y);
     const result=await client.tool("get_blocks_region",{
-      dimension:DIM,from:{...from,y},to:{...to,y:top},includeAir:true,includeState:true
+      dimension:DIM,from:{...from,y},to:{...to,y:top},includeAir:true,includeState:true,limit:4096
     });
     const expected=width*depth*(top-y+1);
     if (result.truncated || result.count!==expected || result.volume!==expected || result.blocks.length!==expected)
-      throw Error("Load the whole tower footprint before continuing.");
+      throw Error("Load the whole build footprint before continuing.");
     for (const b of result.blocks) {
-      if (typeof b.state !== "string") throw Error("Tower survey is missing a block state.");
+      if (typeof b.state !== "string") throw Error("Build survey is missing a block state.");
       live.set(cellKey(b.x,b.y,b.z),b.state);
     }
   }
@@ -133,11 +134,27 @@ function append(runs,cell) {
   }
 }
 
-export async function previewTower(client,origin,previous,next,{exclude=[]}={}) {
+export function previewTower(client,origin,previous,next,options) {
+  return previewDesign(towerCells,client,origin,previous,next,options);
+}
+
+export function previewBridge(client,origin,previous,next,options) {
+  return previewDesign(bridgeCells,client,origin,previous,next,options);
+}
+
+export function designRuns(kind,origin,params) {
+  const voxels=geometry(params,origin,kind==="bridge"?bridgeCells:towerCells);
+  return Array.from(voxels,([k,after])=>{
+    const [x,y,z]=k.split(",").map(Number);
+    return {x,y,z,top:y,after};
+  });
+}
+
+async function previewDesign(generate,client,origin,previous,next,{exclude=[]}={}) {
   validPoint(origin);
-  if (!next) throw Error("A proposed tower needs dimensions.");
+  if (!next) throw Error("A proposed build needs dimensions.");
   await checkSite(client);
-  const old=geometry(previous,origin), proposed=geometry(next,origin);
+  const old=geometry(previous,origin,generate), proposed=geometry(next,origin,generate);
   const footprint = [...new Set([...old.keys(),...proposed.keys()])].map(k => {
     const [x,y,z]=k.split(",").map(Number);
     return {x,y,z,top:y};
@@ -154,7 +171,7 @@ export async function previewTower(client,origin,previous,next,{exclude=[]}={}) 
   let protectedCount=0;
   for (const {x,y,z} of footprint) {
     const k=cellKey(x,y,z), before=old.get(k)??AIR, after=proposed.get(k)??AIR;
-    if (!live.has(k)) throw Error("Incomplete tower survey.");
+    if (!live.has(k)) throw Error("Incomplete build survey.");
     if (excludedCells.has(k)) { protectedCount++; continue; }
     if (live.get(k)!==before) {
       append(newlyExcluded,{x,y,z});
@@ -169,7 +186,7 @@ export async function previewTower(client,origin,previous,next,{exclude=[]}={}) 
 function splitMatching(run,live,allowed,conflicts) {
   for (let y=run.y;y<=run.top;y++) {
     const k=cellKey(run.x,y,run.z);
-    if (!live.has(k)) throw Error("Incomplete tower readback.");
+    if (!live.has(k)) throw Error("Incomplete build readback.");
     if (live.get(k) === run.before) append(allowed,{...run,y});
     else append(conflicts,{x:run.x,y,z:run.z});
   }
@@ -182,7 +199,7 @@ function casCommand(r) {
     tests.join(" ")+` run fill ${r.x} ${r.y} ${r.z} ${r.x} ${r.top} ${r.z} ${r.after} replace ${r.before}`;
 }
 
-export async function applyTower(client,plan,{onBeforeRun,onProgress,signal,surveyed=false}={}) {
+export async function applyDesign(client,plan,{onBeforeRun,onProgress,signal,surveyed=false}={}) {
   for (const r of plan.runs) checkRun(r,surveyed);
   await checkSite(client);
   const bounds=boundsOf(plan.runs);
@@ -202,14 +219,14 @@ export async function applyTower(client,plan,{onBeforeRun,onProgress,signal,surv
       await onProgress?.({run:r,changed:true});
       continue;
     }
-    if (response.success || response.resultValue!==0) throw Error("Uncertain tower write; inspect the in-flight run.");
+    if (response.success || response.resultValue!==0) throw Error("Uncertain build write. Inspect the in-flight run.");
     // A failed execute condition writes nothing. A fresh scan lets unaffected
     // neighbours proceed; syntax, permission or world changes stop the operation.
     await checkSite(client);
     const fresh=await scan(client,boundsOf([r]));
     const retry=[], missed=[];
     splitMatching(r,fresh,retry,missed);
-    if (!missed.length) throw Error("Tower command failed: "+(response.output??[]).join(" "));
+    if (!missed.length) throw Error("Build command failed: "+(response.output??[]).join(" "));
     await onProgress?.({run:r,changed:false});
     conflicts.push(...missed);
     allowed.splice(i+1,0,...retry);
@@ -223,7 +240,9 @@ export async function applyTower(client,plan,{onBeforeRun,onProgress,signal,surv
   return {written:volume(applied),verified,skipped:volume(conflicts),applied,conflicts};
 }
 
-export function reverseTower(applied) {
+export function reverseDesign(applied) {
   const runs=applied.map(r => ({...r,before:r.after,after:r.before})).reverse();
   return {runs,bounds:boundsOf(runs),count:volume(runs)};
 }
+
+export {applyDesign as applyTower, reverseDesign as reverseTower};

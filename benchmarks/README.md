@@ -20,7 +20,24 @@ The raw records include `tick query` immediately before and after the edit. Its 
 
 Each individual or grouped edit finishes as one or more commands. Stopping a loop leaves completed commands in the world. WorldEdit commits use the player's own undo history. Undoing one WorldEdit change can affect later edits to the same positions. The native plan supports job cancellation between steps. This harness verified direct conditional cleanup on successful trials. Keep a closed-world copy for whole-session recovery.
 
-## Reproduce one trial
+## Fresh structures and architectural revisions
+
+Each method started with the same design and world state in a disposable Fabric 26.3 lab. The clock included surveying the site, preparing and applying the edit, and reading back all 9,234 cells in the test volume. The schematic path wrote a new file and loaded it into WorldEdit for each trial. An independent readback also checked each undo. [Raw results](results/architecture-backends.json)
+
+| Workload | Changed blocks | Guarded fills | MCP calls | WorldEdit schematic | MCP calls |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Build a curved bridge | 172 | 8.77 s | 533 | 0.29 s | 13 |
+| Widen the bridge from three to five blocks | 175 | 9.64 s | 585 | 1.49 s | 85 |
+| Build a tower | 375 | 31.18 s | 639 | 0.64 s | 15 |
+| Move the doorway to the opposite side | 27 | 3.39 s | 79 | 2.38 s | 53 |
+
+Guarded fills check world, player and block state as the edit progresses. The WorldEdit path pastes changed solid blocks with `//paste -a -o` and handles intentional removals with separate guarded fills. Both methods excluded a manual edit present at planning time. After the edit, the fixture placed a lantern on a changed block. Studio undo preserved the lantern on both revision workloads. WorldEdit undo restored its previous block there.
+
+Use a schematic for a fresh placement where the destination is clear. Use Studio's guarded editor for conversational revisions where the player may continue building. These are single measurements on one PC with zero model calls. The MCP counts include checks and readback. This run did not measure frame times, server tick duration or memory.
+
+To reproduce, launch a disposable lab copy and run `node --experimental-strip-types benchmarks/bridge-backends.mjs --lab-root <copied-project>`. [Harness](bridge-backends.mjs)
+
+## Reproduce one bulk-edit trial
 
 Start the lab, close menus, load the benchmark chunks, and keep the single human player's WorldEdit selection and clipboard available for this test. In a fresh empty copy of the benchmark volume, from the repository root:
 

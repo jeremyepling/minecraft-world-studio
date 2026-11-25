@@ -1,0 +1,95 @@
+{
+  "case": "curved-bridge-chat",
+  "phase": "pass",
+  "requests": [
+    "@studio menu mark 9 210 86 Trial West Bank",
+    "@studio menu mark 25 210 86 Trial East Bank",
+    "@studio preview Build a curved stone bridge from Trial West Bank to Trial East Bank. Make its deck 3 blocks wide, its arch rise 2 blocks, and its signed bend +3 blocks.",
+    "@studio Build a curved stone bridge from Trial West Bank to Trial East Bank. Make its deck 3 blocks wide, its arch rise 2 blocks, and its signed bend +3 blocks.",
+    "@studio export schematic",
+    "@studio Widen that same bridge from 3 to 5 blocks. Keep the arch height, bend and bank markers exactly as before.",
+    "@studio Raise the arch of that same bridge by 2 blocks. Keep the width and bend unchanged.",
+    "@studio undo",
+    "@studio undo",
+    "@studio undo",
+    "@studio forget marker Trial West Bank",
+    "@studio forget marker Trial East Bank"
+  ],
+  "observations": [
+    {
+      "phase": "setup",
+      "reply": "[AI] Marked Trial West Bank at 9 210 86 (minecraft:emerald_block).",
+      "wallMs": 336
+    },
+    {
+      "phase": "setup",
+      "reply": "[AI] Marked Trial East Bank at 25 210 86 (minecraft:emerald_block).",
+      "wallMs": 448
+    },
+    {
+      "phase": "preview",
+      "reply": "[AI] Bridge preview between Trial West Bank and Trial East Bank. Width 3, arch rise 2, bend 3. 172 cells would change, 0 protected.",
+      "wallMs": 8209
+    },
+    {
+      "phase": "build",
+      "reply": "[AI] Applied 6f038883: 172 cells changed, 172 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 16731
+    },
+    {
+      "phase": "export",
+      "reply": "[AI] Exported the generated bridge design. Load it with //schem load studio_bridge_57b1a8b092.schem, then use //paste -a at your chosen placement point. WorldEdit records its own undo.",
+      "wallMs": 533
+    },
+    {
+      "phase": "widen",
+      "reply": "[AI] Applied 228c6bd2: 175 cells changed, 175 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 17844
+    },
+    {
+      "phase": "raise-arch",
+      "reply": "[AI] Applied 973757f4: 284 cells changed, 284 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 25528
+    },
+    {
+      "phase": "undo",
+      "reply": "[AI] Undid 973757f4: 284 cells changed, 284 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 19579
+    },
+    {
+      "phase": "undo",
+      "reply": "[AI] Undid 228c6bd2: 175 cells changed, 175 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 10045
+    },
+    {
+      "phase": "undo",
+      "reply": "[AI] Undid 6f038883: 172 cells changed, 172 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 9245
+    },
+    {
+      "phase": "undo",
+      "reply": "[AI] Forgot marker Trial West Bank.",
+      "wallMs": 399
+    },
+    {
+      "phase": "undo",
+      "reply": "[AI] Forgot marker Trial East Bank.",
+      "wallMs": 383
+    }
+  ],
+  "exportedSchematic": {
+    "bytes": 346,
+    "loadedByWorldEdit": true
+  },
+  "summary": {
+    "surveyedCells": 9234,
+    "freshCells": 172,
+    "widthChanges": 175,
+    "archChanges": 284,
+    "manualOverride": "10,211,85",
+    "previewReadOnly": true,
+    "restoredWorld": true,
+    "restoredMarkers": true,
+    "restoredHistory": true
+  }
+}

@@ -14,6 +14,31 @@ function setup(t) {
   return new StudioState(dir);
 }
 
+test("bridge registration survives restart and undo restores both its previous design and protected cells",t=>{
+  const store=setup(t);
+  delete store.data.bridges;store.save(); // Existing tower-only session.
+  const session=new StudioState(store.directory);
+  const bridge={id:"make",kind:"bridge",key:"bridge-1",banks:["West","East"],before:null,
+    designBounds:{from:{x:0,y:60,z:-2},to:{x:18,y:67,z:4}},
+    plan:{origin:{x:0,y:63,z:0},next:{dx:18,dy:0,dz:0,width:3,arch:3,bend:2},excluded:[]}};
+  function apply(s,e) {
+    s.begin("apply",e);s.receipt({before:column});s.receipt({done:column,changed:true});s.finish({conflicts:[]});
+  }
+  apply(session,bridge);
+  const resumed=new StudioState(store.directory);
+  const before=resumed.data.bridges[bridge.key];
+  assert.deepEqual(before.banks,bridge.banks);
+  assert.deepEqual(before.bounds,bridge.designBounds);
+  const revision={...bridge,id:"widen",before,plan:{...bridge.plan,next:{...bridge.plan.next,width:5}}};
+  apply(resumed,revision);
+  const manual={x:9,y:120,z:86,top:120};
+  resumed.begin("undo",resumed.data.history.at(-1));resumed.finish({conflicts:[manual]});
+  assert.deepEqual(resumed.data.bridges[bridge.key],{...before,exclude:[manual]});
+  resumed.begin("undo",resumed.data.history[0]);resumed.finish({conflicts:[]});
+  assert.deepEqual(resumed.data.bridges,{});
+  assert.deepEqual(resumed.data.towers,{});
+});
+
 test("survey recolors and their undo have receipts without claiming a generated object", t=>{
   const store=setup(t);
   const generated={origin:{x:0,y:60,z:0},params:defaults,exclude:[]};

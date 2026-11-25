@@ -36,6 +36,7 @@ export class StudioState {
     this.data=existsSync(this.file) ? JSON.parse(readFileSync(this.file,"utf8")) :
       {version:1,towers:{},history:[],pending:null,selected:null,cursor:0,turns:[]};
     if(this.data.version!==1) throw Error("Unknown World Studio state version");
+    this.data.bridges??={};
   }
   save() {
     writeFileSync(this.file+".tmp",JSON.stringify(this.data),{flush:true});
@@ -56,6 +57,7 @@ export class StudioState {
   }
   finish(result) {
     const {entry,direction,receipt}=this.data.active;
+    const objects=entry.kind==="bridge"?this.data.bridges:this.data.towers;
     const file=join(this.directory,receipt);
     let uncertain=null;
     const confirmed=[];
@@ -76,7 +78,8 @@ export class StudioState {
         if(entry.kind!=="survey") this.data.selected=entry.key;
       }
       if(result && confirmed.length && entry.kind!=="survey") {
-        this.data.towers[entry.key]={origin:entry.plan.origin,params:entry.plan.next,
+        objects[entry.key]={origin:entry.plan.origin,params:entry.plan.next,
+          ...(entry.kind==="bridge"?{banks:entry.banks,bounds:entry.designBounds}:{}),
           exclude:[...entry.plan.excluded,...omitted]};
       }
     } else {
@@ -90,10 +93,10 @@ export class StudioState {
       } else {
         this.data.history.pop();
         if(entry.kind!=="survey") {
-          if(entry.before) this.data.towers[entry.key]={...entry.before,
+          if(entry.before) objects[entry.key]={...entry.before,
             exclude:[...entry.before.exclude,...(last.undoExcluded??[]),...omitted]};
-          else delete this.data.towers[entry.key];
-          this.data.selected=this.data.towers[entry.key] ? entry.key : null;
+          else delete objects[entry.key];
+          this.data.selected=objects[entry.key] ? entry.key : null;
         }
       }
     }

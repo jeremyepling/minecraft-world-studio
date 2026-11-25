@@ -13,7 +13,7 @@
     "thickness",
     "roof",
     "roofFinish",
-    "entrance"
+    "entrance", "fromMarker", "toMarker", "width", "arch", "bend"
   ],
   "properties": {
     "previewOnly": {"type":"boolean"},
@@ -22,7 +22,7 @@
       "enum": [
         "answer",
         "revise",
-        "new"
+        "new", "new_bridge", "revise_bridge"
       ]
     },
     "target": {
@@ -42,6 +42,11 @@
       "enum": ["copper", "black_to_grey", "brown_to_tan", null]
     },
     "entrance": {"type":["string","null"],"enum":["north","east","south","west",null]},
+    "fromMarker": {"type":["string","null"]},
+    "toMarker": {"type":["string","null"]},
+    "width": {"type":["integer","null"]},
+    "arch": {"type":["integer","null"]},
+    "bend": {"type":["integer","null"]},
     "height": {
       "type": [
         "integer",
