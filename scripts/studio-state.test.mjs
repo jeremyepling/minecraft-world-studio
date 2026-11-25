@@ -82,4 +82,10 @@ test("interrupted undo retains exactly the cells still eligible for checked reve
 test("a relative revision retains unmodified parameters and rejects oversized generations", ()=>{
   assert.deepEqual(parameters(defaults,{height:null,roof:14}),{...defaults,roof:14});
   assert.throws(()=>parameters(defaults,{radius:500}));
+  const legacy={...defaults};
+  delete legacy.entrance;
+  assert.equal(parameters(legacy,{roof:14}).entrance,"north");
+  const south=parameters(legacy,{entrance:"south"});
+  assert.equal(parameters(south,{roof:14,entrance:null}).entrance,"south");
+  assert.throws(()=>parameters(south,{entrance:"up"}),/cardinal/);
 });

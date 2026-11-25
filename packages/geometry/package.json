@@ -1,0 +1,9 @@
+{
+  "name": "@world-studio/geometry",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./voxels": "./voxels.ts",
+    "./tower": "./tower.ts"
+  }
+}

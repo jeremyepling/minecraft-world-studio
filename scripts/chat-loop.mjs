@@ -11,7 +11,7 @@ import { createVoice } from "./studio-voice.mjs";
 import { StudioSession, coordinates, inside, selectionName } from "./studio-session.mjs";
 import { surveyBrownRoof } from "./survey-roof.mjs";
 import { StudioState } from "./studio-state.mjs";
-import { previewTower, applyTower, reverseTower } from "./tower.mjs";
+import { previewTower, applyTower, reverseTower, recordedParameters } from "./tower.mjs";
 
 const WORLD="sp:WorldStudioLab", DIM="minecraft:overworld";
 const hillside={origin:{x:9,y:96,z:86},params:{...defaults,roof:10},exclude:[]};
@@ -141,7 +141,7 @@ async function survey() {
 
 function previewText(p) {
   const {origin:o,next:n,count,protectedCount}=p.plan;
-  return `Preview at ${o.x} ${o.y} ${o.z}. ${p.summary} Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}; roof ${n.roof}. ${count} cells would change, ${protectedCount} protected.`;
+  return `Preview at ${o.x} ${o.y} ${o.z}. Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}. Roof ${n.roof} high. Entrance faces ${n.entrance}. ${count} cells would change, ${protectedCount} protected. ${p.summary}`.trim();
 }
 async function outline(p) {
   await context();
@@ -166,7 +166,7 @@ function acceptNextInput(signal) {
 
 async function design(request,signal,previewOnly,observeOnly=false) {
   const site=await survey();
-  const objects=Object.fromEntries(Object.entries(state.towers).map(([key,t])=>[key,{origin:t.origin,params:t.params}]));
+  const objects=Object.fromEntries(Object.entries(state.towers).map(([key,t])=>[key,{origin:t.origin,params:recordedParameters(key,t,state.history)}]));
   await say(`Working with ${planner.provider}. Use @studio cancel or @studio redirect <request>.`);
   let image;
   if(observeOnly) {
@@ -201,7 +201,7 @@ async function design(request,signal,previewOnly,observeOnly=false) {
   } else {
     key=!anchor && decision.target==="hillside"?"hillside":site.selected;
     before=state.towers[key]??null;
-    if(before) { origin=before.origin;base=before.params; }
+    if(before) { origin=before.origin;base=objects[key].params; }
     else throw Error("Point at a known tower or ask for a new tower on the ground.");
   }
   const next=parameters(base,decision);
@@ -213,7 +213,7 @@ async function design(request,signal,previewOnly,observeOnly=false) {
       origin.y<t.origin.y+t.params.height+t.params.roof && origin.y+next.height+next.roof>t.origin.y)
       throw Error("That footprint overlaps another Studio tower. Select a different site.");
   }
-  const plan=await previewTower(c,origin,before?.params??null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
+  const plan=await previewTower(c,origin,before?base:null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
   signal.throwIfAborted();
   checkSelection(plan);
   if(!plan.count) { lastPreview=null;store.save();await reply(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }

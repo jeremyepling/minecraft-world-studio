@@ -1,21 +1,26 @@
-# Milestone 1 — In-game collaboration
+# Milestone 2 — Building fluency
 
-**Implemented in the Windows Fabric 26.3 lab. Human acceptance is open.** Start **World Studio.cmd**, type `@studio help` and try an hour building in WorldStudioLab. The player decides whether the in-game conversation, pointing, speech and interruption are comfortable enough for regular use. [Player guide](collaborate.md) · [Hour-long acceptance case](collaboration-session-test.md)
+## First slice · Parametric tower revisions
 
-| Experience | Implementation |
+Open World Studio, press **J → Ask Studio…**, and ask **“Make the hillside watchtower roof four blocks taller. Keep its walls and doorway exactly as they are.”** To see its dimensions and estimated change count first, begin with **preview**.
+
+Follow with **“Move the entrance to the opposite side. Keep the roof as it is.”** The first revision changes the cap. The second closes the old doorway and cuts a matching arch in the new face. You can also name a cardinal direction or ask for a wider base. **@studio undo** reverses the last applied revision.
+
+The TypeScript module generates the hollow shaft and cap from circular cross-sections, subtracts the entrance and windows, and assigns materials. Changing the entrance rotates the opening independently of the roof finish. The Minecraft adapter compares the old design, new design and live blocks. A hand edit that differs from the old design stays protected. The existing brown hillside repaint can supply the expected finish when its recorded writes account for the entire generated cap.
+
+In the Fabric 26.3 acceptance run, a copper test roof grew from six to ten blocks high. Studio verified 131 changed cells, all in the roof. Relocating the north doorway to the south changed 28 cells in the lowest five courses. A sea lantern placed at the original crown survived both revisions and their undos. The 5,400-cell test volume and prior edit history were restored. [Exact chat, counts and timings](parametric-tower-results.json)
+
+[Geometry source](../packages/geometry/tower.ts) · [Building controls](in-game-building.md) · [Testing](testing.md)
+
+The matching north views replay the verified designs in the disposable world with the same manual lantern. The arch below the roof is a reference for scale.
+
+| Six-block roof | Ten-block roof |
 | --- | --- |
-| Keep a conversation | Codex App Server keeps a dedicated thread. Studio resumes it across listener restarts. It also saves provider-independent messages and world references in private storage. |
-| Refer to the world | Press **J** for the rebindable Studio menu. Save a crosshair target, locate it by its white sparkles, select a point or two corners, or attach the current framebuffer for a read-only critique. Chat commands remain available. |
-| Control the work | Direct build requests retain checked writes and undo. Explicit previews are read-only. The HUD reports activity and block progress. Cancel or redirect an active turn from chat or recognized speech. |
-| Choose input and output | Text is available throughout. F8 push-to-talk and spoken replies are independently opt-in. The Windows helper checks the focused Studio instance and lab authorization. |
-| Choose an agent | Codex is the default. The mock adapter supports offline tests. The Ollama adapter accepts a compatible installed local model through loopback. Image-capable turns currently use Codex. |
+| ![Tower before raising the roof](../screenshots/parametric-tower-before.png) | ![Same tower with its roof four blocks taller](../screenshots/parametric-tower-raised.png) |
 
-## Evidence and remaining acceptance
+## Remaining Milestone 2 work
 
-* The combined automated suite passed 19 tests covering checked editing and recovery, provider contracts, durable markers and conversations, and speech lifecycle.
-* A real Minecraft chat fixture placed and selected a marker at an independently raycast block, established a conversation, restarted the listener, then checked the same Codex thread and recalled phrase. The fixture restored the prior marker selection and checked all 2,700 roof and neighboring cells and the previous edit history. [Reproduce the test](collaboration-session-test.md)
-* In the same lab, Codex described the tower and daylight sky from the attached framebuffer. Active turns were cancelled and redirected, the replacement returned the requested code, and the player switched from Codex to the mock adapter and back. A roof preview crossing a two-marker region was refused. The camera, selection, original provider, edit history and all surveyed blocks were restored.
-* The installed Codex runtime passed a separate interruption, recovery, isolated-survey and image-input check. The local Windows speech engine recognized an in-memory synthesized sentence exactly. Ollama was exercised with a loopback API fixture. [Provider tests](agent-providers.md) · [Speech tests](voice.md)
-* Physical microphone intelligibility, audible playback at the player's desk, a real Axiom edit during collaboration, and the one-hour comfort criterion remain human checks. Text, voice and provider support are documented separately from the historical Phase 1 trials. [Known limitations](known-limitations.md)
+1. Compare grouped, guarded fills with schematic placement on representative fresh builds and small revisions. Measure correctness, recoverability and elapsed time for each.
+2. Build a curved bridge between two saved markers. Use it to develop a second caller for shared geometry and test a width or arch-height revision in game.
 
-Milestone 2 covers building fluency. The broader SDK and regional planning work remain on the [roadmap](roadmap.md).
+[Milestone 1 implementation and human acceptance](milestone-1.md) · [Product roadmap](roadmap.md)

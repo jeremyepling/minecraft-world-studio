@@ -20,14 +20,14 @@ $node = @("$env:ProgramFiles/nodejs/node.exe", (Get-Command node.exe -ErrorActio
 if (!$node) { throw 'The Studio listener needs Node.js 22.16 or newer.' }
 $listener = Join-Path $PSScriptRoot 'chat-loop.mjs'
 if (!$Background) {
-    & $node $listener
+    & $node --experimental-strip-types $listener
     exit $LASTEXITCODE
 }
 $null = [IO.Directory]::CreateDirectory($stateDir)
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-ffff'
 $stdout = Join-Path $stateDir "listener-$stamp.log"
 $stderr = Join-Path $stateDir "listener-$stamp.err"
-$process = Start-Process -FilePath $node -ArgumentList ('"' + $listener + '"') -WorkingDirectory $root -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+$process = Start-Process -FilePath $node -ArgumentList ('--experimental-strip-types "' + $listener + '"') -WorkingDirectory $root -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
 for ($i=0; $i -lt 35; $i++) {
     if ($process.HasExited) {
         $detail = Get-Content -LiteralPath $stderr -Raw

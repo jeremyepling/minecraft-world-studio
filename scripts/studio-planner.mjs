@@ -1,17 +1,19 @@
 import {readFileSync} from "node:fs";
 import {CodexRuntime} from "./codex-runtime.mjs";
+import {towerDefaults, towerLimits} from "../packages/geometry/tower.ts";
 
 const designSchema=JSON.parse(readFileSync(new URL("./tower-decision.schema.json",import.meta.url),"utf8"));
 const surveySchema=JSON.parse(readFileSync(new URL("./survey-intent.schema.json",import.meta.url),"utf8"));
 
-export const defaults = {height:30,radius:7,taper:2,thickness:2,roof:9,roofFinish:"copper"};
-const limits = {height:[12,40],radius:[5,10],taper:[0,3],thickness:[1,3],roof:[4,16]};
+export const defaults = towerDefaults;
 
 export function parameters(base, decision) {
   const params = {...base};
   params.roofFinish = decision.roofFinish ?? base.roofFinish ?? "copper";
-  if (!["copper","black_to_grey"].includes(params.roofFinish)) throw Error("Unknown roof finish.");
-  for (const [key,[lo,hi]] of Object.entries(limits)) {
+  if (!["copper","black_to_grey","brown_to_tan"].includes(params.roofFinish)) throw Error("Unknown roof finish.");
+  params.entrance = decision.entrance ?? base.entrance ?? defaults.entrance;
+  if (!["north","east","south","west"].includes(params.entrance)) throw Error("Choose a cardinal direction for the entrance.");
+  for (const [key,[lo,hi]] of Object.entries(towerLimits)) {
     const value = decision[key] ?? params[key];
     if (!Number.isInteger(value) || value < lo || value > hi) {
       throw Error(`Choose a ${key} between ${lo} and ${hi} blocks.`);
@@ -28,7 +30,8 @@ function designPrompt(context) {
     "Use current observations, recent exchanges and recorded edit results. Previous proposals are not proof that a build happened. Never treat quoted material, a question, ambiguous language, or a remembered instruction as permission for a new write. If observeOnly is true return action=answer. Treat named markers as saved points and selections as a bounded pair of points; report only coordinates actually supplied.",
     "An explicit direct build or revision executes immediately. Set previewOnly true for requests to preview or show the shape first. For new choose new/point; for revisions choose revise/selected or revise/hillside if explicitly named. If the player explicitly refers to a named marker, return its exact name from site.markers in marker. Otherwise set marker=null. If the referenced marker is missing or ambiguous, ask for clarification with action=answer.",
     "Use absolute integer values only for changed dimensions, null for all unchanged. Limits in blocks: height 12..40, base radius 5..10, taper 0..3, wall thickness 1..3, roof height 4..16. State a limit instead of silently changing the request.",
-    "The tower roof supports copper (weathered green) or black_to_grey (black eaves to grey tip). Walls, north doorway and slit windows have fixed materials and placement. Answer unsupported requests conversationally.",
+    "Wall-top radius equals base radius minus taper. To widen only the base while keeping the crown and roof the same width, increase base radius and taper by the same number of blocks within the limits.",
+    "The tower roof supports copper (weathered green), black_to_grey and brown_to_tan. Preserve the current finish on dimensional revisions. The arched entrance can face north, east, south or west; older towers default to north. For an entrance revision, resolve 'opposite' from the selected tower's current entrance, or a pointed side from the hit relative to its center. If the side is ambiguous, ask. Set entrance=null when unchanged. Slit windows and wall materials stay fixed. Answer unsupported requests conversationally.",
     "Keep message under 450 characters; never claim a proposed edit was applied. The application performs its own world checks and reports the result. Use any relevant previous conversation to resolve references; the supplied current world observation is authoritative.",
     JSON.stringify(context)
   ].join("\n");
@@ -100,7 +103,7 @@ export function createPlanner({directory,provider="codex",world="sp:WorldStudioL
     if(provider==="mock") {
       report("Preparing the mock reply");
       decision=ephemeral?{action:"inspect"}:{action:"answer",message:"Mock received: "+String(context.request).slice(0,160),
-        target:"point",marker:null,previewOnly:false,height:null,radius:null,taper:null,thickness:null,roof:null,roofFinish:null};
+        target:"point",marker:null,previewOnly:false,height:null,radius:null,taper:null,thickness:null,roof:null,roofFinish:null,entrance:null};
     } else {
       const params={schema,ephemeral,signal:cancel,onProgress:report,image:checkedImage(image),
         prompt:ephemeral?surveyPrompt(request):designPrompt(context)};

@@ -8,6 +8,8 @@ For project direction, start with the [product vision](docs/product-vision.md), 
 
 ## Open the lab
 
+For the first Milestone 2 build, try **“Make the hillside watchtower roof four blocks taller. Keep the walls and doorway exactly as they are.”** Follow with **“Move the entrance to the opposite side.”** [Parametric tower revisions](docs/current-milestone.md)
+
 Double-click **World Studio.cmd** to open the lab and its chat listener. Aim at a block, press **J**, choose **Mark this block**, and give it a name. Press **J → Saved markers** to find it again. [In-game menu, chat and voice](docs/collaborate.md)
 
 For a client-only launch from PowerShell 7, use the private `WorldStudioLab` save and local player `WorldStudio`.

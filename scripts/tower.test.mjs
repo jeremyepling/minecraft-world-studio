@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {previewTower,applyTower,reverseTower} from "./tower.mjs";
+import {previewTower,applyTower,reverseTower,recordedParameters} from "./tower.mjs";
 
 const air="minecraft:air", stone="minecraft:stone_bricks";
 const key=(x,y,z)=>[x,y,z].join(",");
@@ -110,4 +110,35 @@ test("an existing copper roof can be shaded without changing its massing, then r
   assert.equal((await previewTower(c,origin,colored,colored)).count,0);
   assert.equal((await applyTower(c,reverseTower(result.applied))).verified,258);
   assert.equal((await previewTower(c,origin,shape,shape)).protectedCount,0);
+});
+
+test("a fully receipted brown repaint follows a taller roof and undo preserves a later manual block",async()=>{
+  const client=fixture(), origin={x:9,y:96,z:86};
+  const shape={height:30,radius:7,taper:2,thickness:2,roof:10,roofFinish:"black_to_grey"};
+  const tower={origin,params:shape};
+  await applyTower(client,await previewTower(client,origin,null,shape));
+  const brown={...shape,roofFinish:"brown_to_tan"};
+  const recolor=await previewTower(client,origin,shape,brown);
+  const survey={kind:"survey",applied:(await applyTower(client,recolor)).applied,
+    plan:{bounds:{from:{x:3,y:126,z:80},to:{x:15,y:135,z:92}}}};
+  assert.equal(recolor.count,258);
+  const effective=recordedParameters("hillside",tower,[survey]);
+  assert.equal(effective.entrance,"north");
+  assert.equal(effective.roofFinish,"brown_to_tan");
+  for(const history of [[],[{...survey,partial:true}],[{...survey,applied:survey.applied.slice(1)}],
+    [survey,{key:"hillside"}],[{...survey,applied:[{...survey.applied[0],before:air},...survey.applied.slice(1)]}]])
+    assert.equal(recordedParameters("hillside",tower,history).roofFinish,"black_to_grey");
+  const next={...effective,roof:14};
+  const plan=await previewTower(client,origin,effective,next);
+  assert.ok(plan.runs.every(r=>r.y>=126));
+  assert.equal(plan.count,254);
+  const override=plan.runs.find(r=>r.before!==air);
+  const position=key(override.x,override.y,override.z);
+  client.cells.set(position,"minecraft:sea_lantern");
+  const baseline=new Map(client.cells);
+  const applied=await applyTower(client,plan);
+  assert.equal(applied.verified,253);
+  await applyTower(client,reverseTower(applied.applied));
+  for(const [k,id] of client.cells)assert.equal(id,baseline.get(k)??air,k);
+  for(const [k,id] of baseline)assert.equal(client.cells.get(k),id,k);
 });

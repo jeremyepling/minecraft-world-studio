@@ -1,5 +1,5 @@
 // Read-only. Infer an isolated tower cap from the live crosshair and connected courses.
-const palette = ["dark_oak", "spruce", "jungle", "oak"].map(wood => "minecraft:" + wood + "_planks");
+import {brownRoofMaterial} from "../packages/geometry/tower.ts";
 // Only vanilla full cubes with no block-state properties or block entity. Deliberately
 // exclude shape-bearing variants, even when the region API reports only the base ID.
 const plain = new Set([
@@ -73,16 +73,6 @@ function eaveCandidate(courses,i) {
   return eave.ids.every(id => !wallIds.has(id));
 }
 
-function roofColor(block,first,last,centerX,centerZ) {
-  const h = (block.y-first)/(last-first);
-  // Smooth waves shift the two intermediate transitions across neighboring columns.
-  // Fix both endpoints so every eave cell is darkest and every peak cell is lightest.
-  const x = block.x-centerX, z = block.z-centerZ;
-  const wave = (Math.sin(0.48*x+0.31*z)+Math.cos(0.29*x-0.52*z))/2;
-  const level = Math.max(0,Math.min(3,Math.floor(h*4 + 0.62*wave*4*h*(1-h))));
-  return palette[level];
-}
-
 export async function surveyBrownRoof(c,signal) {
   const read = async (name,args) => {
     signal?.throwIfAborted();
@@ -152,7 +142,7 @@ export async function surveyBrownRoof(c,signal) {
   const runs = [];
   let count = 0;
   for (const b of blocks.sort((a,b) => a.x-b.x || a.z-b.z || a.y-b.y)) {
-    const after = roofColor(b,eave.y,tip.y,centerX,centerZ);
+    const after = "minecraft:"+brownRoofMaterial(b.x-centerX,b.z-centerZ,(b.y-eave.y)/(tip.y-eave.y));
     if (b.id===after) continue;
     count++;
     const last = runs.at(-1);

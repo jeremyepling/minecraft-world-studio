@@ -12,7 +12,8 @@
     "taper",
     "thickness",
     "roof",
-    "roofFinish"
+    "roofFinish",
+    "entrance"
   ],
   "properties": {
     "previewOnly": {"type":"boolean"},
@@ -38,8 +39,9 @@
     "marker": {"type":["string","null"]},
     "roofFinish": {
       "type": ["string", "null"],
-      "enum": ["copper", "black_to_grey", null]
+      "enum": ["copper", "black_to_grey", "brown_to_tan", null]
     },
+    "entrance": {"type":["string","null"],"enum":["north","east","south","west",null]},
     "height": {
       "type": [
         "integer",

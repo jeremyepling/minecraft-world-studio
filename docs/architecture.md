@@ -27,7 +27,9 @@ These are responsibilities within the evolving product. Split a package or proce
 
 The initial proposal for asynchronous in-game requests was a **local listener** that reads addressed messages from the known player, tracks the event cursor, and submits one turn to a dedicated Codex thread. Persist the cursor and request ID to prevent replays on reconnect. Handle interrupt separately from undo. Keep the local player in charge of applying changes, especially following cancellation or a stale survey. This runner could use Codex app-server's documented thread and turn methods with the same MCP registration. A chat message becomes input data. It should never grant more game or filesystem permissions. [Codex app-server](https://developers.openai.com/codex/app-server/) · [MCB prompt queue](https://github.com/Gasased/mcb) · [ACP example](https://github.com/emil28092005/minecraft-builder-mcp)
 
-## Standalone SDK, when the first loop works
+## Standalone geometry SDK
+
+The tower uses two circular lofts sampled in local integer coordinates, with world +X east, +Y up and +Z south. The wall and cap have independent shell thicknesses. Subtractive predicates cut the openings before material assignment. The adapter translates emitted occupied cells by the tower origin. A cell removed from the old design proposes a guarded air write. Air outside both designs receives no write. The original QuickJS experiment remains a compatibility reference. [Geometry](../packages/geometry/voxels.ts) · [Adapter](../scripts/tower.mjs)
 
 Start with integer coordinates, a bounded sparse voxel field, immutable transforms, cylinder/profile sampling, hollowing and subtraction. Add explicit air and a distinct untouched cell. Make materials a second pass over positions, normals or exposed faces, height, nearby water and a fixed seed. Preserve full block states, including orientation and waterlogging, in the Minecraft adapter. Define the coordinate convention once and test a rotated stair against the game.
 

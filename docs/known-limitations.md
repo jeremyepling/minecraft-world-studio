@@ -1,5 +1,7 @@
 # Known limitations
 
+* **Parametric revisions.** The registered tower supports cardinal doorways and a fixed slit-window layout. A complete matching brown repaint receipt can establish its roof finish. Unrecorded material changes stay protected overrides. The tower's particle preview outlines its massing; the preview text identifies the entrance direction. [Building controls](in-game-building.md)
+
 * **Marker visibility.** The menu saves names and coordinates. White sparkles appear briefly when marking, moving or locating a point. To see one again, use **J → Saved markers → Locate**. The picker reads the session on opening and the Studio listener handles its commands. [Menu guide](collaborate.md)
 
 * **Conversation and providers.** The Codex adapter requires a signed-in CLI and model access. The local Ollama adapter needs a running service and a compatible installed model. Vision is available on the Codex path. The mock adapter returns test responses. [Provider capabilities](agent-providers.md)

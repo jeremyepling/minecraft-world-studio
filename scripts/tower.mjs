@@ -1,5 +1,4 @@
-import {readFile} from "node:fs/promises";
-import {runScript} from "../local/server/server/script/sandbox.js";
+import {towerCells, brownRoofMaterial} from "../packages/geometry/tower.ts";
 import {isSurveyMaterial} from "./survey-roof.mjs";
 
 const WORLD = "sp:WorldStudioLab";
@@ -9,7 +8,7 @@ const materials = new Set([AIR,"minecraft:andesite","minecraft:stone_bricks","mi
   "minecraft:polished_blackstone","minecraft:deepslate_tiles","minecraft:deepslate_bricks",
   "minecraft:polished_deepslate","minecraft:polished_andesite"]);
 const brownPlanks=new Set(["minecraft:dark_oak_planks","minecraft:spruce_planks","minecraft:jungle_planks","minecraft:oak_planks"]);
-const skill = new URL("../experiments/sample.js", import.meta.url);
+for (const id of brownPlanks) materials.add(id);
 const cellKey = (x,y,z) => `${x},${y},${z}`;
 const length = r => r.top - r.y + 1;
 const volume = runs => runs.reduce((sum,r) => sum + length(r), 0);
@@ -38,22 +37,16 @@ async function checkSite(client) {
   if (self.dimension !== DIM || self.gameMode !== "creative") throw Error("Enter the lab Overworld in Creative mode.");
 }
 
-// The trusted, checked-in skill also runs in Minecraft. This invocation runs in
-// the installed QuickJS runtime with no bridge helpers; chat cannot supply code.
-async function geometry(params, origin) {
+function geometry(params, origin) {
   const cells = new Map();
   if (!params) return cells;
-  const guest = await runScript(await readFile(skill,"utf8"), {helpers:[],call:() => {throw Error("Offline geometry only");}}, {
-    args:{...params,sample:"tower",action:"geometry"}, limits:{maxResultChars:128000}
-  });
-  if (!guest.ok || guest.resultTruncated) throw Error(guest.error?.message || "Incomplete tower geometry");
-  for (const [dx,minY,dz,maxY,material] of JSON.parse(guest.result)) {
-    const x = origin.x+dx, z = origin.z+dz;
+  for (const cell of towerCells(params)) {
+    const x=origin.x+cell.x, y=origin.y+cell.y, z=origin.z+cell.z;
+    const material=cell.material;
     const id = "minecraft:"+material;
     if (!materials.has(id) || id === AIR) throw Error("Unsupported tower material");
-    validPoint({x,y:origin.y+minY,z});
-    validPoint({x,y:origin.y+maxY,z});
-    for (let y=origin.y+minY;y<=origin.y+maxY;y++) cells.set(cellKey(x,y,z),id);
+    validPoint({x,y,z});
+    cells.set(cellKey(x,y,z),id);
   }
   return cells;
 }
@@ -66,6 +59,41 @@ function boundsOf(runs) {
     to.x=Math.max(to.x,r.x); to.y=Math.max(to.y,r.top); to.z=Math.max(to.z,r.z);
   }
   return {from,to};
+}
+
+// Older releases recorded blind repaints separately from parameter edits. Only a
+// receipt for the complete generated cap can establish its new expected finish.
+// Keep this derived until an edit commits so undoing the survey still works.
+export function recordedParameters(key,tower,history) {
+  const {origin,params}=tower;
+  const base={entrance:"north",...params};
+  if(base.roofFinish==="brown_to_tan")return base;
+  const bottom=origin.y+params.height;
+  const radius=params.radius-params.taper+1;
+  for(let i=history.length-1;i>=0;i--) {
+    const entry=history[i];
+    if(entry.key===key)break;
+    if(entry.kind!=="survey")continue;
+    const bounds=entry.plan?.bounds;
+    if(!bounds || bounds.from.x>origin.x+radius || bounds.to.x<origin.x-radius ||
+       bounds.from.z>origin.z+radius || bounds.to.z<origin.z-radius ||
+       bounds.from.y>bottom+params.roof-1 || bounds.to.y<bottom)continue;
+    if(entry.partial || bounds.from.y!==bottom || bounds.to.y!==bottom+params.roof-1)return base;
+    const expected=new Map();
+    for(const {x,y,z,material} of towerCells(base)) {
+      if(y<params.height)continue;
+      expected.set(cellKey(origin.x+x,origin.y+y,origin.z+z),{
+        before:"minecraft:"+material,after:"minecraft:"+brownRoofMaterial(x,z,(y-params.height)/(params.roof-1))
+      });
+    }
+    for(const run of entry.applied)for(let y=run.y;y<=run.top;y++) {
+      const k=cellKey(run.x,y,run.z), cell=expected.get(k);
+      if(!cell || cell.before!==run.before || cell.after!==run.after)return base;
+      expected.delete(k);
+    }
+    return expected.size===0 ? {...base,roofFinish:"brown_to_tan"} : base;
+  }
+  return base;
 }
 
 // Read whole slabs, including air. Missing/unloaded cells never become implicit air.
@@ -109,7 +137,7 @@ export async function previewTower(client,origin,previous,next,{exclude=[]}={}) 
   validPoint(origin);
   if (!next) throw Error("A proposed tower needs dimensions.");
   await checkSite(client);
-  const old=await geometry(previous,origin), proposed=await geometry(next,origin);
+  const old=geometry(previous,origin), proposed=geometry(next,origin);
   const footprint = [...new Set([...old.keys(),...proposed.keys()])].map(k => {
     const [x,y,z]=k.split(",").map(Number);
     return {x,y,z,top:y};

@@ -1,0 +1,59 @@
+{
+  "case": "parametric-tower-revisions",
+  "world": "sp:WorldStudioLab",
+  "dimension": "minecraft:overworld",
+  "origin": {
+    "x": 9,
+    "y": 211,
+    "z": 86
+  },
+  "phase": "pass",
+  "inputs": [
+    "@studio Build a new copper-roof watchtower here with 12-block walls, radius 5, taper 1, wall thickness 1, a 6-block roof and a north entrance.",
+    "@studio Make the roof of the tower we just built four blocks taller. Leave the walls and doorway exactly as they are.",
+    "@studio Move the entrance of that same tower to the south side and close its north entrance. Keep the roof and other dimensions as they are.",
+    "@studio undo",
+    "@studio undo",
+    "@studio undo"
+  ],
+  "observations": [
+    {
+      "phase": "create",
+      "reply": "Applied ef7551c8: 411 cells changed, 411 verified; 0 changed since preview or commit and preserved.",
+      "elapsedMs": 18451
+    },
+    {
+      "phase": "raise-roof",
+      "reply": "Applied 58b3f712: 131 cells changed, 131 verified; 0 changed since preview or commit and preserved.",
+      "elapsedMs": 13009
+    },
+    {
+      "phase": "move-door",
+      "reply": "Applied 310f6348: 28 cells changed, 28 verified; 0 changed since preview or commit and preserved.",
+      "elapsedMs": 5968
+    },
+    {
+      "phase": "undo-door",
+      "reply": "Undid 310f6348: 28 cells changed, 28 verified; 0 changed since preview or commit and preserved.",
+      "elapsedMs": 1516
+    },
+    {
+      "phase": "undo-roof",
+      "reply": "Undid 58b3f712: 131 cells changed, 131 verified; 0 changed since preview or commit and preserved.",
+      "elapsedMs": 6153
+    },
+    {
+      "phase": "undo-create",
+      "reply": "Undid ef7551c8: 411 cells changed, 411 verified; 0 changed since preview or commit and preserved.",
+      "elapsedMs": 11181
+    }
+  ],
+  "summary": {
+    "surveyedCells": 5400,
+    "roofChanges": 131,
+    "doorChanges": 28,
+    "manualOverride": "0,17,0",
+    "restoredWorld": true,
+    "restoredHistory": true
+  }
+}
