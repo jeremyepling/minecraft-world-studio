@@ -27,6 +27,10 @@ The Fabric 26.3 chat case previewed the bridge without writing, built 172 blocks
 | --- | --- | --- |
 | ![Three-block deck](../screenshots/bridge-three-wide.png) | ![Five-block deck](../screenshots/bridge-five-wide.png) | ![Raised arch](../screenshots/bridge-raised.png) |
 
+The second site crossed a river between two grass banks 18 blocks apart. In-game chat produced the preview and exported it before construction. WorldEdit loaded that file. The subsequent build request timed out during planning, so the screenshot shows a replay of the exact preview through Studio’s guarded editor. It placed 218 blocks and protected 81 occupied cells. Undo verified all 218 direct writes. A separate terrain scan found one grass block had changed beneath the bridge during the trial. Studio undo covers its recorded writes and does not rewind Minecraft’s environmental updates.
+
+![Five-block-wide curved stone bridge across the river in the disposable lab](../screenshots/river-bridge.png)
+
 ## First slice · Parametric tower revisions
 
 Open World Studio, press **J → Ask Studio…**, and ask **“Make the hillside watchtower roof four blocks taller. Keep its walls and doorway exactly as they are.”** To see its dimensions and estimated change count first, begin with **preview**.
