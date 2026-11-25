@@ -29,6 +29,8 @@ The Fabric 26.3 chat case previewed the bridge without writing, built 172 blocks
 
 The second site crossed a river between two grass banks 18 blocks apart. In-game chat produced the preview and exported it before construction. WorldEdit loaded that file. The subsequent build request timed out during planning, so the screenshot shows a replay of the exact preview through Studio’s guarded editor. It placed 218 blocks and protected 81 occupied cells. Undo verified all 218 direct writes. A separate terrain scan found one grass block had changed beneath the bridge during the trial. Studio undo covers its recorded writes and does not rewind Minecraft’s environmental updates.
 
+The final cleanup restored that dirt block to grass and verified it. [River chat and WorldEdit feedback](river-preview-export.json) · [Terrain readback and repair](river-bridge-readback.json)
+
 ![Five-block-wide curved stone bridge across the river in the disposable lab](../screenshots/river-bridge.png)
 
 ## First slice · Parametric tower revisions

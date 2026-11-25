@@ -1,0 +1,36 @@
+{
+  "kind": "Actual Codex in-game bridge preview and preview schematic export. The subsequent live planning request timed out before world edits.",
+  "world": "sp:WorldStudioLab",
+  "banks": [
+    [
+      57,
+      62,
+      27
+    ],
+    [
+      75,
+      62,
+      27
+    ]
+  ],
+  "inputs": [
+    "@studio menu mark 57 62 27 Willow Bank",
+    "@studio menu mark 75 62 27 Birch Bank",
+    "@studio preview Build a curved stone bridge from Willow Bank to Birch Bank. Set the total width to 5 blocks, arch rise to 4 and signed bend to +2.",
+    "@studio export preview schematic",
+    "@studio Build a curved stone bridge from Willow Bank to Birch Bank. Set the total width to 5 blocks, arch rise to 4 and signed bend to +2.",
+    "@studio forget marker Willow Bank",
+    "@studio forget marker Birch Bank"
+  ],
+  "observations": [
+    "[AI] Marked Willow Bank at 57 62 27 (minecraft:grass_block).",
+    "[AI] Marked Birch Bank at 75 62 27 (minecraft:grass_block).",
+    "[AI] Bridge preview between Willow Bank and Birch Bank. Width 5, arch rise 4, bend 2. 218 cells would change, 81 protected.",
+    "[AI] Exported the generated bridge design. Load it with //schem load studio_bridge_c732f2b69a.schem, then use //paste -a at your chosen placement point. WorldEdit records its own undo.",
+    "[AI] Forgot marker Willow Bank.",
+    "[AI] Forgot marker Birch Bank."
+  ],
+  "differencesAfterUndo": [],
+  "checked": 4914,
+  "worldEditLoadFeedback": "studio_bridge_c732f2b69a.schem loaded. Paste it with //paste"
+}
