@@ -3,12 +3,19 @@
 Use the standalone Fabric 26.3 lab for live checks. The tower geometry and adapter tests run directly from a checkout, including before Minecraft is installed. Run from the repository root with Node.js 22.16 or newer.
 
 ```powershell
-node --experimental-strip-types --test packages/geometry/bridge.test.mjs packages/geometry/tower.test.mjs scripts/schematic.test.mjs scripts/tower.test.mjs scripts/studio-state.test.mjs scripts/studio-session.test.mjs scripts/studio-planner.test.mjs scripts/studio-voice.test.mjs
+$tests = Get-ChildItem packages/geometry,scripts -Filter '*.test.mjs' -Recurse
+node --experimental-strip-types --test $tests.FullName
 ```
 
 These tests exercise deterministic tower edits, material revisions, guarded writes, conflicts, lost acknowledgements, restart recovery and undo receipts. They can run with Minecraft closed.
 
 ## Direct chat fixture
+
+### Bridge weathering
+
+In a disposable copy with its own authenticated port, the original riverbanks and the feature listener running, use `node --experimental-strip-types experiments/bridge-weathering.mjs --lab-root <copied-project>`. The case exercises addressed player chat, two finish strengths, a protected block and undo, with fixed-camera captures at each finish. [Player instructions](current-milestone.md)
+
+The initial run encountered an archived Codex conversation before construction. A separate signed-in App Server check used a copy of that archived session reference and verified automatic creation, permission checks and persistence of a fresh planner thread. Studio keeps its local bridge records and recent chat across that transition.
 
 ### Curved bridge and backend comparison
 
@@ -19,7 +26,7 @@ node --experimental-strip-types experiments/curved-bridge.mjs --lab-root <copied
 node --experimental-strip-types benchmarks/bridge-backends.mjs --lab-root <copied-project>
 ```
 
-The chat case records exact requests and checks the bank approaches, curvature, deck height, manual override, widths, screenshot views and undo. The benchmark records preparation, mutation and readback separately with tool counts for each backend. Both check the entire plotted volume. [Bridge instructions](current-milestone.md) · [Benchmark results](../benchmarks/README.md)
+The chat case records exact requests and checks the bank approaches, curvature, deck height, manual override, widths, screenshot views and undo. The benchmark records preparation, mutation and readback separately with tool counts for each backend. Both check the entire plotted volume. [Bridge instructions](milestone-2.md) · [Benchmark results](../benchmarks/README.md)
 
 ### Parametric tower revisions
 

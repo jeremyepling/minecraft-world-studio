@@ -1,7 +1,9 @@
 # Known limitations
 
+* **Bridge weathering.** The palette handles one dominant water elevation along the span. It samples water blocks beneath the deck within eight blocks below the lower landing. Waterlogged blocks, moisture simulation, custom resource-pack colors and lighting analysis are outside this first pass. A separately pasted schematic has no registered bridge to repaint. [Weathering workflow](current-milestone.md)
+
 * **Bridge landings.** The two markers set the endpoints. The bridge does not route around obstructions, excavate the banks or search for a crossing. Existing occupied cells are protected by Studio, so a blocked approach can require a different landing. Bridges use full-block steps.
-* **Planning latency.** Some signed-in Codex planning turns reached the 120-second timeout during bridge playtesting. Those turns ended before any block writes. The listener accepted subsequent requests. Backend timings exclude model latency. [In-game results](current-milestone.md)
+* **Planning latency.** Some signed-in Codex planning turns reached the 120-second timeout during bridge playtesting. Those turns ended before any block writes. The listener accepted subsequent requests. Backend timings exclude model latency. [In-game results](milestone-2.md)
 * **WorldEdit copies.** Export produces generated block geometry for this lab’s 26.3 data version. Pasting with `//paste -a` skips air and can overwrite occupied blocks. The copy is independent of Studio's registered object and checked undo. Use it for fresh placements, and use Studio revisions where manual edits matter.
 
 * **Parametric revisions.** The registered tower supports cardinal doorways and a fixed slit-window layout. A complete matching brown repaint receipt can establish its roof finish. Unrecorded material changes stay protected overrides. The tower's particle preview outlines its massing; the preview text identifies the entrance direction. [Building controls](in-game-building.md)

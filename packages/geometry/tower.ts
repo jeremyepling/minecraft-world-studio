@@ -1,4 +1,5 @@
 import {circularLoft, subtract, type Voxel} from "./voxels.ts";
+import {valueNoise} from "./materials.ts";
 
 export type Entrance = "north" | "east" | "south" | "west";
 export type RoofFinish = "copper" | "black_to_grey" | "brown_to_tan";
@@ -37,22 +38,6 @@ function windowSlit({x, y, z}: Voxel): boolean {
   return y > 7 && y % 10 < 3 && ((x === 0 && z !== 0) || (z === 0 && x !== 0));
 }
 
-// Fixed value noise and interpolation preserve the original tower's clustered finish.
-function noise(x: number, z: number): number {
-  let n = Math.imul(x, 374761393) + Math.imul(z, 668265263) + Math.imul(42, 1274126177);
-  n = Math.imul(n ^ (n >>> 13), 1274126177);
-  return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
-}
-
-function cloud(x: number, z: number): number {
-  const ix = Math.floor(x), iz = Math.floor(z);
-  const ease = (t: number) => t * t * (3 - 2 * t);
-  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-  const u = ease(x - ix), v = ease(z - iz);
-  return lerp(lerp(noise(ix, iz), noise(ix + 1, iz), u),
-    lerp(noise(ix, iz + 1), noise(ix + 1, iz + 1), u), v);
-}
-
 const slate = ["polished_blackstone", "deepslate_tiles", "deepslate_bricks", "polished_deepslate", "polished_andesite"];
 const wood = ["dark_oak_planks", "spruce_planks", "jungle_planks", "oak_planks"];
 
@@ -66,7 +51,7 @@ export function brownRoofMaterial(x: number, z: number, rise: number): string {
 function roofMaterial(point: Voxel, rise: number, finish: RoofFinish): string {
   if (finish === "copper") return "waxed_weathered_cut_copper";
   if (finish === "brown_to_tan") return brownRoofMaterial(point.x, point.z, rise);
-  const variation = (cloud(point.x / 2.7, point.z / 2.7) - 0.5) * 1.8;
+  const variation = (valueNoise(point.x / 2.7, point.z / 2.7, 42) - 0.5) * 1.8;
   const shade = Math.round((slate.length - 1) * rise + variation * Math.sin(Math.PI * rise));
   return slate[Math.max(0, Math.min(slate.length - 1, shade))];
 }

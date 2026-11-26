@@ -1,0 +1,196 @@
+{
+  "case": "river-bridge-weathering",
+  "world": "sp:WorldStudioLab",
+  "phase": "passed",
+  "requests": [
+    {
+      "phase": "setup",
+      "message": "@studio menu mark 57 62 27 Weathering West Bank",
+      "reply": "[AI] Marked Weathering West Bank at 57 62 27 (minecraft:grass_block).",
+      "wallMs": 397
+    },
+    {
+      "phase": "setup",
+      "message": "@studio menu mark 75 62 27 Weathering East Bank",
+      "reply": "[AI] Marked Weathering East Bank at 75 62 27 (minecraft:grass_block).",
+      "wallMs": 575
+    },
+    {
+      "phase": "build",
+      "message": "@studio Build a curved stone bridge from Weathering West Bank to Weathering East Bank. Set the total width to 5 blocks, arch rise to 4 and signed bend to +2.",
+      "reply": "[AI] Applied e0c362a0: 218 cells changed, 218 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 19248
+    },
+    {
+      "phase": "paint",
+      "message": "@studio Give this bridge darker, weathered stone near the waterline. Keep the upper stonework lighter and the walking surface quiet. Preserve the shape and my hand-placed blocks.",
+      "reply": "[AI] Applied bc896a54: 58 cells changed, 58 verified; 0 changed since preview or commit and preserved. Stone finish: weathered (waterline Y 62).",
+      "wallMs": 8014
+    },
+    {
+      "phase": "subtler",
+      "message": "@studio Make the weathering subtler",
+      "reply": "[AI] Applied 28a8c400: 42 cells changed, 42 verified; 0 changed since preview or commit and preserved. Stone finish: subtle (waterline Y 62).",
+      "wallMs": 6784
+    },
+    {
+      "phase": "undo paint revisions",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 28a8c400: 42 cells changed, 42 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 2949
+    },
+    {
+      "phase": "undo paint revisions",
+      "message": "@studio undo",
+      "reply": "[AI] Undid bc896a54: 58 cells changed, 58 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 4120
+    },
+    {
+      "phase": "cleanup",
+      "message": "@studio undo",
+      "reply": "[AI] Undid e0c362a0: 218 cells changed, 218 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 14441
+    },
+    {
+      "phase": "cleanup",
+      "message": "@studio forget marker Weathering East Bank",
+      "reply": "[AI] Forgot marker Weathering East Bank.",
+      "wallMs": 461
+    },
+    {
+      "phase": "cleanup",
+      "message": "@studio forget marker Weathering West Bank",
+      "reply": "[AI] Forgot marker Weathering West Bank.",
+      "wallMs": 465
+    }
+  ],
+  "images": [
+    {
+      "name": "bridge-original-downstream.png",
+      "camera": [
+        78.5,
+        69.8,
+        44.5
+      ],
+      "target": [
+        66.5,
+        65.6,
+        28.5
+      ],
+      "yaw": 143.13037,
+      "pitch": 11.8599205,
+      "raining": false,
+      "dayTime": 6247
+    },
+    {
+      "name": "bridge-weathered-downstream.png",
+      "camera": [
+        78.5,
+        69.8,
+        44.5
+      ],
+      "target": [
+        66.5,
+        65.6,
+        28.5
+      ],
+      "yaw": 143.13037,
+      "pitch": 11.8599205,
+      "raining": false,
+      "dayTime": 6248
+    },
+    {
+      "name": "bridge-subtle-downstream.png",
+      "camera": [
+        78.5,
+        69.8,
+        44.5
+      ],
+      "target": [
+        66.5,
+        65.6,
+        28.5
+      ],
+      "yaw": 143.13037,
+      "pitch": 11.8599205,
+      "raining": false,
+      "dayTime": 6246
+    }
+  ],
+  "revisions": {
+    "build": {
+      "id": "e0c362a0",
+      "changed": 218
+    },
+    "weathered": {
+      "id": "bc896a54",
+      "changedFromPrevious": 58,
+      "changedFromOriginal": 58,
+      "surveyed": 4914,
+      "materials": {
+        "minecraft:tuff_bricks": 6,
+        "minecraft:polished_tuff": 32,
+        "minecraft:smooth_stone": 20
+      },
+      "elevations": {
+        "63": 26,
+        "64": 12,
+        "66": 6,
+        "67": 7,
+        "68": 7
+      },
+      "meanDarkY": 63.31578947368421,
+      "meanLightY": 67.05,
+      "waterlineY": 62,
+      "preservedHandEdit": "minecraft:cut_copper",
+      "unchangedTreadSamples": [
+        "58,64,27",
+        "66,67,29",
+        "75,63,27"
+      ]
+    },
+    "subtle": {
+      "id": "28a8c400",
+      "changedFromPrevious": 42,
+      "changedFromOriginal": 16,
+      "surveyed": 4914,
+      "materials": {
+        "minecraft:tuff_bricks": 6,
+        "minecraft:polished_tuff": 4,
+        "minecraft:smooth_stone": 6
+      },
+      "elevations": {
+        "63": 7,
+        "64": 3,
+        "66": 5,
+        "67": 1
+      },
+      "meanDarkY": 63.3,
+      "meanLightY": 66.16666666666667,
+      "waterlineY": 62,
+      "preservedHandEdit": "minecraft:cut_copper",
+      "unchangedTreadSamples": [
+        "58,64,27",
+        "66,67,29",
+        "75,63,27"
+      ]
+    },
+    "undoSubtle": {
+      "id": "28a8c400",
+      "restored": 42
+    },
+    "undoPaint": {
+      "id": "bc896a54",
+      "restored": 58
+    }
+  },
+  "manualEdit": {
+    "point": "57,63,29",
+    "before": "minecraft:andesite",
+    "placed": "minecraft:cut_copper",
+    "otherwisePainted": "minecraft:polished_tuff",
+    "method": "conditional vanilla setblock simulating a builder's hand placement"
+  },
+  "lastPhase": "undo paint revisions",
+  "restoredRiver": true
+}

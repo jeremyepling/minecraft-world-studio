@@ -6,6 +6,7 @@
     "./voxels": "./voxels.ts",
     "./tower": "./tower.ts",
     "./paths": "./paths.ts",
-    "./bridge": "./bridge.ts"
+    "./bridge": "./bridge.ts",
+    "./materials": "./materials.ts"
   }
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {previewTower,applyTower,reverseTower,recordedParameters} from "./tower.mjs";
+import {previewTower,applyTower,reverseTower,recordedParameters,surveyBridgeWaterline,designRuns} from "./tower.mjs";
 
 const air="minecraft:air", stone="minecraft:stone_bricks";
 const key=(x,y,z)=>[x,y,z].join(",");
@@ -31,6 +31,21 @@ function fixture() {
   }};
   return client;
 }
+
+test("the bridge samples exposed water under its deck and ignores buried and off-span water",async()=>{
+  const client=fixture(), origin={x:57,y:70,z:27};
+  const bridge={dx:18,dy:0,dz:0,width:5,bend:2,arch:4};
+  for(const {x,y,z,after} of designRuns("bridge",origin,bridge))client.cells.set(key(x,y,z),after);
+  for(let x=50;x<83;x++)for(let z=18;z<36;z++) {
+    client.cells.set(key(x,66,z),"minecraft:water[level=0]");
+    client.cells.set(key(x,67,z),"minecraft:dirt");
+  }
+  client.cells.set(key(66,69,25),"minecraft:water[level=0]"); // Outside the curved deck.
+  assert.equal(await surveyBridgeWaterline(client,origin,bridge,bridge),null);
+  for(let x=63;x<70;x++)client.cells.set(key(x,68,29),"minecraft:water[level=0]");
+  client.cells.set(key(70,69,29),"minecraft:water[level=4]");
+  assert.equal(await surveyBridgeWaterline(client,origin,bridge,bridge),-2);
+});
 
 test("preview only owns eligible tower cells; a matching preexisting block stays excluded on a later design",async()=>{
   const client=fixture(), origin={x:3,y:70,z:8};

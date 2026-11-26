@@ -12,7 +12,7 @@ import { createVoice } from "./studio-voice.mjs";
 import { StudioSession, coordinates, inside, selectionName } from "./studio-session.mjs";
 import { surveyBrownRoof } from "./survey-roof.mjs";
 import { StudioState } from "./studio-state.mjs";
-import { previewTower, previewBridge, applyDesign, reverseDesign, recordedParameters, designRuns, boundsOf } from "./tower.mjs";
+import { previewTower, previewBridge, applyDesign, reverseDesign, recordedParameters, designRuns, boundsOf, surveyBridgeWaterline } from "./tower.mjs";
 import {bridgeParameters,bridgeDefaults} from "../packages/geometry/bridge.ts";
 import {exportSchematic} from "./schematic.mjs";
 
@@ -144,9 +144,18 @@ async function survey() {
     markers:session.data.markers,selection:session.data.selection,region:session.region()};
 }
 
+function bridgeFinish(plan) {
+  const {weathering,waterline}=plan.next;
+  if(!weathering || weathering==="none")return "";
+  const site=waterline==null?"dry foundation":"waterline Y "+(plan.origin.y+waterline);
+  return ` Stone finish: ${weathering} (${site}).`;
+}
+
 function previewText(p) {
   const {origin:o,next:n,count,protectedCount}=p.plan;
-  if(p.kind==="bridge")return `Bridge preview between ${p.banks.join(" and ")}. Width ${n.width}, arch rise ${n.arch}, bend ${n.bend}. ${count} cells would change, ${protectedCount} protected.`;
+  if(p.kind==="bridge") {
+    return `Bridge preview between ${p.banks.join(" and ")}. Width ${n.width}, arch rise ${n.arch}, bend ${n.bend}.${bridgeFinish(p.plan)} ${count} cells would change, ${protectedCount} protected.`;
+  }
   return `Preview at ${o.x} ${o.y} ${o.z}. Walls ${n.height} high, radius ${n.radius} to ${n.radius-n.taper}, thickness ${n.thickness}. Roof ${n.roof} high. Entrance faces ${n.entrance}. ${count} cells would change, ${protectedCount} protected. ${p.summary}`.trim();
 }
 async function outline(p) {
@@ -261,7 +270,12 @@ async function planBridge(site,d) {
     key="bridge-"+randomBytes(6).toString("hex");
     base={...bridgeDefaults,dx:b.x-a.x,dy:b.y-a.y,dz:b.z-a.z};before=null;
   }
-  const next=bridgeParameters({...base,width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend});
+  const next=bridgeParameters({...base,width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend,
+    weathering:d.weathering??base.weathering??"none"});
+  if(next.weathering==="none")next.waterline=null;
+  else if(!base.weathering || base.weathering==="none") {
+    next.waterline=await surveyBridgeWaterline(c,origin,next,before?.params??null);
+  }
   const plan=await previewBridge(c,origin,before?.params??null,next,{exclude:[...(before?.exclude??[]),...(state.uncertainSpans??[])]});
   const designBounds=boundsOf(designRuns("bridge",origin,next));
   if(Object.values(state.towers).some(t=>intersects(towerBounds(t),designBounds)) ||
@@ -327,7 +341,8 @@ async function edit(direction,entry,signal) {
   finally { receipt=store.finish(result); }
   acceptNextInput(signal);
   const verb=direction==="apply"?"Applied":"Undid";
-  await reply(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.`);
+  const finish=direction==="apply" && entry.kind==="bridge"?bridgeFinish(plan):"";
+  await reply(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.${finish}`);
 }
 async function surveyedEdit(request,signal) {
   await context();

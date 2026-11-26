@@ -1,6 +1,7 @@
 import {towerCells, brownRoofMaterial} from "../packages/geometry/tower.ts";
 import {isSurveyMaterial} from "./survey-roof.mjs";
 import {bridgeCells} from "../packages/geometry/bridge.ts";
+import {weatheringMaterials} from "../packages/geometry/materials.ts";
 
 const WORLD = "sp:WorldStudioLab";
 const DIM = "minecraft:overworld";
@@ -10,6 +11,7 @@ const materials = new Set([AIR,"minecraft:andesite","minecraft:stone_bricks","mi
   "minecraft:polished_deepslate","minecraft:polished_andesite"]);
 const brownPlanks=new Set(["minecraft:dark_oak_planks","minecraft:spruce_planks","minecraft:jungle_planks","minecraft:oak_planks"]);
 for (const id of brownPlanks) materials.add(id);
+for (const id of weatheringMaterials) materials.add("minecraft:"+id);
 const cellKey = (x,y,z) => `${x},${y},${z}`;
 const length = r => r.top - r.y + 1;
 const volume = runs => runs.reduce((sum,r) => sum + length(r), 0);
@@ -140,6 +142,36 @@ export function previewTower(client,origin,previous,next,options) {
 
 export function previewBridge(client,origin,previous,next,options) {
   return previewDesign(bridgeCells,client,origin,previous,next,options);
+}
+
+// Use one surface sample per column under the actual curved deck. Count exposed
+// water through the existing bridge, stopping at terrain that conceals a lower pool.
+export async function surveyBridgeWaterline(client,origin,next,previous) {
+  await checkSite(client);
+  const footprint=designRuns("bridge",origin,next);
+  const bounds=boundsOf(footprint);
+  bounds.from.y=Math.max(-64,origin.y+Math.min(0,next.dy)-8);
+  bounds.to.y=Math.min(319,origin.y+Math.max(0,next.dy)+1);
+  const live=await scan(client,bounds);
+  const existing=geometry(previous,origin,bridgeCells);
+  const sampled=new Set(), heights=new Map();
+  for(const {x,z} of footprint) {
+    const column=x+","+z;
+    if(sampled.has(column))continue;
+    sampled.add(column);
+    for(let y=bounds.to.y;y>=bounds.from.y;y--) {
+      const key=cellKey(x,y,z), block=live.get(key);
+      if(typeof block!=="string")throw Error("Incomplete bridge water survey.");
+      if(block===AIR || block===existing.get(key))continue;
+      if(block==="minecraft:water" || block.startsWith("minecraft:water[")) {
+        heights.set(y,(heights.get(y)??0)+1);
+      }
+      break;
+    }
+  }
+  if(!heights.size)return null;
+  const [[waterY]]=[...heights].sort(([ay,an],[by,bn])=>bn-an || by-ay);
+  return waterY-origin.y;
 }
 
 export function designRuns(kind,origin,params) {

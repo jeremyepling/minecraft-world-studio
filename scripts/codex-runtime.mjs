@@ -160,7 +160,7 @@ export class CodexRuntime {
       onProgress("Resuming the conversation");
       try {response=await server.request("thread/resume",{...options,threadId:saved.threadId,excludeTurns:true});}
       catch(e){
-        if(!/no rollout found|thread not found|unable to find.*thread|no such thread/i.test(e.message))throw e;
+        if(!/no rollout found|thread not found|unable to find.*thread|no such thread|session [\w-]+ is archived\b/i.test(e.message))throw e;
         onProgress("Saved Codex thread unavailable; using Studio context");
       }
     }
