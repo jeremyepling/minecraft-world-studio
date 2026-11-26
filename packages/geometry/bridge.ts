@@ -1,9 +1,10 @@
 import {extrudePolygon, subtract, union, type Voxel} from "./voxels.ts";
 import {quadraticBezier, sweepProfile} from "./paths.ts";
 import {weatheredStone, type Weathering} from "./materials.ts";
+import {architecturalStone, validateFinish, type ArchitecturalFinish, type PaintCell} from "./architectural-materials.ts";
 
-export const bridgeDefaults = {width: 5, arch: 3, bend: 2, weathering: "none", waterline: null} as const;
-export interface BridgeParameters {
+export const bridgeDefaults = {width: 5, arch: 3, bend: 2, weathering: "none", waterline: null, drips:false, shadowSource:null} as const;
+export interface BridgeParameters extends ArchitecturalFinish {
   dx: number; dy: number; dz: number;
   width?: number; arch?: number; bend?: number;
   weathering?: Weathering; waterline?: number | null;
@@ -21,7 +22,9 @@ export function bridgeParameters(params: BridgeParameters): Required<BridgeParam
   if (2*arch + Math.abs(dy) > span) throw new RangeError("Use a lower arch or move the bridge markers farther apart for a walkable slope.");
   if (!["none","subtle","weathered"].includes(weathering)) throw new RangeError("Choose none, subtle or weathered stone.");
   if (waterline !== null && !Number.isSafeInteger(waterline)) throw new RangeError("Use an integer local water height.");
-  return {dx,dy,dz,width,arch,bend,weathering,waterline};
+  validateFinish(params);
+  const {drips=false,shadowSource=null}=params;
+  return {dx,dy,dz,width,arch,bend,weathering,waterline,drips,shadowSource};
 }
 
 interface BridgeVoxel extends Voxel { material: string }
@@ -45,7 +48,11 @@ function* footing(center: Voxel, toward: Voxel, width: number): Generator<Bridge
  * the midpoint above the interpolated bank heights. Width includes the coping.
  */
 export function* bridgeCells(input: BridgeParameters): Generator<BridgeVoxel> {
-  const {dx,dy,dz,width,arch,bend,weathering,waterline} = bridgeParameters(input);
+  const params=bridgeParameters(input);
+  yield* architecturalStone(bridgeSurfaces(params),params);
+}
+
+function* bridgeSurfaces({dx,dy,dz,width,arch,bend,weathering,waterline}: Required<BridgeParameters>): Generator<PaintCell> {
   const span = Math.hypot(dx,dz);
   const start = {x:0,y:0,z:0}, end = {x:dx,y:dy,z:dz};
   const control = {x:dx/2 - 2*bend*dz/span, y:dy/2+2*arch, z:dz/2 + 2*bend*dx/span};
@@ -75,6 +82,6 @@ export function* bridgeCells(input: BridgeParameters): Generator<BridgeVoxel> {
     const material = weatheredStone(p,baseStone[p.part],{
       strength:weathering,waterline,foundation,role:p.part==="tread"?"tread":"masonry"
     });
-    yield {x:p.x,y:p.y,z:p.z,material};
+    yield {x:p.x,y:p.y,z:p.z,material,paintable:p.part!=="tread"};
   }
 }

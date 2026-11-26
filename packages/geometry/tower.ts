@@ -1,5 +1,6 @@
 import {circularLoft, subtract, type Voxel} from "./voxels.ts";
 import {valueNoise} from "./materials.ts";
+import {architecturalStone, type ArchitecturalFinish, type PaintCell} from "./architectural-materials.ts";
 
 export type Entrance = "north" | "east" | "south" | "west";
 export type RoofFinish = "copper" | "black_to_grey" | "brown_to_tan";
@@ -12,7 +13,7 @@ export const towerLimits = {
   height: [12, 40], radius: [5, 10], taper: [0, 3], thickness: [1, 3], roof: [4, 16],
 } as const;
 
-export type TowerParameters = Partial<Record<keyof typeof towerLimits, number>> & {
+export type TowerParameters = Partial<Record<keyof typeof towerLimits, number>> & ArchitecturalFinish & {
   entrance?: Entrance;
   roofFinish?: RoofFinish;
 };
@@ -58,6 +59,10 @@ function roofMaterial(point: Voxel, rise: number, finish: RoofFinish): string {
 
 /** Occupied voxels of the recipe. Omitted space is left to the edit adapter's ownership checks. */
 export function* towerCells(params: TowerParameters = {}): Generator<MaterialVoxel> {
+  yield* architecturalStone(towerSurfaces(params),params);
+}
+
+function* towerSurfaces(params: TowerParameters): Generator<PaintCell> {
   const height = dimension("height", params), radius = dimension("radius", params);
   const taper = dimension("taper", params), thickness = dimension("thickness", params);
   const roof = dimension("roof", params);
@@ -68,11 +73,11 @@ export function* towerCells(params: TowerParameters = {}): Generator<MaterialVox
 
   const shaft = circularLoft({bottom: 0, height, thickness, radiusAt: y => radius - taper * y / (height - 1)});
   for (const point of subtract(shaft, p => doorway(p, entrance) || windowSlit(p))) {
-    yield {...point, material: point.y < 3 ? "andesite" : "stone_bricks"};
+    yield {...point, material: point.y < 3 ? "andesite" : "stone_bricks", paintable:true};
   }
   const cap = circularLoft({bottom: height, height: roof, thickness: 1.6,
     radiusAt: layer => (radius - taper + 1) * (1 - layer / roof)});
   for (const point of cap) {
-    yield {...point, material: roofMaterial(point, (point.y - height) / (roof - 1), finish)};
+    yield {...point, material: roofMaterial(point, (point.y - height) / (roof - 1), finish), paintable:false};
   }
 }

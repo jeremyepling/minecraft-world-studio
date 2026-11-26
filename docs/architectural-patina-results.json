@@ -1,0 +1,381 @@
+{
+  "case": "architectural-patina",
+  "platform": "Fabric 26.3",
+  "world": "sp:WorldStudioLab",
+  "observations": [
+    {
+      "phase": "tower build",
+      "message": "@studio Build a new copper-roof watchtower here with 20-block walls, radius 6, taper 1, wall thickness 1, a 6-block roof and a north entrance.",
+      "reply": "[AI] Applied b2f8e4c8: 799 cells changed, 799 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 21573
+    },
+    {
+      "phase": "tower window-drips",
+      "message": "@studio Add dark rainwater drips beneath the windows of this tower. Keep the walls, roof and openings the same shape.",
+      "reply": "[AI] Applied 962f75c5: 24 cells changed, 24 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 7393
+    },
+    {
+      "phase": "tower shadow source question",
+      "message": "@studio Add cast shadows to this tower",
+      "reply": "[AI] Where should the light come from: your position, the direction you face, directly overhead, or a compass direction?",
+      "wallMs": 4228
+    },
+    {
+      "phase": "tower overhead-shadow",
+      "message": "@studio From directly overhead",
+      "reply": "[AI] Applied 55033b40: 220 cells changed, 220 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 10713
+    },
+    {
+      "phase": "tower overhead-shadow",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 55033b40: 219 cells changed, 219 verified; 1 changed since preview or commit and preserved.",
+      "wallMs": 6014
+    },
+    {
+      "phase": "tower overhead-shadow",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 962f75c5: 24 cells changed, 24 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 1837
+    },
+    {
+      "phase": "tower overhead-shadow",
+      "message": "@studio undo",
+      "reply": "[AI] Undid b2f8e4c8: 799 cells changed, 799 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 32914
+    },
+    {
+      "phase": "tower overhead-shadow",
+      "message": "@studio menu mark 57 62 27 Patina West Bank",
+      "reply": "[AI] Marked Patina West Bank at 57 62 27 (minecraft:grass_block).",
+      "wallMs": 826
+    },
+    {
+      "phase": "tower overhead-shadow",
+      "message": "@studio menu mark 75 62 27 Patina East Bank",
+      "reply": "[AI] Marked Patina East Bank at 75 62 27 (minecraft:grass_block).",
+      "wallMs": 790
+    },
+    {
+      "phase": "bridge build",
+      "message": "@studio Build a curved stone bridge from Patina West Bank to Patina East Bank with total width 5 blocks, arch rise 4 and signed bend +2.",
+      "reply": "[AI] Applied c3a7b1c0: 218 cells changed, 218 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 47288
+    },
+    {
+      "phase": "bridge player-shadow",
+      "message": "@studio Cast a shadow on this bridge from where I am standing",
+      "reply": "[AI] Applied 148b49a5: 9 cells changed, 9 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 9045
+    },
+    {
+      "phase": "bridge player-shadow",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 148b49a5: 8 cells changed, 8 verified; 1 changed since preview or commit and preserved.",
+      "wallMs": 3728
+    },
+    {
+      "phase": "bridge player-shadow",
+      "message": "@studio undo",
+      "reply": "[AI] Undid c3a7b1c0: 218 cells changed, 218 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 44605
+    },
+    {
+      "phase": "bridge player-shadow",
+      "message": "@studio forget marker Patina East Bank",
+      "reply": "[AI] Forgot marker Patina East Bank.",
+      "wallMs": 788
+    },
+    {
+      "phase": "bridge player-shadow",
+      "message": "@studio forget marker Patina West Bank",
+      "reply": "[AI] Forgot marker Patina West Bank.",
+      "wallMs": 559
+    }
+  ],
+  "images": [
+    {
+      "name": "tower-original-north-elevation.png",
+      "site": "tower",
+      "camera": [
+        16.5,
+        224,
+        60.5
+      ],
+      "target": [
+        9.5,
+        223,
+        86.5
+      ],
+      "yaw": 15.068306,
+      "pitch": 2.1267793,
+      "raining": false,
+      "dayTime": 6242
+    },
+    {
+      "name": "tower-window-drips-north-elevation.png",
+      "site": "tower",
+      "camera": [
+        16.5,
+        224,
+        60.5
+      ],
+      "target": [
+        9.5,
+        223,
+        86.5
+      ],
+      "yaw": 15.068306,
+      "pitch": 2.1267793,
+      "raining": false,
+      "dayTime": 6243
+    },
+    {
+      "name": "tower-overhead-shadow-north-elevation.png",
+      "site": "tower",
+      "camera": [
+        16.5,
+        224,
+        60.5
+      ],
+      "target": [
+        9.5,
+        223,
+        86.5
+      ],
+      "yaw": 15.068306,
+      "pitch": 2.1267793,
+      "raining": false,
+      "dayTime": 6244
+    },
+    {
+      "name": "bridge-original-upstream-soffit.png",
+      "site": "bridge",
+      "camera": [
+        66.5,
+        63.15,
+        23.5
+      ],
+      "target": [
+        66.5,
+        63.65,
+        28.5
+      ],
+      "yaw": -0.0000076293945,
+      "pitch": -5.7104254,
+      "raining": false,
+      "dayTime": 6247
+    },
+    {
+      "name": "bridge-player-shadow-upstream-soffit.png",
+      "site": "bridge",
+      "camera": [
+        66.5,
+        63.15,
+        23.5
+      ],
+      "target": [
+        66.5,
+        63.65,
+        28.5
+      ],
+      "yaw": -0.0000076293945,
+      "pitch": -5.7104254,
+      "raining": false,
+      "dayTime": 6248
+    }
+  ],
+  "objects": {
+    "tower": {
+      "build": {
+        "id": "b2f8e4c8",
+        "count": 799,
+        "palette": {
+          "minecraft:andesite": 114,
+          "minecraft:stone_bricks": 524,
+          "minecraft:waxed_weathered_cut_copper": 161
+        },
+        "params": {
+          "height": 20,
+          "radius": 6,
+          "taper": 1,
+          "thickness": 1,
+          "roof": 6,
+          "entrance": "north",
+          "roofFinish": "copper"
+        },
+        "surveyed": 6525
+      },
+      "window-drips": {
+        "id": "962f75c5",
+        "count": 24,
+        "palette": {
+          "minecraft:polished_tuff": 6,
+          "minecraft:tuff_bricks": 6,
+          "minecraft:deepslate_bricks": 12
+        },
+        "params": {
+          "entrance": "north",
+          "height": 20,
+          "radius": 6,
+          "taper": 1,
+          "thickness": 1,
+          "roof": 6,
+          "roofFinish": "copper",
+          "drips": true
+        },
+        "surveyed": 6525
+      },
+      "dripLayers": [
+        9,
+        8,
+        7,
+        6
+      ],
+      "northSill": {
+        "localY": [
+          9,
+          7,
+          6,
+          5
+        ],
+        "materials": [
+          "minecraft:deepslate_bricks",
+          "minecraft:tuff_bricks",
+          "minecraft:polished_tuff",
+          "minecraft:stone_bricks"
+        ]
+      },
+      "overhead-shadow": {
+        "id": "55033b40",
+        "count": 220,
+        "palette": {
+          "minecraft:polished_tuff": 80,
+          "minecraft:tuff_bricks": 84,
+          "minecraft:deepslate_bricks": 56
+        },
+        "params": {
+          "entrance": "north",
+          "height": 20,
+          "radius": 6,
+          "taper": 1,
+          "thickness": 1,
+          "roof": 6,
+          "roofFinish": "copper",
+          "drips": true,
+          "shadowSource": {
+            "x": 0,
+            "y": 1024,
+            "z": 0
+          }
+        },
+        "surveyed": 6525
+      },
+      "northEave": {
+        "localY": [
+          19,
+          17,
+          14
+        ],
+        "materials": [
+          "minecraft:deepslate_bricks",
+          "minecraft:tuff_bricks",
+          "minecraft:polished_tuff"
+        ]
+      },
+      "undos": [
+        {
+          "id": "55033b40",
+          "count": 219,
+          "manual": "4,223,85",
+          "skipped": 1
+        },
+        {
+          "id": "962f75c5",
+          "count": 24,
+          "skipped": 0
+        },
+        {
+          "id": "b2f8e4c8",
+          "count": 799,
+          "skipped": 0
+        }
+      ]
+    },
+    "bridge": {
+      "build": {
+        "id": "c3a7b1c0",
+        "count": 218,
+        "palette": {
+          "minecraft:stone_bricks": 86,
+          "minecraft:andesite": 97,
+          "minecraft:polished_andesite": 35
+        },
+        "params": {
+          "dx": 18,
+          "dy": 0,
+          "dz": 0,
+          "width": 5,
+          "arch": 4,
+          "bend": 2,
+          "weathering": "none",
+          "waterline": null,
+          "drips": false,
+          "shadowSource": null
+        },
+        "surveyed": 4914
+      },
+      "player-shadow": {
+        "id": "148b49a5",
+        "count": 9,
+        "palette": {
+          "minecraft:tuff_bricks": 1,
+          "minecraft:deepslate_bricks": 8
+        },
+        "params": {
+          "dx": 18,
+          "dy": 0,
+          "dz": 0,
+          "width": 5,
+          "arch": 4,
+          "bend": 2,
+          "weathering": "none",
+          "waterline": null,
+          "drips": false,
+          "shadowSource": {
+            "x": 17.5,
+            "y": 12.620000000000005,
+            "z": 11.5
+          }
+        },
+        "surveyed": 4914
+      },
+      "playerEyeLocal": {
+        "x": 17.5,
+        "y": 12.620000000000005,
+        "z": 11.5
+      },
+      "upstreamSoffit": {
+        "61,64,26": "minecraft:deepslate_bricks",
+        "60,63,28": "minecraft:tuff_bricks"
+      },
+      "undos": [
+        {
+          "id": "148b49a5",
+          "count": 8,
+          "manual": "60,63,28",
+          "skipped": 1
+        },
+        {
+          "id": "c3a7b1c0",
+          "count": 218,
+          "skipped": 0
+        }
+      ]
+    }
+  },
+  "phase": "passed",
+  "restored": true,
+  "lastPhase": "bridge player-shadow"
+}

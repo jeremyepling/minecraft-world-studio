@@ -1,5 +1,7 @@
 # Known limitations
 
+* **Directional shadows and opening stains.** These finishes operate on registered tower and bridge designs. Their model of openings and overhangs comes from the generated block geometry. Surrounding trees, hand-built awnings and manually cut windows do not participate in the calculation. Checked edits preserve divergent live blocks. The shadow is a fixed material finish and remains in place as the sun or player moves.
+
 * **Bridge weathering.** The palette handles one dominant water elevation along the span. It samples water blocks beneath the deck within eight blocks below the lower landing. Waterlogged blocks, moisture simulation, custom resource-pack colors and lighting analysis are outside this first pass. A separately pasted schematic has no registered bridge to repaint. [Weathering workflow](current-milestone.md)
 
 * **Bridge landings.** The two markers set the endpoints. The bridge does not route around obstructions, excavate the banks or search for a crossing. Existing occupied cells are protected by Studio, so a blocked approach can require a different landing. Bridges use full-block steps.

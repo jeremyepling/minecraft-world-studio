@@ -3,6 +3,8 @@ import {isSurveyMaterial} from "./survey-roof.mjs";
 import {bridgeCells} from "../packages/geometry/bridge.ts";
 import {weatheringMaterials} from "../packages/geometry/materials.ts";
 
+import {architecturalMaterials} from "../packages/geometry/architectural-materials.ts";
+
 const WORLD = "sp:WorldStudioLab";
 const DIM = "minecraft:overworld";
 const AIR = "minecraft:air";
@@ -11,7 +13,7 @@ const materials = new Set([AIR,"minecraft:andesite","minecraft:stone_bricks","mi
   "minecraft:polished_deepslate","minecraft:polished_andesite"]);
 const brownPlanks=new Set(["minecraft:dark_oak_planks","minecraft:spruce_planks","minecraft:jungle_planks","minecraft:oak_planks"]);
 for (const id of brownPlanks) materials.add(id);
-for (const id of weatheringMaterials) materials.add("minecraft:"+id);
+for (const id of [...weatheringMaterials,...architecturalMaterials]) materials.add("minecraft:"+id);
 const cellKey = (x,y,z) => `${x},${y},${z}`;
 const length = r => r.top - r.y + 1;
 const volume = runs => runs.reduce((sum,r) => sum + length(r), 0);

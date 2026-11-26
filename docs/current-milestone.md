@@ -20,6 +20,26 @@ Studio built the bridge through chat and found water at Y62. The full finish cha
 | --- | --- | --- |
 | ![Original river bridge](../screenshots/bridge-original-downstream.png) | ![Darker lower courses and lighter upper stone](../screenshots/bridge-weathered-downstream.png) | ![Fewer accents after softening](../screenshots/bridge-subtle-downstream.png) |
 
+## Window drips and cast shadows
+
+Aim at a registered windowed tower and open **J → Ask Studio…**. Try **“Weather this tower with drips below its windows.”** The masonry darkens just below the sills and lightens down the wall over a distance derived from the building height.
+
+For a separate material pass, ask **“Add cast shadows to this tower.”** Studio asks where the light comes from. Reply **“From directly overhead”** or name a compass direction. To position the light yourself, stand above the masonry you want to shade, where the light should originate and say **“Cast a shadow on this bridge from where I am standing.”** The listener records a light point relative to the build. Moving afterward leaves the finish in place. Choosing your facing direction uses your compass heading at a raised angle.
+
+The two instructions combine on the same build. The renderer tests the registered design’s occupied blocks, including its projecting roof or deck, and the editor checks live block states before painting. Use **@studio undo** for each pass. [Weathering skill](../skills/minecraft-weathering/SKILL.md) · [Cast-shadow skill](../skills/minecraft-cast-shadows/SKILL.md)
+
+In an offline comparison, the same sill produced a two-block streak on a 12-block wall and a six-block streak on a 40-block wall. A plate projecting from a wall cast three material bands below it. Moving the light to the opposite side removed that shadow. [Geometry regression cases](../packages/geometry/architectural-materials.test.mjs)
+
+In Fabric 26.3 chat, the tower acquired 24 streak blocks. The shadow request asked for a direction before changing any blocks. Overhead light changed 220 masonry blocks, and the bridge’s player-position light changed nine below its deck. A cut-copper test edit survived checked undo. [Chat, captures and block verification](architectural-patina-results.json)
+
+| Original tower | Window drips | Drips and overhead shadow |
+| --- | --- | --- |
+| ![Original tower](../screenshots/tower-original-north-elevation.png) | ![Darker streaks under the tower windows](../screenshots/tower-window-drips-north-elevation.png) | ![Added shadow below the copper eaves](../screenshots/tower-overhead-shadow-north-elevation.png) |
+
+| Original bridge underside | With light at the player’s position |
+| --- | --- |
+| ![Original stone under the bridge](../screenshots/bridge-original-upstream-soffit.png) | ![Directional shadow beneath the projecting deck](../screenshots/bridge-player-shadow-upstream-soffit.png) |
+
 ## Remaining artistic work
 
 The broader milestone includes reference palettes, evaluation from multiple views, terrain blending and personal style preferences. The bridge provides the first in-game example for judging a palette on existing architecture. [Roadmap](roadmap.md)

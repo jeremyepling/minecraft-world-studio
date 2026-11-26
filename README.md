@@ -8,6 +8,8 @@ For project direction, start with the [product vision](docs/product-vision.md), 
 
 ## Open the lab
 
+For window streaks, aim at a Studio tower and ask **“Weather this tower.”** To use your position as a light source, aim at a tower or bridge and ask **“Cast a shadow from where I am standing.”** [Artistic skills and examples](docs/current-milestone.md)
+
 To weather an existing Studio bridge, aim at it and choose **J → Ask Studio…**. Try **“Darken the stone near the waterline and keep the upper stonework lighter.”** Follow with **“Make the weathering subtler.”** [Bridge weathering and undo](docs/current-milestone.md)
 
 For a curved bridge, mark both landings with **J → Mark this block**. Name them **West Bank** and **East Bank**, then use **J → Ask Studio…** and enter **“Build a curved stone bridge between West Bank and East Bank.”** Follow with **“Raise its arch by two blocks.”** [Bridge and tower workflows](docs/milestone-2.md)

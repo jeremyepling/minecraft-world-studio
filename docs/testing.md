@@ -11,6 +11,10 @@ These tests exercise deterministic tower edits, material revisions, guarded writ
 
 ## Direct chat fixture
 
+### Opening stains and cast shadows
+
+Use `node --experimental-strip-types experiments/architectural-patina.mjs --lab-root <copied-project>` in a disposable Fabric 26.3 installation at the river fixture. The listener needs the repository’s `skills/` directory alongside its scripts and geometry package. The case compares a tower and bridge at fixed views, checks a direction clarification, and verifies the world after undo.
+
 ### Bridge weathering
 
 In a disposable copy with its own authenticated port, the original riverbanks and the feature listener running, use `node --experimental-strip-types experiments/bridge-weathering.mjs --lab-root <copied-project>`. The case exercises addressed player chat, two finish strengths, a protected block and undo, with fixed-camera captures at each finish. [Player instructions](current-milestone.md)

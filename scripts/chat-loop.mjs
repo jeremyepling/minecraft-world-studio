@@ -14,6 +14,7 @@ import { surveyBrownRoof } from "./survey-roof.mjs";
 import { StudioState } from "./studio-state.mjs";
 import { previewTower, previewBridge, applyDesign, reverseDesign, recordedParameters, designRuns, boundsOf, surveyBridgeWaterline } from "./tower.mjs";
 import {bridgeParameters,bridgeDefaults} from "../packages/geometry/bridge.ts";
+import {architecturalFinish} from "./architectural-finish.mjs";
 import {exportSchematic} from "./schematic.mjs";
 
 const WORLD="sp:WorldStudioLab", DIM="minecraft:overworld";
@@ -40,6 +41,7 @@ if(state.active) store.finish(null);
 // Older listeners saved uncommitted proposals. Never execute those on upgrade.
 if(state.pending) { state.pending=null;store.save(); }
 const c=await connect();
+let shadowQuestion;
 let busy, lastPreview, stopping=false, online=false, cursor=0;
 let incoming=Promise.resolve();
 const voice=createVoice({directory:dir,instanceDirectory:join(local,"instance"),
@@ -91,9 +93,10 @@ function contains(t,p) {
 }
 async function viewRay() {
   const self=await context();
-  const ray=await c.tool("raycast",{origin:{x:self.x,y:self.y+(self.sneaking?1.27:1.62),z:self.z},yaw:self.yaw,pitch:self.pitch,
+  const eyeY=self.y+(self.sneaking?1.27:1.62);
+  const ray=await c.tool("raycast",{origin:{x:self.x,y:eyeY,z:self.z},yaw:self.yaw,pitch:self.pitch,
     maxDistance:96,includeEntities:false,dimension:DIM});
-  return {hit:ray.hitType==="block"?ray.block:null,player:{x:self.x,y:self.y,z:self.z,yaw:self.yaw,pitch:self.pitch}};
+  return {hit:ray.hitType==="block"?ray.block:null,player:{x:self.x,y:self.y,eyeY,z:self.z,yaw:self.yaw,pitch:self.pitch}};
 }
 async function highlight(point) {
   const pos=[point.x+0.5,point.y+1.2,point.z+0.5].join(" ");
@@ -205,14 +208,38 @@ async function design(request,signal,previewOnly,observeOnly=false) {
   const recent=session.recent.slice(0,-1);
   const bridges=Object.fromEntries(Object.entries(state.bridges).map(([key,b])=>[key,{banks:b.banks,origin:b.origin,params:b.params}]));
   const decision=await planner.ask({request,site,towers:objects,bridges,defaultNewBridge:bridgeDefaults,defaultNewTower:defaults,recent,
-    observeOnly,previewOnly},signal,activity,image);
+    shadowQuestion:shadowQuestion?.key,observeOnly,previewOnly},signal,activity,image);
   signal.throwIfAborted();
   await context();
   const summary=compact(decision.message).slice(0,450);
   if(observeOnly || decision.action==="answer") {
+    shadowQuestion=null;
     acceptNextInput(signal);await reply(summary||"Please describe the tower or revision.");return;
   }
   if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before proposing another edit.");
+  if(decision.continueShadow) {
+    if(!shadowQuestion || !decision.light || decision.light==="ask")throw Error("Please point at the structure and specify the light source.");
+    const light=decision.light;
+    Object.assign(decision,shadowQuestion.decision,{light});
+    site.selected=shadowQuestion.key;
+    site.selection=null;
+    decision.target="selected";
+    decision.marker=decision.fromMarker=decision.toMarker=null;
+    decision.action=state.bridges[site.selected]?"revise_bridge":"revise";
+    previewOnly ||= shadowQuestion.previewOnly;
+    shadowQuestion=null;
+  }
+  if(decision.light==="ask") {
+    let key=decision.target==="hillside"?"hillside":site.selected;
+    if(decision.fromMarker && decision.toMarker) {
+      const names=[decision.fromMarker,decision.toMarker].map(n=>n.toLowerCase());
+      key=Object.keys(state.bridges).find(k=>state.bridges[k].banks.every(n=>names.includes(n.toLowerCase())));
+    }
+    if(!state.towers[key] && !state.bridges[key])throw Error("Aim at the tower or bridge you want to shade.");
+    shadowQuestion={key,decision,previewOnly:previewOnly||decision.previewOnly};
+    acceptNextInput(signal);await reply("Where should the light come from: your position, the direction you face, directly overhead, or a compass direction?");return;
+  }
+  shadowQuestion=null;
   const isBridge=decision.action==="new_bridge" || decision.action==="revise_bridge";
   const p=isBridge?await planBridge(site,decision):await planTower(site,objects,decision);
   const {plan}=p;
@@ -270,7 +297,7 @@ async function planBridge(site,d) {
     key="bridge-"+randomBytes(6).toString("hex");
     base={...bridgeDefaults,dx:b.x-a.x,dy:b.y-a.y,dz:b.z-a.z};before=null;
   }
-  const next=bridgeParameters({...base,width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend,
+  const next=bridgeParameters({...architecturalFinish(base,d,site,origin),width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend,
     weathering:d.weathering??base.weathering??"none"});
   if(next.weathering==="none")next.waterline=null;
   else if(!base.weathering || base.weathering==="none") {
@@ -305,7 +332,7 @@ async function planTower(site,objects,decision) {
     if(before) { origin=before.origin;base=objects[key].params; }
     else throw Error("Point at a known tower or ask for a new tower on the ground.");
   }
-  const next=parameters(base,decision);
+  const next=parameters(architecturalFinish(base,decision,site,origin),decision);
   // Keep an independently owned tower out of this object's editing footprint.
   for(const [other,t] of Object.entries(state.towers)) {
     if(other===key) continue;
@@ -414,6 +441,7 @@ async function handle(input) {
     return;
   }
   if(cmd==="cancel" || cmd==="stop") {
+    shadowQuestion=null;
     voice.quiet();
     if(busy) {busy.next=null;busy.abort.abort();await say("Stopping the current request.");}
     else {lastPreview=null;await say("Studio is idle.");}
@@ -531,6 +559,7 @@ async function handle(input) {
 }
 
 function disconnect() {
+  shadowQuestion=null;
   online=false;
   voice.disconnect();
   if(busy){busy.next=null;busy.abort.abort();}

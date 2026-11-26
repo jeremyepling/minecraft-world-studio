@@ -13,7 +13,7 @@
     "thickness",
     "roof",
     "roofFinish",
-    "entrance", "fromMarker", "toMarker", "width", "arch", "bend", "weathering"
+    "entrance", "fromMarker", "toMarker", "width", "arch", "bend", "weathering", "drips", "light", "continueShadow"
   ],
   "properties": {
     "previewOnly": {"type":"boolean"},
@@ -46,6 +46,9 @@
     "toMarker": {"type":["string","null"]},
     "width": {"type":["integer","null"]},
     "arch": {"type":["integer","null"]},
+    "drips": {"type":["boolean","null"]},
+    "continueShadow": {"type":"boolean"},
+    "light": {"type":["string","null"],"enum":["ask","player","overhead","facing","north","east","south","west","remove",null]},
     "bend": {"type":["integer","null"]},
     "weathering": {"type":["string","null"],"enum":["weathered","subtle","none",null]},
     "height": {

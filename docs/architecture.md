@@ -1,5 +1,7 @@
 # From a prototype to a building partner
 
+The listener loads portable weathering and cast-shadow instructions into its structured planner. The planner chooses an effect and a light reference. Studio resolves the reference against the target and the player’s pose and saves it in local block coordinates. Reusing the recipe preserves the material finish across restarts and exports.
+
 Bridge weathering separates the player’s intent, the site survey and material selection. Chat supplies a finish strength. The Minecraft adapter measures a water elevation under the bridge, and the standalone material function uses that elevation, each voxel’s role and coherent noise to choose stone. The object record retains the finish and its water elevation for revisions, undo and schematic generation. [Current milestone](current-milestone.md) · [Material function](../packages/geometry/materials.ts)
 
 The first useful loop is to point at a hill, request a build there, walk around it and request one revision. The player should be able to place a custom block between those steps and find it still there afterward.

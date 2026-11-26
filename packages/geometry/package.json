@@ -7,6 +7,7 @@
     "./tower": "./tower.ts",
     "./paths": "./paths.ts",
     "./bridge": "./bridge.ts",
-    "./materials": "./materials.ts"
+    "./materials": "./materials.ts",
+    "./architectural-materials": "./architectural-materials.ts"
   }
 }
