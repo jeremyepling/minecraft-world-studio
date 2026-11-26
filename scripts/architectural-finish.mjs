@@ -2,7 +2,12 @@ export function architecturalFinish(base,d,site,origin) {
   const finish={...base};
   if(d.drips!=null)finish.drips=d.drips;
   if(!d.light)return finish;
-  if(d.light==="remove"){finish.shadowSource=null;return finish;}
+  if(d.light==="remove"){finish.shadowSource=null;delete finish.shadowVariation;return finish;}
+  finish.shadowVariation=true;
+  if(d.light==="existing") {
+    if(!finish.shadowSource)throw Error("This build has no saved light source. Where should the light come from?");
+    return finish;
+  }
   const player=site.player;
   if(d.light==="player") {
     finish.shadowSource={x:player.x-origin.x,y:player.eyeY-origin.y,z:player.z-origin.z};

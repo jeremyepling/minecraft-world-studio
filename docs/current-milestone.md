@@ -26,6 +26,8 @@ Aim at a registered windowed tower and open **J → Ask Studio…**. Try **“We
 
 For a separate material pass, ask **“Add cast shadows to this tower.”** Studio asks where the light comes from. Reply **“From directly overhead”** or name a compass direction. To position the light yourself, stand above the masonry you want to shade, where the light should originate and say **“Cast a shadow on this bridge from where I am standing.”** The listener records a light point relative to the build. Moving afterward leaves the finish in place. Choosing your facing direction uses your compass heading at a raised angle.
 
+New cast shadows have irregular clusters along the edges of the darker stone. To update an older uniform shadow while keeping its light source, ask **“Break up the shadow bands on this tower.”** Studio saves the finish with the build.
+
 The two instructions combine on the same build. The renderer tests the registered design’s occupied blocks, including its projecting roof or deck, and the editor checks live block states before painting. Use **@studio undo** for each pass. [Weathering skill](../skills/minecraft-weathering/SKILL.md) · [Cast-shadow skill](../skills/minecraft-cast-shadows/SKILL.md)
 
 In an offline comparison, the same sill produced a two-block streak on a 12-block wall and a six-block streak on a 40-block wall. A plate projecting from a wall cast three material bands below it. Moving the light to the opposite side removed that shadow. [Geometry regression cases](../packages/geometry/architectural-materials.test.mjs)
@@ -39,6 +41,14 @@ In Fabric 26.3 chat, the tower acquired 24 streak blocks. The shadow request ask
 | Original bridge underside | With light at the player’s position |
 | --- | --- |
 | ![Original stone under the bridge](../screenshots/bridge-original-upstream-soffit.png) | ![Directional shadow beneath the projecting deck](../screenshots/bridge-player-shadow-upstream-soffit.png) |
+
+### Shadow variation
+
+| Earlier bands | Clustered tones |
+| --- | --- |
+| ![Level bands under the tower eave](../screenshots/tower-overhead-shadow-north-elevation.png) | ![Irregular edges under the same eave](../screenshots/tower-overhead-shadow-varied.png) |
+
+The live test found 79 tower blocks and two bridge blocks with different tones from the earlier finish. Both checked undos preserved a simulated hand edit. [Bridge underside](../screenshots/bridge-player-shadow-varied.png) · [Chat and block verification](shadow-variation-results.json)
 
 ## Remaining artistic work
 

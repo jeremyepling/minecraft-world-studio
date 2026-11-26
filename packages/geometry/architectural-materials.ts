@@ -1,9 +1,11 @@
+import {valueNoise} from "./materials.ts";
 import type {Voxel} from "./voxels.ts";
 
 export interface ArchitecturalFinish {
   drips?: boolean;
   /** Point emitter in local block coordinates. Block (0,0,0) has centre (.5,.5,.5). */
   shadowSource?: Voxel | null;
+  shadowVariation?: boolean;
 }
 export const architecturalMaterials: readonly string[] = Object.freeze(["deepslate_bricks","tuff_bricks","polished_tuff"]);
 export interface PaintCell extends Voxel { material: string; paintable: boolean }
@@ -144,8 +146,16 @@ export function* architecturalStone(input:Iterable<PaintCell>,options:Architectu
     const view=elevation(cells,face);
     if (options.drips) stainOpenings(view,high-low+1,ink);
     if (options.shadowSource) {
-      for (const p of view.grid.values()) if (p.paintable)
-        ink(p,projectedShadow(p,face,options.shadowSource,occupied,high-low+2));
+      for (const p of view.grid.values()) {
+        if (!p.paintable) continue;
+        const shadow=projectedShadow(p,face,options.shadowSource,occupied,high-low+2);
+        if (shadow<=.10) continue;
+        // Coherent patches break up tone boundaries inside the projected shadow.
+        const patch=options.shadowVariation
+          ? (valueNoise((p.x+.31*p.y)/3.2,(p.z-.47*p.y)/3.2,53)-.5)*.54
+          : 0;
+        ink(p,shadow+patch);
+      }
     }
   }
   for (const p of cells) {

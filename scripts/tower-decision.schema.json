@@ -48,7 +48,7 @@
     "arch": {"type":["integer","null"]},
     "drips": {"type":["boolean","null"]},
     "continueShadow": {"type":"boolean"},
-    "light": {"type":["string","null"],"enum":["ask","player","overhead","facing","north","east","south","west","remove",null]},
+    "light": {"type":["string","null"],"enum":["ask","player","overhead","facing","north","east","south","west","existing","remove",null]},
     "bend": {"type":["integer","null"]},
     "weathering": {"type":["string","null"],"enum":["weathered","subtle","none",null]},
     "height": {

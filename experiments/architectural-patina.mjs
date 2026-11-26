@@ -101,6 +101,17 @@ function verifyReceipt(match,before,after) {
   return count;
 }
 
+function checkPatchedShadow(site,prior,shaded) {
+  assert.equal(shaded.params.shadowVariation,true,"A new shadow should enable clustered tones");
+  const banded=expected(site.base,{...shaded.params,shadowVariation:false},site.generate,site.origin);
+  const differing=changed(banded,shaded.map);
+  assert.ok(differing.length,"Expected at least one live shade that differs from the older banded finish");
+  for (const point of differing) {
+    assert.notEqual(banded.get(point),prior.get(point),"A clustered tone escaped the original shadow at "+point);
+  }
+  report.objects[site.name].cellsDifferentFromBandedShadow=differing.length;
+}
+
 async function revise(site,prompt,label,prior) {
   report.phase=site.name+" "+label;
   const match=await chat(prompt,applied);
@@ -196,8 +207,16 @@ async function runTower() {
   const source=shaded.params.shadowSource;
   assert.ok(source && Math.abs(source.x)<2 && Math.abs(source.z)<2 && source.y>tower.shape.height);
   assert.equal(shaded.params.drips,true);
-  assert.deepEqual(northFace(shaded.map,[19,17,14]),dripMaterials.slice(0,3),"Scaled penumbra should soften down the wall under the roof");
-  report.objects.tower.northEave={localY:[19,17,14],materials:dripMaterials.slice(0,3)};
+  checkPatchedShadow(tower,dripped.map,shaded);
+  assert.deepEqual(northFace(shaded.map,[19,15,13]),dripMaterials.slice(0,3),"Scaled penumbra should soften down the wall under the roof");
+  report.objects.tower.northEave={localY:[19,15,13],materials:dripMaterials.slice(0,3)};
+  // Follow the outside face around the tapered wall. This course used to be
+  // a single band. Its darker patch should span adjacent stones before fading.
+  const course=[[-3,-4],[-2,-4],[-1,-5],[0,-5],[1,-5],[2,-4],[3,-4]];
+  const courseMaterials=course.map(([x,z])=>shaded.map.get(key(tower.origin.x+x,tower.origin.y+16,tower.origin.z+z)));
+  const [dark,mid]=dripMaterials;
+  assert.deepEqual(courseMaterials,[mid,mid,dark,dark,dark,dark,mid],"Expected a coherent dark patch in the north eave course");
+  report.objects.tower.northEaveCourse={localY:16,localXZ:course,materials:courseMaterials};
   await photo(tower,"overhead-shadow");
   await checkUndo(tower,shaded,dripped.map,true);
   await checkUndo(tower,dripped,built.map,false);
@@ -224,7 +243,8 @@ async function runBridge() {
   assert.ok(source);
   for (const axis of ["x","y","z"]) assert.ok(Math.abs(source[axis]-eyes[axis])<0.05,"Light source captured player's "+axis);
   report.objects.bridge.playerEyeLocal=eyes;
-  const bridgeSamples={"61,64,26":"minecraft:deepslate_bricks","60,63,28":"minecraft:tuff_bricks"};
+  checkPatchedShadow(bridge,built.map,shaded);
+  const bridgeSamples={"61,64,26":"minecraft:deepslate_bricks","60,63,28":"minecraft:deepslate_bricks","69,65,27":"minecraft:tuff_bricks"};
   for (const [position,material] of Object.entries(bridgeSamples)) {
     assert.notEqual(built.map.get(position),material);
     assert.equal(shaded.map.get(position),material);

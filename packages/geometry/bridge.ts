@@ -3,7 +3,7 @@ import {quadraticBezier, sweepProfile} from "./paths.ts";
 import {weatheredStone, type Weathering} from "./materials.ts";
 import {architecturalStone, validateFinish, type ArchitecturalFinish, type PaintCell} from "./architectural-materials.ts";
 
-export const bridgeDefaults = {width: 5, arch: 3, bend: 2, weathering: "none", waterline: null, drips:false, shadowSource:null} as const;
+export const bridgeDefaults = {width: 5, arch: 3, bend: 2, weathering: "none", waterline: null, drips:false, shadowSource:null, shadowVariation:false} as const;
 export interface BridgeParameters extends ArchitecturalFinish {
   dx: number; dy: number; dz: number;
   width?: number; arch?: number; bend?: number;
@@ -23,8 +23,8 @@ export function bridgeParameters(params: BridgeParameters): Required<BridgeParam
   if (!["none","subtle","weathered"].includes(weathering)) throw new RangeError("Choose none, subtle or weathered stone.");
   if (waterline !== null && !Number.isSafeInteger(waterline)) throw new RangeError("Use an integer local water height.");
   validateFinish(params);
-  const {drips=false,shadowSource=null}=params;
-  return {dx,dy,dz,width,arch,bend,weathering,waterline,drips,shadowSource};
+  const {drips=false,shadowSource=null,shadowVariation=false}=params;
+  return {dx,dy,dz,width,arch,bend,weathering,waterline,drips,shadowSource,shadowVariation};
 }
 
 interface BridgeVoxel extends Voxel { material: string }

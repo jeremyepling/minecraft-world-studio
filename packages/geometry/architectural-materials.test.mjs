@@ -48,6 +48,26 @@ test("only an actual projecting blocker casts a graded shadow toward the light",
   assert.deepEqual(baked,[...architecturalStone(canopy,source)]);
 });
 
+test("clustered shadows vary a single course while remaining inside the cast shadow",()=>{
+  const flat=wall(16);
+  const eave=flat.concat(Array.from({length:9},(_,i)=>stone(i-4,14,-1,false)));
+  const light={shadowSource:{x:.5,y:1024,z:.5}};
+  const banded=[...architecturalStone(eave,light)];
+  const options={...light,shadowVariation:true};
+  const varied=[...architecturalStone(eave,options)];
+  assert.deepEqual(varied,[...architecturalStone(eave,options)]);
+  assert.deepEqual(coords(varied),coords(banded));
+  assert.ok(varied.every((p,i)=>banded[i].material!=="stone_bricks" || p.material==="stone_bricks"));
+  for (let y=7;y<13;y++) {
+    const course=varied.filter(p=>p.y===y).map(p=>p.material);
+    if (new Set(course).size>1) {
+      assert.ok(course.some((material,i)=>i>0 && material===course[i-1] && material!=="stone_bricks"));
+      return;
+    }
+  }
+  assert.fail("The shade boundary stayed level along every course");
+});
+
 test("tower patina follows actual window sills and the chosen door while protecting finished roofs",()=>{
   const size={height:20,radius:6,taper:1,thickness:1,roof:6};
   const shadowSource={x:0,y:1024,z:0};
