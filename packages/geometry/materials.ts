@@ -17,8 +17,8 @@ export function valueNoise(x: number, z: number, seed: number): number {
 }
 
 export type Weathering = "none" | "subtle" | "weathered";
-const palette = {wet:"tuff_bricks", transition:"polished_tuff", highlight:"smooth_stone"} as const;
-export const weatheringMaterials: readonly string[] = Object.freeze(Object.values(palette));
+export const weatheringPalette = {wet:"tuff_bricks", transition:"polished_tuff", highlight:"smooth_stone"} as const;
+export const weatheringMaterials: readonly string[] = Object.freeze(Object.values(weatheringPalette));
 
 export interface StoneWeathering {
   strength: Weathering;
@@ -39,12 +39,12 @@ export function weatheredStone(point: Voxel, base: string, options: StoneWeather
   const above = y - (options.waterline ?? options.foundation);
   const variation = (patch - 0.5)*3;
   if (options.waterline !== null) {
-    if (above <= 0.8 + variation) return palette.wet;
-    if (above <= 2.3 + variation) return palette.transition;
+    if (above <= 0.8 + variation) return weatheringPalette.wet;
+    if (above <= 2.3 + variation) return weatheringPalette.transition;
   } else if (above <= 1.2 + variation && patch >= 0.43) {
-    return palette.transition;
+    return weatheringPalette.transition;
   }
   const highlightThreshold = 0.55 - Math.min(0.22,0.07*Math.max(0,above-3));
-  if (above >= 3.5 + variation && patch >= highlightThreshold) return palette.highlight;
+  if (above >= 3.5 + variation && patch >= highlightThreshold) return weatheringPalette.highlight;
   return base;
 }

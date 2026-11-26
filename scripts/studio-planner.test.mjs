@@ -3,10 +3,11 @@ import assert from "node:assert/strict";
 import {createServer} from "node:http";
 import {once} from "node:events";
 import {createPlanner} from "./studio-planner.mjs";
+import {emptyArtDecision} from "./artistic-intent.mjs";
 
 const reply={action:"answer",target:"point",marker:null,previewOnly:false,message:"Consider a quiet stone base.",
   height:null,radius:null,thickness:null,taper:null,roof:null,roofFinish:null,entrance:null,
-  fromMarker:null,toMarker:null,width:null,arch:null,bend:null,weathering:null,drips:null,light:null,continueShadow:false};
+  fromMarker:null,toMarker:null,width:null,arch:null,bend:null,weathering:null,drips:null,light:null,continueShadow:false,...emptyArtDecision};
 
 test("mock provider answers without world writes and respects interruption and capability checks",async()=>{
   const p=createPlanner({provider:"mock"});

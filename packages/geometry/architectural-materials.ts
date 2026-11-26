@@ -1,4 +1,5 @@
 import {valueNoise} from "./materials.ts";
+import {painterlyShade, type PaletteName} from "./painterly-materials.ts";
 import type {Voxel} from "./voxels.ts";
 
 export interface ArchitecturalFinish {
@@ -8,7 +9,7 @@ export interface ArchitecturalFinish {
   shadowVariation?: boolean;
 }
 export const architecturalMaterials: readonly string[] = Object.freeze(["deepslate_bricks","tuff_bricks","polished_tuff"]);
-export interface PaintCell extends Voxel { material: string; paintable: boolean }
+export interface PaintCell extends Voxel { material: string; paintable: boolean; stonePalette?: PaletteName }
 type Face = {axis: "x" | "z"; sign: number};
 const faces: Face[] = [{axis:"x",sign:1},{axis:"x",sign:-1},{axis:"z",sign:1},{axis:"z",sign:-1}];
 const key = (x:number,y:number,z:number) => `${x},${y},${z}`;
@@ -163,8 +164,13 @@ export function* architecturalStone(input:Iterable<PaintCell>,options:Architectu
     let material=p.material;
     if (s!==undefined) {
       const band=s>=.73?0:s>=.42?1:2;
-      const old=architecturalMaterials.indexOf(material);
-      material=architecturalMaterials[old<0?band:Math.min(old,band)];
+      if (p.stonePalette) {
+        const tones=["deepShadow","shadow","midtone"] as const;
+        material=painterlyShade(material,p.stonePalette,tones[band]);
+      } else {
+        const old=architecturalMaterials.indexOf(material);
+        material=architecturalMaterials[old<0?band:Math.min(old,band)];
+      }
     }
     yield {x:p.x,y:p.y,z:p.z,material};
   }

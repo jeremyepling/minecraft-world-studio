@@ -2,15 +2,18 @@ import {extrudePolygon, subtract, union, type Voxel} from "./voxels.ts";
 import {quadraticBezier, sweepProfile} from "./paths.ts";
 import {weatheredStone, type Weathering} from "./materials.ts";
 import {architecturalStone, validateFinish, type ArchitecturalFinish, type PaintCell} from "./architectural-materials.ts";
+import {painterlyStone, painterlyWeathering, validateArtisticIntent, type ArtisticIntent} from "./painterly-materials.ts";
 
 export const bridgeDefaults = {width: 5, arch: 3, bend: 2, weathering: "none", waterline: null, drips:false, shadowSource:null, shadowVariation:false} as const;
 export interface BridgeParameters extends ArchitecturalFinish {
+  artisticIntent?: ArtisticIntent | null;
   dx: number; dy: number; dz: number;
   width?: number; arch?: number; bend?: number;
   weathering?: Weathering; waterline?: number | null;
 }
 
-export function bridgeParameters(params: BridgeParameters): Required<BridgeParameters> {
+type ResolvedBridge = Required<Omit<BridgeParameters,"artisticIntent">> & Pick<BridgeParameters,"artisticIntent">;
+export function bridgeParameters(params: BridgeParameters): ResolvedBridge {
   const {dx,dy,dz,width=bridgeDefaults.width,arch=bridgeDefaults.arch,bend=bridgeDefaults.bend} = params;
   const {weathering=bridgeDefaults.weathering,waterline=bridgeDefaults.waterline} = params;
   if (![dx,dy,dz,width,arch,bend].every(Number.isSafeInteger)) throw new RangeError("Use integer bridge dimensions and marker offsets.");
@@ -23,8 +26,10 @@ export function bridgeParameters(params: BridgeParameters): Required<BridgeParam
   if (!["none","subtle","weathered"].includes(weathering)) throw new RangeError("Choose none, subtle or weathered stone.");
   if (waterline !== null && !Number.isSafeInteger(waterline)) throw new RangeError("Use an integer local water height.");
   validateFinish(params);
+  validateArtisticIntent(params.artisticIntent);
   const {drips=false,shadowSource=null,shadowVariation=false}=params;
-  return {dx,dy,dz,width,arch,bend,weathering,waterline,drips,shadowSource,shadowVariation};
+  const resolved={dx,dy,dz,width,arch,bend,weathering,waterline,drips,shadowSource,shadowVariation};
+  return params.artisticIntent ? {...resolved,artisticIntent:params.artisticIntent} : resolved;
 }
 
 interface BridgeVoxel extends Voxel { material: string }
@@ -52,7 +57,7 @@ export function* bridgeCells(input: BridgeParameters): Generator<BridgeVoxel> {
   yield* architecturalStone(bridgeSurfaces(params),params);
 }
 
-function* bridgeSurfaces({dx,dy,dz,width,arch,bend,weathering,waterline}: Required<BridgeParameters>): Generator<PaintCell> {
+function* bridgeSurfaces({dx,dy,dz,width,arch,bend,weathering,waterline,artisticIntent}: ResolvedBridge): Generator<PaintCell> {
   const span = Math.hypot(dx,dz);
   const start = {x:0,y:0,z:0}, end = {x:dx,y:dy,z:dz};
   const control = {x:dx/2 - 2*bend*dz/span, y:dy/2+2*arch, z:dz/2 + 2*bend*dx/span};
@@ -79,9 +84,11 @@ function* bridgeSurfaces({dx,dy,dz,width,arch,bend,weathering,waterline}: Requir
   const stone = subtract(union(deck(),footing(start,path[1],width),footing(end,path[path.length-2],width)),bankBlocks);
   const foundation = Math.min(0,dy)-3;
   for (const p of stone) {
-    const material = weatheredStone(p,baseStone[p.part],{
+    let material = weatheredStone(p,baseStone[p.part],{
       strength:weathering,waterline,foundation,role:p.part==="tread"?"tread":"masonry"
     });
-    yield {x:p.x,y:p.y,z:p.z,material,paintable:p.part!=="tread"};
+    const intent=p.part==="masonry" ? artisticIntent : null;
+    if (intent) material=painterlyWeathering(painterlyStone(p,intent,foundation),intent.palette,material);
+    yield {x:p.x,y:p.y,z:p.z,material,paintable:p.part!=="tread",stonePalette:intent?.palette};
   }
 }

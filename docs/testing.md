@@ -9,6 +9,10 @@ node --experimental-strip-types --test $tests.FullName
 
 These tests exercise deterministic tower edits, material revisions, guarded writes, conflicts, lost acknowledgements, restart recovery and undo receipts. They can run with Minecraft closed.
 
+## Painterly art direction
+
+Run the Node tests in `scripts` and `packages/geometry` using Node 22.16+ with `--experimental-strip-types --test`. They cover palette roles, geometry/region preservation, direction, snapshots and checked undo. For visual acceptance, start the real Codex listener in a separate disposable installed lab with an authenticated loopback port distinct from 25639. With its empty reserved sky plot and the client in Creative, run `node --experimental-strip-types experiments/painterly-foundation.mjs --lab-root <copied-lab>`. The case exercises actual chat and records full block comparisons and seven fixed-camera PNGs in that lab. [Setup and safeguards](../experiments/bridge-fixture.mjs) · [Results](painterly-results.md) · [Benchmark matrix](painterly-building.md)
+
 ## Direct chat fixture
 
 ### Opening stains and cast shadows

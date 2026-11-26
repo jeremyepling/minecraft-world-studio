@@ -8,6 +8,8 @@ For project direction, start with the [product vision](docs/product-vision.md), 
 
 ## Open the lab
 
+For painterly masonry, aim at ground and ask **“Build a painterly medieval tower in warm limestone.”** Then try **“Make the walls quieter,”** **“Make this tower four blocks taller,”** or **“Critique this build.”** The object remembers its art direction. [Player guide](docs/painterly-building.md) · [In-game comparison](docs/painterly-results.md)
+
 For window streaks, aim at a Studio tower and ask **“Weather this tower.”** To use your position as a light source, aim at a tower or bridge and ask **“Cast a shadow from where I am standing.”** [Artistic skills and examples](docs/current-milestone.md)
 
 To weather an existing Studio bridge, aim at it and choose **J → Ask Studio…**. Try **“Darken the stone near the waterline and keep the upper stonework lighter.”** Follow with **“Make the weathering subtler.”** [Bridge weathering and undo](docs/current-milestone.md)

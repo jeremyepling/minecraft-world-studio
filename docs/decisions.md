@@ -16,4 +16,6 @@
 | **Long term · Keep artistic guidance and autonomy policies replaceable.** | Artistic skills should express intent. Material algorithms should place the resulting blocks. A provider switch should preserve world plans and personal preferences. | Revisit when the first reusable artistic skill, preference record or alternative provider is exercised. |
 | **Speculative · Defer deployment and distribution choices.** | Multiple agents, public distribution and shared style packs have no current acceptance case. | Record a new decision when a real workflow depends on one. |
 
+**Painterly foundation.** Keep the portable skill, deterministic masonry function and private world journal as the three integration points. Mood and focal point guide discussion; a typed material recipe controls actual placements. Snapshot explicit project styles so changing one building cannot recolor unrelated work. Fixed, measured vanilla palettes make the first comparisons reproducible. Add automatic pack-aware palette search after a bounded editable facade passes a visual comparison. [Decision and acceptance criteria](painterly-building.md)
+
 When a decision changes, record the affected milestone, observed need, tradeoff against the vision, and evidence that would warrant reconsideration.

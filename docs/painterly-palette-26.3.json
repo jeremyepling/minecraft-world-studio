@@ -1,0 +1,320 @@
+{
+  "blocks": {
+    "bricks": {
+      "up": "minecraft:block/bricks",
+      "down": "minecraft:block/bricks",
+      "north": "minecraft:block/bricks",
+      "south": "minecraft:block/bricks",
+      "west": "minecraft:block/bricks",
+      "east": "minecraft:block/bricks"
+    },
+    "brown_terracotta": {
+      "up": "minecraft:block/brown_terracotta",
+      "down": "minecraft:block/brown_terracotta",
+      "north": "minecraft:block/brown_terracotta",
+      "south": "minecraft:block/brown_terracotta",
+      "west": "minecraft:block/brown_terracotta",
+      "east": "minecraft:block/brown_terracotta"
+    },
+    "cut_sandstone": {
+      "up": "minecraft:block/sandstone_top",
+      "down": "minecraft:block/sandstone_top",
+      "north": "minecraft:block/cut_sandstone",
+      "south": "minecraft:block/cut_sandstone",
+      "west": "minecraft:block/cut_sandstone",
+      "east": "minecraft:block/cut_sandstone"
+    },
+    "deepslate_bricks": {
+      "up": "minecraft:block/deepslate_bricks",
+      "down": "minecraft:block/deepslate_bricks",
+      "north": "minecraft:block/deepslate_bricks",
+      "south": "minecraft:block/deepslate_bricks",
+      "west": "minecraft:block/deepslate_bricks",
+      "east": "minecraft:block/deepslate_bricks"
+    },
+    "dripstone_block": {
+      "up": "minecraft:block/dripstone_block",
+      "down": "minecraft:block/dripstone_block",
+      "north": "minecraft:block/dripstone_block",
+      "south": "minecraft:block/dripstone_block",
+      "west": "minecraft:block/dripstone_block",
+      "east": "minecraft:block/dripstone_block"
+    },
+    "granite": {
+      "up": "minecraft:block/granite",
+      "down": "minecraft:block/granite",
+      "north": "minecraft:block/granite",
+      "south": "minecraft:block/granite",
+      "west": "minecraft:block/granite",
+      "east": "minecraft:block/granite"
+    },
+    "nether_bricks": {
+      "up": "minecraft:block/nether_bricks",
+      "down": "minecraft:block/nether_bricks",
+      "north": "minecraft:block/nether_bricks",
+      "south": "minecraft:block/nether_bricks",
+      "west": "minecraft:block/nether_bricks",
+      "east": "minecraft:block/nether_bricks"
+    },
+    "polished_tuff": {
+      "up": "minecraft:block/polished_tuff",
+      "down": "minecraft:block/polished_tuff",
+      "north": "minecraft:block/polished_tuff",
+      "south": "minecraft:block/polished_tuff",
+      "west": "minecraft:block/polished_tuff",
+      "east": "minecraft:block/polished_tuff"
+    },
+    "sandstone": {
+      "up": "minecraft:block/sandstone_top",
+      "down": "minecraft:block/sandstone_bottom",
+      "north": "minecraft:block/sandstone",
+      "south": "minecraft:block/sandstone",
+      "west": "minecraft:block/sandstone",
+      "east": "minecraft:block/sandstone"
+    },
+    "smooth_sandstone": {
+      "up": "minecraft:block/sandstone_top",
+      "down": "minecraft:block/sandstone_top",
+      "north": "minecraft:block/sandstone_top",
+      "south": "minecraft:block/sandstone_top",
+      "west": "minecraft:block/sandstone_top",
+      "east": "minecraft:block/sandstone_top"
+    },
+    "smooth_stone": {
+      "up": "minecraft:block/smooth_stone",
+      "down": "minecraft:block/smooth_stone",
+      "north": "minecraft:block/smooth_stone",
+      "south": "minecraft:block/smooth_stone",
+      "west": "minecraft:block/smooth_stone",
+      "east": "minecraft:block/smooth_stone"
+    },
+    "stone_bricks": {
+      "up": "minecraft:block/stone_bricks",
+      "down": "minecraft:block/stone_bricks",
+      "north": "minecraft:block/stone_bricks",
+      "south": "minecraft:block/stone_bricks",
+      "west": "minecraft:block/stone_bricks",
+      "east": "minecraft:block/stone_bricks"
+    },
+    "terracotta": {
+      "up": "minecraft:block/terracotta",
+      "down": "minecraft:block/terracotta",
+      "north": "minecraft:block/terracotta",
+      "south": "minecraft:block/terracotta",
+      "west": "minecraft:block/terracotta",
+      "east": "minecraft:block/terracotta"
+    },
+    "tuff": {
+      "up": "minecraft:block/tuff",
+      "down": "minecraft:block/tuff",
+      "north": "minecraft:block/tuff",
+      "south": "minecraft:block/tuff",
+      "west": "minecraft:block/tuff",
+      "east": "minecraft:block/tuff"
+    }
+  },
+  "textures": {
+    "minecraft:block/bricks": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.55946,
+        0.05775,
+        0.03965
+      ],
+      "pixelLightnessSD": 0.07245,
+      "meanAdjacentDeltaL": {
+        "x": 0.04732,
+        "y": 0.07513
+      }
+    },
+    "minecraft:block/brown_terracotta": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.34842,
+        0.0284,
+        0.03564
+      ],
+      "pixelLightnessSD": 0.00528,
+      "meanAdjacentDeltaL": {
+        "x": 0.00382,
+        "y": 0.00553
+      }
+    },
+    "minecraft:block/cut_sandstone": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.85289,
+        -0.00671,
+        0.06091
+      ],
+      "pixelLightnessSD": 0.04627,
+      "meanAdjacentDeltaL": {
+        "x": 0.02047,
+        "y": 0.03766
+      }
+    },
+    "minecraft:block/sandstone_top": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.87383,
+        -0.00729,
+        0.05815
+      ],
+      "pixelLightnessSD": 0.01762,
+      "meanAdjacentDeltaL": {
+        "x": 0.01712,
+        "y": 0.01537
+      }
+    },
+    "minecraft:block/deepslate_bricks": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.41225,
+        0.00018,
+        -0.00059
+      ],
+      "pixelLightnessSD": 0.08271,
+      "meanAdjacentDeltaL": {
+        "x": 0.03656,
+        "y": 0.05099
+      }
+    },
+    "minecraft:block/dripstone_block": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.55931,
+        0.02403,
+        0.03343
+      ],
+      "pixelLightnessSD": 0.06817,
+      "meanAdjacentDeltaL": {
+        "x": 0.04612,
+        "y": 0.07164
+      }
+    },
+    "minecraft:block/granite": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.5669,
+        0.0489,
+        0.04276
+      ],
+      "pixelLightnessSD": 0.07329,
+      "meanAdjacentDeltaL": {
+        "x": 0.07647,
+        "y": 0.07473
+      }
+    },
+    "minecraft:block/nether_bricks": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.23841,
+        0.03846,
+        0.0058
+      ],
+      "pixelLightnessSD": 0.03881,
+      "meanAdjacentDeltaL": {
+        "x": 0.0224,
+        "y": 0.03942
+      }
+    },
+    "minecraft:block/polished_tuff": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.51417,
+        -0.00907,
+        0.00375
+      ],
+      "pixelLightnessSD": 0.04439,
+      "meanAdjacentDeltaL": {
+        "x": 0.01998,
+        "y": 0.02933
+      }
+    },
+    "minecraft:block/sandstone": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.84519,
+        -0.00521,
+        0.06214
+      ],
+      "pixelLightnessSD": 0.05275,
+      "meanAdjacentDeltaL": {
+        "x": 0.042,
+        "y": 0.06349
+      }
+    },
+    "minecraft:block/sandstone_bottom": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.84133,
+        -0.00489,
+        0.06316
+      ],
+      "pixelLightnessSD": 0.04895,
+      "meanAdjacentDeltaL": {
+        "x": 0.04857,
+        "y": 0.05962
+      }
+    },
+    "minecraft:block/smooth_stone": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.70564,
+        0.0,
+        0.0
+      ],
+      "pixelLightnessSD": 0.05944,
+      "meanAdjacentDeltaL": {
+        "x": 0.02809,
+        "y": 0.03796
+      }
+    },
+    "minecraft:block/stone_bricks": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.58564,
+        0.00132,
+        -0.0009
+      ],
+      "pixelLightnessSD": 0.06341,
+      "meanAdjacentDeltaL": {
+        "x": 0.02855,
+        "y": 0.04478
+      }
+    },
+    "minecraft:block/terracotta": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.54053,
+        0.06077,
+        0.06042
+      ],
+      "pixelLightnessSD": 0.00562,
+      "meanAdjacentDeltaL": {
+        "x": 0.0034,
+        "y": 0.00784
+      }
+    },
+    "minecraft:block/tuff": {
+      "pixelsPerSide": 16,
+      "meanOKLab": [
+        0.54052,
+        -0.00364,
+        0.00856
+      ],
+      "pixelLightnessSD": 0.07054,
+      "meanAdjacentDeltaL": {
+        "x": 0.05325,
+        "y": 0.06611
+      }
+    }
+  },
+  "unsupported": {},
+  "layersLowToHigh": [
+    {
+      "file": "26.3.jar",
+      "sha256": "4508d006323f24fa02876310c192d739af56516eb259000ac50f0909a68c9a2d"
+    }
+  ]
+}

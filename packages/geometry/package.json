@@ -8,6 +8,7 @@
     "./paths": "./paths.ts",
     "./bridge": "./bridge.ts",
     "./materials": "./materials.ts",
-    "./architectural-materials": "./architectural-materials.ts"
+    "./architectural-materials": "./architectural-materials.ts",
+    "./painterly-materials": "./painterly-materials.ts"
   }
 }

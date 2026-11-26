@@ -1,0 +1,438 @@
+{
+  "case": "painterly-foundation",
+  "world": "sp:WorldStudioLab",
+  "platform": "Fabric 26.3",
+  "inputs": [
+    {
+      "phase": "balanced",
+      "message": "@studio Build a painterly medieval tower with warm limestone. Use 16-block walls, radius 5, taper 1, wall thickness 1, a 6-block copper roof and a north entrance.",
+      "reply": "[AI] Applied 9b2d769c: 519 cells changed, 519 verified; 0 changed since preview or commit and preserved. Art direction v1: balanced warm limestone.",
+      "wallMs": 23339
+    },
+    {
+      "phase": "quiet",
+      "message": "@studio Make the walls of this tower quieter. Keep the warm limestone, geometry, copper roof and my hand-placed block.",
+      "reply": "[AI] Applied 3caef6d8: 158 cells changed, 158 verified; 0 changed since preview or commit and preserved. Art direction v2: quiet warm limestone.",
+      "wallMs": 10795
+    },
+    {
+      "phase": "quiet",
+      "message": "@studio art direction",
+      "reply": "[AI] tower-9_211_86 · art v2: quiet warm limestone. Mood: Quiet, aged medieval warmth. Focal point: North arched entrance framed by quieter limestone.",
+      "wallMs": 273
+    },
+    {
+      "phase": "save project style",
+      "message": "@studio save this as the project style",
+      "reply": "[AI] Project style v1 saved from tower-9_211_86. Ask for a new tower or bridge in the project style.",
+      "wallMs": 448
+    },
+    {
+      "phase": "save project style",
+      "message": "@studio project style",
+      "reply": "[AI] Project style v1 from tower-9_211_86: quiet warm limestone. Quiet, aged medieval warmth.",
+      "wallMs": 416
+    },
+    {
+      "phase": "visual critique",
+      "message": "@studio look Critique this tower from my current view. Name one visible feature and suggest one specific improvement, without changing any blocks.",
+      "reply": "[AI] From this view, the green copper roof stands out clearly against the warm limestone. The pale frame around the slit window also draws attention, competing with the entrance. One improvement: bring that frame closer to the adjacent wall’s tone while keeping the opening unchanged. No blocks changed.",
+      "wallMs": 6365
+    },
+    {
+      "phase": "taller",
+      "message": "@studio Make this same tower four blocks taller. Keep its wall finish, opening direction and roof proportions.",
+      "reply": "[AI] Applied af094e32: 414 cells changed, 414 verified; 0 changed since preview or commit and preserved. Art direction v2: quiet warm limestone.",
+      "wallMs": 22355
+    },
+    {
+      "phase": "undo af094e32",
+      "message": "@studio undo",
+      "reply": "[AI] Undid af094e32: 414 cells changed, 414 verified; 0 changed since preview or commit and preserved. Art direction v2: quiet warm limestone.",
+      "wallMs": 17612
+    },
+    {
+      "phase": "undo 3caef6d8",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 3caef6d8: 158 cells changed, 158 verified; 0 changed since preview or commit and preserved. Art direction v1: balanced warm limestone.",
+      "wallMs": 5995
+    },
+    {
+      "phase": "undo 9b2d769c",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 9b2d769c: 518 cells changed, 518 verified; 1 changed since preview or commit and preserved.",
+      "wallMs": 21102
+    },
+    {
+      "phase": "ordinary",
+      "message": "@studio Build a functional stone utility tower here. Use 16-block walls, radius 5, taper 1, wall thickness 1, a 6-block copper roof and a north entrance.",
+      "reply": "[AI] Applied 5f3857c3: 518 cells changed, 518 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 21147
+    },
+    {
+      "phase": "undo 5f3857c3",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 5f3857c3: 518 cells changed, 518 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 11345
+    },
+    {
+      "phase": "project-match",
+      "message": "@studio Build a new tower here matching the saved project style. Use 16-block walls, radius 5, taper 1, wall thickness 1, a 6-block copper roof and a north entrance.",
+      "reply": "[AI] Applied 46537c8f: 518 cells changed, 518 verified; 0 changed since preview or commit and preserved. Art direction v1: quiet warm limestone.",
+      "wallMs": 21205
+    },
+    {
+      "phase": "undo 46537c8f",
+      "message": "@studio undo",
+      "reply": "[AI] Undid 46537c8f: 518 cells changed, 518 verified; 0 changed since preview or commit and preserved.",
+      "wallMs": 12837
+    },
+    {
+      "phase": "restore project style",
+      "message": "@studio restore previous project style",
+      "reply": "[AI] Cleared the project's first saved style.",
+      "wallMs": 344
+    }
+  ],
+  "stages": {
+    "balanced": {
+      "id": "9b2d769c",
+      "changed": 519,
+      "surveyed": 6750,
+      "params": {
+        "height": 16,
+        "radius": 5,
+        "taper": 1,
+        "thickness": 1,
+        "roof": 6,
+        "entrance": "north",
+        "roofFinish": "copper",
+        "artisticIntent": {
+          "version": 1,
+          "approach": "painterly",
+          "revision": 1,
+          "palette": "warm_limestone",
+          "texture": "balanced",
+          "atmosphere": "Quiet, aged medieval warmth",
+          "focalPoint": "North arched entrance framed by quieter limestone",
+          "kind": "tower",
+          "regions": {
+            "walls": "warm_limestone",
+            "trim": "existing",
+            "roof": "existing"
+          }
+        }
+      }
+    },
+    "quiet": {
+      "id": "3caef6d8",
+      "changed": 158,
+      "surveyed": 6750,
+      "params": {
+        "entrance": "north",
+        "height": 16,
+        "radius": 5,
+        "taper": 1,
+        "thickness": 1,
+        "roof": 6,
+        "roofFinish": "copper",
+        "artisticIntent": {
+          "version": 1,
+          "approach": "painterly",
+          "revision": 2,
+          "palette": "warm_limestone",
+          "texture": "quiet",
+          "atmosphere": "Quiet, aged medieval warmth",
+          "focalPoint": "North arched entrance framed by quieter limestone",
+          "kind": "tower",
+          "regions": {
+            "walls": "warm_limestone",
+            "trim": "existing",
+            "roof": "existing"
+          }
+        }
+      }
+    },
+    "taller": {
+      "id": "af094e32",
+      "changed": 414,
+      "surveyed": 6750,
+      "params": {
+        "entrance": "north",
+        "height": 20,
+        "radius": 5,
+        "taper": 1,
+        "thickness": 1,
+        "roof": 6,
+        "roofFinish": "copper",
+        "artisticIntent": {
+          "version": 1,
+          "approach": "painterly",
+          "revision": 2,
+          "palette": "warm_limestone",
+          "texture": "quiet",
+          "atmosphere": "Quiet, aged medieval warmth",
+          "focalPoint": "North arched entrance framed by quieter limestone",
+          "kind": "tower",
+          "regions": {
+            "walls": "warm_limestone",
+            "trim": "existing",
+            "roof": "existing"
+          }
+        }
+      }
+    },
+    "ordinary": {
+      "id": "5f3857c3",
+      "changed": 518,
+      "surveyed": 6750,
+      "params": {
+        "height": 16,
+        "radius": 5,
+        "taper": 1,
+        "thickness": 1,
+        "roof": 6,
+        "entrance": "north",
+        "roofFinish": "copper"
+      }
+    },
+    "project-match": {
+      "id": "46537c8f",
+      "changed": 518,
+      "surveyed": 6750,
+      "params": {
+        "height": 16,
+        "radius": 5,
+        "taper": 1,
+        "thickness": 1,
+        "roof": 6,
+        "entrance": "north",
+        "roofFinish": "copper",
+        "artisticIntent": {
+          "version": 1,
+          "approach": "painterly",
+          "revision": 1,
+          "palette": "warm_limestone",
+          "texture": "quiet",
+          "atmosphere": "Quiet, aged medieval warmth",
+          "focalPoint": "North arched entrance framed by quieter limestone",
+          "kind": "tower",
+          "regions": {
+            "walls": "warm_limestone",
+            "trim": "existing",
+            "roof": "existing"
+          },
+          "styleSource": "project",
+          "styleSourceRevision": 1
+        }
+      }
+    }
+  },
+  "images": [
+    {
+      "name": "painterly-balanced-near.png",
+      "view": "near",
+      "point": [
+        13.5,
+        219.5,
+        71.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 14.931427,
+      "pitch": -4.7866616,
+      "dayTime": 6244,
+      "raining": false
+    },
+    {
+      "name": "painterly-balanced-medium.png",
+      "view": "medium",
+      "point": [
+        16.5,
+        223,
+        60.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 15.068306,
+      "pitch": 4.671076,
+      "dayTime": 6244,
+      "raining": false
+    },
+    {
+      "name": "painterly-balanced-far.png",
+      "view": "far",
+      "point": [
+        23.5,
+        229,
+        33.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 14.796661,
+      "pitch": 8.507604,
+      "dayTime": 6242,
+      "raining": false
+    },
+    {
+      "name": "painterly-quiet-near.png",
+      "view": "near",
+      "point": [
+        13.5,
+        219.5,
+        71.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 14.931427,
+      "pitch": -4.7866616,
+      "dayTime": 6243,
+      "raining": false
+    },
+    {
+      "name": "painterly-quiet-medium.png",
+      "view": "medium",
+      "point": [
+        16.5,
+        223,
+        60.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 15.068306,
+      "pitch": 4.671076,
+      "dayTime": 6244,
+      "raining": false
+    },
+    {
+      "name": "painterly-quiet-far.png",
+      "view": "far",
+      "point": [
+        23.5,
+        229,
+        33.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 14.796661,
+      "pitch": 8.507604,
+      "dayTime": 6243,
+      "raining": false
+    },
+    {
+      "name": "painterly-taller-medium.png",
+      "view": "medium",
+      "point": [
+        16.5,
+        223,
+        60.5
+      ],
+      "target": [
+        9.5,
+        220.8,
+        86.5
+      ],
+      "yaw": 15.068306,
+      "pitch": 4.671076,
+      "dayTime": 6244,
+      "raining": false
+    }
+  ],
+  "phase": "passed",
+  "manual": {
+    "point": "5,211,87",
+    "old": "minecraft:dripstone_block",
+    "after": "minecraft:cut_copper",
+    "coords": "5 211 87",
+    "intended": "minecraft:sandstone",
+    "method": "Conditional setblock simulating a builder"
+  },
+  "wallMetrics": {
+    "balanced": {
+      "occupied": 381,
+      "accents": 204,
+      "joins": 581,
+      "transitions": 116,
+      "materials": {
+        "minecraft:dripstone_block": 95,
+        "minecraft:sandstone": 92,
+        "minecraft:cut_sandstone": 177,
+        "minecraft:smooth_sandstone": 17
+      }
+    },
+    "quiet": {
+      "occupied": 381,
+      "accents": 87,
+      "joins": 581,
+      "transitions": 54,
+      "materials": {
+        "minecraft:sandstone": 41,
+        "minecraft:cut_sandstone": 294,
+        "minecraft:dripstone_block": 46
+      }
+    }
+  },
+  "savedProjectStyle": {
+    "source": "tower-9_211_86",
+    "revision": 1,
+    "intent": {
+      "version": 1,
+      "approach": "painterly",
+      "revision": 2,
+      "palette": "warm_limestone",
+      "texture": "quiet",
+      "atmosphere": "Quiet, aged medieval warmth",
+      "focalPoint": "North arched entrance framed by quieter limestone",
+      "kind": "tower",
+      "regions": {
+        "walls": "warm_limestone",
+        "trim": "existing",
+        "roof": "existing"
+      }
+    }
+  },
+  "critique": "From this view, the green copper roof stands out clearly against the warm limestone. The pale frame around the slit window also draws attention, competing with the entrance. One improvement: bring that frame closer to the adjacent wall’s tone while keeping the opening unchanged. No blocks changed.",
+  "undos": [
+    {
+      "id": "af094e32",
+      "changed": 414
+    },
+    {
+      "id": "3caef6d8",
+      "changed": 158
+    },
+    {
+      "id": "9b2d769c",
+      "changed": 518
+    },
+    {
+      "id": "5f3857c3",
+      "changed": 518
+    },
+    {
+      "id": "46537c8f",
+      "changed": 518
+    }
+  ],
+  "projectStyleRestored": true,
+  "lastPhase": "restore project style",
+  "restored": true
+}

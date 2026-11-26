@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "World Studio object-local artistic intent, version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "revision",
+    "kind",
+    "approach",
+    "palette",
+    "texture",
+    "focalPoint",
+    "atmosphere",
+    "regions"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "kind": {
+      "enum": [
+        "tower",
+        "bridge"
+      ]
+    },
+    "approach": {
+      "const": "painterly"
+    },
+    "palette": {
+      "enum": [
+        "warm_limestone",
+        "cool_stone",
+        "red_brick"
+      ]
+    },
+    "texture": {
+      "enum": [
+        "quiet",
+        "balanced",
+        "expressive"
+      ]
+    },
+    "focalPoint": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96
+    },
+    "atmosphere": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96
+    },
+    "styleSource": {
+      "type": "string",
+      "minLength": 1
+    },
+    "styleSourceRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "regions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "walls": {
+          "enum": [
+            "warm_limestone",
+            "cool_stone",
+            "red_brick"
+          ]
+        },
+        "masonry": {
+          "enum": [
+            "warm_limestone",
+            "cool_stone",
+            "red_brick"
+          ]
+        },
+        "roof": {
+          "const": "existing"
+        },
+        "trim": {
+          "const": "existing"
+        },
+        "tread": {
+          "const": "existing"
+        },
+        "coping": {
+          "const": "existing"
+        },
+        "parapet": {
+          "const": "existing"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "tower"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "regions": {
+            "required": [
+              "walls",
+              "trim",
+              "roof"
+            ],
+            "maxProperties": 3
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "regions": {
+            "required": [
+              "masonry",
+              "tread",
+              "coping",
+              "parapet"
+            ],
+            "maxProperties": 4
+          }
+        }
+      }
+    }
+  ],
+  "dependentRequired": {
+    "styleSource": [
+      "styleSourceRevision"
+    ],
+    "styleSourceRevision": [
+      "styleSource"
+    ]
+  }
+}

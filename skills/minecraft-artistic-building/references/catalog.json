@@ -1,0 +1,844 @@
+{
+  "version": 1,
+  "checkedOn": "2026-11-26",
+  "purpose": "Search tags or subjects for an attributable study. Use documented to identify the source's claims and studioUse for an original exercise. Inspect visualStudy only where an actual image was seen.",
+  "rightsPolicy": "link_only means linked for study. No third-party images, thumbnails, transcripts, builds or texture files are included. A public URL does not establish a reuse license. Any code license noted applies to the named repository.",
+  "evidence": "An inspected gallery image or thumbnail supports observations about its visible composition only. Technique, authorship and weathering causes require independent documentation. A null field records an unobserved or unresolved feature.",
+  "entries": [
+    {
+      "id": "bdubs-texture-breakdown",
+      "creator": "BdoubleO100",
+      "title": "Build Texture Breakdown · Building with BdoubleO #5",
+      "url": "https://www.youtube.com/watch?v=EHRCJM3hiZI",
+      "tags": [
+        "texture",
+        "architecture",
+        "value",
+        "massing",
+        "quiet areas"
+      ],
+      "verified": "creator_description_and_thumbnail",
+      "documented": "The episode revisits a mountain build to discuss texturing.",
+      "studioUse": "Group a facade into roof, plaster, timber and foundation before comparing individual blocks.",
+      "limits": "Thumbnail is promotional. Exact blocks, actual shadow source and the episode's spoken techniques were not verified.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://i.ytimg.com/vi/EHRCJM3hiZI/hqdefault.jpg",
+        "view": "creator thumbnail",
+        "composition": "A large front-facing gable on the left and smaller connected roof on the right step down toward the open horizon.",
+        "dominantPalette": "Cream panels, dark brown framing, gray footings and olive vegetation.",
+        "shadow": "Dark beams outline the pale triangular end wall.",
+        "highlight": "The pale upper panels and opening through the base have the strongest light shapes.",
+        "temperature": "Warm sunset near the right horizon shifts against the blue upper sky.",
+        "transitions": "A gray lower story and earth terraces mediate between the timber house and grass.",
+        "clustering": "Timbers repeat as connected lines. Small flowers sit in groups along the lower edge.",
+        "focalPoint": "The framed gable.",
+        "weathering": null
+      }
+    },
+    {
+      "id": "bdubs-big-gate",
+      "creator": "BdoubleO100",
+      "title": "The Big Gate Dungeon · Hermitcraft Season 9",
+      "url": "https://www.youtube.com/watch?v=l7Ef7FgQpEk",
+      "tags": [
+        "gatehouse",
+        "silhouette",
+        "negative space",
+        "terrain",
+        "focal point"
+      ],
+      "verified": "creator_description_and_thumbnail",
+      "documented": "Creator identifies the Big Gate dungeon. Calven separately indexes a Big Gate study at 10:36.",
+      "studioUse": "Test the gate from the uphill path. Leave enough empty sky or cliff around the portal for its outline to read.",
+      "limits": "Thumbnail cannot separate block color from lighting or determine which stones make the shadow.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://i.ytimg.com/vi/l7Ef7FgQpEk/hqdefault.jpg",
+        "view": "creator thumbnail",
+        "composition": "A monumental gate fills the left side and merges into a receding hillside. A low stepped approach leads to the portal.",
+        "dominantPalette": "Muted gray stone and yellow-green terrain against an open cyan sky.",
+        "shadow": "A tall, nearly black opening stands between darker vertical jambs.",
+        "highlight": "The pale gray piers read against the darker cliff and doorway.",
+        "temperature": "Cool gray-blue distance recedes behind warmer olive ground.",
+        "transitions": "The structure softens into similarly valued mountain stone around its edges.",
+        "clustering": "Dark ribs repeat vertically in the gate; the field reads as much larger green masses.",
+        "focalPoint": "The high pointed doorway.",
+        "weathering": null
+      }
+    },
+    {
+      "id": "bdubs-castle",
+      "creator": "BdoubleO100",
+      "title": "The Castle is DONE! · Hermitcraft Season 7 #39",
+      "url": "https://www.youtube.com/watch?v=A2f2BGci1Ik",
+      "tags": [
+        "castle",
+        "massing",
+        "roof hierarchy",
+        "skyline",
+        "composition"
+      ],
+      "verified": "creator_description_and_thumbnail",
+      "documented": "The creator presents the completed castle and works on an interior.",
+      "studioUse": "Read the roof group from across the valley before choosing foreground details.",
+      "limits": "Only the left panel of the thumbnail was studied. Ground-level weathering and interior blockwork are unresolved.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://i.ytimg.com/vi/A2f2BGci1Ik/hqdefault.jpg",
+        "view": "left thumbnail panel",
+        "composition": "A dense group of tall volumes rises from a broader, simpler wall above stepped terrain.",
+        "dominantPalette": "Gray lower walls, warm upper stone and blue-green roofs.",
+        "shadow": "Repeating dark vertical divisions separate the towers.",
+        "highlight": "Warmer upper faces separate the skyline from the blue background.",
+        "temperature": "Teal roof tops contrast with warmer upper facades.",
+        "transitions": "The narrow spires rise out of a largely continuous roof field.",
+        "clustering": "Turrets group around a taller central mass; the lower gray section is comparatively quiet.",
+        "focalPoint": "The tallest central roof group.",
+        "weathering": null
+      }
+    },
+    {
+      "id": "bdubs-moon-base",
+      "creator": "BdoubleO100",
+      "title": "Double Betrayal · Hermitcraft Season 8 #2",
+      "url": "https://www.youtube.com/watch?v=OBOAlfX7Zus",
+      "tags": [
+        "Moon base",
+        "organic builds",
+        "silhouette",
+        "function"
+      ],
+      "verified": "creator_description",
+      "documented": "The episode description identifies work on the Moon base interior. Calven indexes a Season 8 Moon base segment at 5:51.",
+      "studioUse": "Start an organic landmark with a recognizable profile. Test whether the interior still supports movement after carving the shell.",
+      "limits": "No Moon base frame inspected here. Neither an exact palette nor a curvature method was verified.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "bdubs-whimsy",
+      "creator": "BdoubleO100",
+      "title": "The Seed of Whimsy! · Hermitcraft Season 9",
+      "url": "https://www.youtube.com/watch?v=TWForj1Ve84",
+      "tags": [
+        "Tree of Whimsy",
+        "organic builds",
+        "canopy",
+        "negative space"
+      ],
+      "verified": "creator_metadata_and_secondary_chapter",
+      "documented": "The primary episode identifies the Seed of Whimsy. Calven explicitly identifies the Tree of Whimsy at 9:08.",
+      "studioUse": "When studying the completed tree, first trace trunk lean, branch forks, canopy masses and gaps beneath them.",
+      "limits": "The primary thumbnail depicts a dark passage. It does not establish the mature tree's crown, palette or branch technique.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "related": [
+        "calven-bdubs"
+      ]
+    },
+    {
+      "id": "calven-bdubs",
+      "creator": "Calven, studying work by BdoubleO100",
+      "title": "The Secrets behind BDoubleO100 · Builders Research #1",
+      "url": "https://www.youtube.com/watch?v=P-OVm6othiM",
+      "tags": [
+        "critique",
+        "Moon base",
+        "castle",
+        "Tree of Whimsy",
+        "Big Gate",
+        "secondary analysis"
+      ],
+      "verified": "creator_chapters",
+      "documented": "Calven calls the analysis a personal interpretation. Published chapters include Moon base (5:51), castle (7:45), Tree of Whimsy (9:08) and Big Gate (10:36).",
+      "studioUse": "Use chapters as pointers for comparing an organic landmark with a gateway and a group of towers.",
+      "limits": "Calven's commentary is a secondary source for Bdubs' decisions. Chapters alone cannot establish exact block IDs or the creator's intent.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "gooses-color",
+      "creator": "The Loosest Of Gooses",
+      "title": "Color Theory In Minecraft · All Lessons",
+      "url": "https://www.youtube.com/watch?v=--H4jQ5-z1E",
+      "tags": [
+        "value",
+        "hue",
+        "saturation",
+        "local color",
+        "contrast",
+        "temperature",
+        "harmony",
+        "color studies"
+      ],
+      "verified": "creator_chapters",
+      "documented": "Chapters cover value, hue/saturation, local color, contrast, temperature and harmony. The creator corrects an inversion: white produces a tint and black produces a shade.",
+      "studioUse": "Compare candidate blocks by value at distance, then judge the warm or cool cast next to their actual neighbors.",
+      "limits": "Chapter and description study. Specific example images, resource packs and placements were not verified.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "shovel-gradients",
+      "creator": "Shovel241",
+      "title": "World Edit 101 · Brush Gradients",
+      "url": "https://www.youtube.com/watch?v=FyykecQBJNU",
+      "tags": [
+        "brush",
+        "WorldEdit",
+        "gradients",
+        "construction technique"
+      ],
+      "verified": "indexed_creator_metadata",
+      "documented": "The indexed creator video identifies a WorldEdit brush gradient tutorial. The creator also references it in a custom-tree tutorial.",
+      "studioUse": "Compare hand-directed brush placement with a seeded field on the same wall sample.",
+      "limits": "Direct video fetch failed here. No commands, brush settings or visual result were verified.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "shovel-fantasy",
+      "creator": "Shovel241",
+      "title": "Creator channel · fantasy windmill and steampunk castle",
+      "url": "https://www.youtube.com/channel/UCSLAT2AVACxik7Ez8f9nsRQ",
+      "tags": [
+        "castles",
+        "fantasy environments",
+        "roof",
+        "silhouette"
+      ],
+      "verified": "creator_listing",
+      "documented": "Creator channel lists a steampunk castle and a fantasy windmill.",
+      "studioUse": "Compare the distance at which a fantasy landmark's identifying silhouette remains legible.",
+      "limits": "No frame of the listed castle was studied. The separate Rubyrock gallery card carries both Shovel241Builds and Graysun marks.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "related": [
+        "bakery-rubyrock",
+        "shovel-gradients"
+      ]
+    },
+    {
+      "id": "bakery-creators",
+      "creator": "The Bakery Creators",
+      "title": "Bakery Creators gallery and roster",
+      "url": "https://www.bakery.builders/bakery-creators",
+      "tags": [
+        "fantasy architecture",
+        "collaboration",
+        "portfolio",
+        "Bakery",
+        "attribution"
+      ],
+      "verified": "publisher_gallery",
+      "documented": "The gallery lists Paintergigi, Snarple, Shovel241, Ara and TheLoosestOfGooses among its creators. The Bakery describes its hub as a group build.",
+      "studioUse": "Use one image and its credits per comparison. Compare the focal contrast of two buildings with different silhouettes.",
+      "limits": "Roster membership does not identify the author of every adjacent thumbnail.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "related": [
+        "bakery-rubyrock",
+        "bakery-fenwitch",
+        "paintergigi",
+        "ara",
+        "snarple",
+        "gooses-color"
+      ]
+    },
+    {
+      "id": "bakery-rubyrock",
+      "creator": "Gallery published by The Bakery. Card bears Shovel241Builds and Graysun marks.",
+      "title": "Rubyrock Fortress · presentation image",
+      "url": "https://www.bakery.builders/bakery-creators",
+      "tags": [
+        "fortress",
+        "fantasy architecture",
+        "masonry",
+        "warm-cool contrast",
+        "texture clusters"
+      ],
+      "verified": "gallery_image_inspected",
+      "documented": "The Bakery displays this titled presentation card.",
+      "studioUse": "Keep repeated red roofs in one family. Use a cooler foundation to support a lively timber upper story.",
+      "limits": "The two marks are visible; the division of building, rendering and publishing credit is unverified. Studio lighting on the neutral backdrop affects visible hue.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://images.squarespace-cdn.com/content/v1/674678cdf7c40961aaa00c55/20c9ca1e-a272-405b-a8db-aa8e0eff443b/RubyRock_Fortress_-_Presentation.png",
+        "view": "public presentation render",
+        "composition": "A tall right tower and shorter left spire bracket a broad red gable. Stacked projections widen the upper house above deep stone arches.",
+        "dominantPalette": "Burgundy roofs, warm timber and cream plaster above blue-gray masonry.",
+        "shadow": "A large cool mass sits on the right of the base. Dark openings pull the arches forward.",
+        "highlight": "Pale upper faces and selected warm timber edges are brightest.",
+        "temperature": "Warm wood and crimson roofs stand above distinctly cooler lower stone.",
+        "transitions": "Brown posts and galleries overlap the stone, joining the upper and lower color families.",
+        "clustering": "Red repeats in several roof caps while almost none appears on the quiet stone base.",
+        "focalPoint": "The warm projecting gable framed by red roof and towers.",
+        "weathering": "A little greenery touches the lower opening. The image does not establish the cause of stone discoloration."
+      }
+    },
+    {
+      "id": "bakery-fenwitch",
+      "creator": "Graysun, credited on the card. Gallery published by The Bakery.",
+      "title": "Fenwitch Cabin · terrain presentation",
+      "url": "https://www.bakery.builders/bakery-creators",
+      "tags": [
+        "fantasy environments",
+        "organic silhouette",
+        "lighting",
+        "focal contrast",
+        "terrain integration"
+      ],
+      "verified": "gallery_image_inspected",
+      "documented": "The gallery and card identify the Fenwitch Cabin.",
+      "studioUse": "Reserve the strongest warm accent for a single opening and let connected foliage carry the roof silhouette.",
+      "limits": "Image colors describe the finished render. The luminous opening's block IDs and light source are unknown.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://images.squarespace-cdn.com/content/v1/674678cdf7c40961aaa00c55/46e2d201-d8fb-4a21-b20e-7f475136d5d9/FenWitch_Cabin_-_Solid_Terrain.png",
+        "view": "public presentation render",
+        "composition": "A low diagonal stair leads from water to a cabin, while a hooked roof mass curves over its lit upper opening.",
+        "dominantPalette": "Leaf and moss greens, brown timber and cool blue water.",
+        "shadow": "Dark timber under the roof and the deck contrasts with the blue distance.",
+        "highlight": "A small amber ring is brighter than the broad roof and foreground.",
+        "temperature": "Warm timber and isolated yellow light advance against the cool blue-violet background.",
+        "transitions": "Hanging growth links the curling roof to the surroundings. The deck steps down toward the water.",
+        "clustering": "Yellow is confined to one focal mass; green repeats in connected roof and bank patches.",
+        "focalPoint": "The round glowing opening below the roof curl.",
+        "weathering": "Hanging vegetation suggests a damp setting. No verified moisture simulation or material recipe."
+      }
+    },
+    {
+      "id": "paintergigi",
+      "creator": "Paintergigi",
+      "title": "Creator portfolio · Haunted House and Fairview Farms",
+      "url": "https://www.planetminecraft.com/member/paintergigi/",
+      "tags": [
+        "expressive builds",
+        "houses",
+        "landscape",
+        "setting"
+      ],
+      "verified": "creator_portfolio",
+      "documented": "Paintergigi describes building houses and landscapes and lists Haunted House and Fairview Farms.",
+      "studioUse": "Compare how a building's approach and surrounding terrain support its intended mood.",
+      "limits": "No named work on this page was visually scored here.",
+      "rights": "Creator states personal use only for builds, with redistribution and commercial use prohibited. Catalog links to the public portfolio.",
+      "visualStudy": null
+    },
+    {
+      "id": "ara",
+      "creator": "BuildsByAra",
+      "title": "Minecraft architecture · creator profile",
+      "url": "https://www.patreon.com/Buildsbyara/about",
+      "tags": [
+        "architecture",
+        "proportion",
+        "siting",
+        "BuildsbyAra",
+        "Bakery"
+      ],
+      "verified": "creator_profile",
+      "documented": "Ara describes creating Minecraft builds for supporters. The Bakery links Ara's architecture account.",
+      "studioUse": "Use a creator-approved exterior reference to compare roof-to-wall proportions and the interval between openings.",
+      "limits": "The public profile confirms authorship and activity. No specific example, file, palette or lesson was inspected.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "related": [
+        "bakery-creators"
+      ]
+    },
+    {
+      "id": "snarple",
+      "creator": "Snarple and the participating Bakery builders",
+      "title": "Creator portfolio · The Bakery Hub",
+      "url": "https://snarple.carrd.co/",
+      "tags": [
+        "fantasy hub",
+        "urban planning",
+        "landmarks",
+        "collaborative composition"
+      ],
+      "verified": "creator_portfolio",
+      "documented": "Snarple credits around 30 builders and describes coordinating the Bakery Hub.",
+      "studioUse": "Evaluate which landmarks orient a person at successive points on a walk. Record where another building eclipses the intended focal point.",
+      "limits": "Group work requires project- and image-specific attribution. The hub was not visited for this study.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "pearl-terraforming",
+      "creator": "PearlescentMoon",
+      "title": "Terraforming Tango... And Pickles · Hermitcraft 10 #16",
+      "url": "https://www.youtube.com/watch?v=d-Mxl8-60ZA",
+      "tags": [
+        "organic environments",
+        "terrain",
+        "cliff",
+        "shoreline",
+        "landscape"
+      ],
+      "verified": "creator_description_and_thumbnail",
+      "documented": "The creator describes terraforming her solarpunk base and Tango's starter base across the river.",
+      "studioUse": "Check the intermediate ground between water and grass. Offset ledges and interrupt the boundary with vegetation.",
+      "limits": "The thumbnail includes text and avatars. Study only the landscape visible in its middle and lower right.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://i.ytimg.com/vi/d-Mxl8-60ZA/hqdefault.jpg",
+        "view": "landscape in creator thumbnail",
+        "composition": "A small architectural mass rises above an irregular bluff; shore and rock form a diagonal approach from the lower right.",
+        "dominantPalette": "Blue water, pale sand, gray cliff and green mossy or grassy surfaces.",
+        "shadow": "Dark openings between rock outcrops break up the face.",
+        "highlight": "Bright pockets of sand line the water.",
+        "temperature": "Pale sand mediates between the cool blue water and the greener slope.",
+        "transitions": "Sand bends around separate outcrops; the top edge varies between exposed gray and vegetation.",
+        "clustering": "Sand and stone form recognizable masses across neighboring blocks.",
+        "focalPoint": "The roofed structure above the cliff in the landscape portion.",
+        "weathering": null
+      }
+    },
+    {
+      "id": "scarland",
+      "creator": "GoodTimesWithScar",
+      "title": "Scarland GRAND OPENING! · Hermitcraft 9 #46",
+      "url": "https://www.youtube.com/watch?v=Jq3WYkiMWe8",
+      "tags": [
+        "architectural composition",
+        "approach",
+        "entrance",
+        "focal point",
+        "landmark"
+      ],
+      "verified": "creator_description_and_thumbnail",
+      "documented": "The episode presents the opening of Scarland. Episode 44 separately covers the entrance build.",
+      "studioUse": "Study whether the arrival route keeps the dominant opening visible, and which decorative accents compete for attention.",
+      "limits": "Thumbnail contains an avatar, ticket, arrow and other graphic overlays. Park-wide sightlines were not measured.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://i.ytimg.com/vi/Jq3WYkiMWe8/hqdefault.jpg",
+        "view": "architecture behind the creator thumbnail overlays",
+        "composition": "One broad central opening and cupola are framed by lower wings and smaller domes.",
+        "dominantPalette": "Cream walls, green roofs and gold accents.",
+        "shadow": "The deep opening and shaded roof undersides separate the arches from the facade.",
+        "highlight": "Pale columns and gold caps pick out high points.",
+        "temperature": "Warm cream frames cooler green rooftops against blue sky.",
+        "transitions": "Repeated changes in roof height draw the eye to the taller center.",
+        "clustering": "Green and gold repeat as grouped caps. The walls carry comparatively broad pale surfaces.",
+        "focalPoint": "The central arch and dome in the architectural layer.",
+        "weathering": null
+      },
+      "additionalUrls": [
+        "https://www.youtube.com/watch?v=jvtgn1jg3hc"
+      ]
+    },
+    {
+      "id": "ardacraft-gradients",
+      "creator": "Eaglz24 for ArdaCraft",
+      "title": "Gradient Guide",
+      "url": "https://www.ardacraft.me/resources/gradient-guide",
+      "tags": [
+        "weathered masonry",
+        "limestone",
+        "value ramps",
+        "cluster shape",
+        "connected textures",
+        "massing",
+        "quiet areas"
+      ],
+      "verified": "publisher_guide",
+      "documented": "The guide compares two limestone arrangements whose connected textures change their apparent edge values. It develops a Byzantine chapel from a plain massing model before applying surface patches.",
+      "studioUse": "Test a limestone pairing in a wall large enough to see several texture variants. Inspect its boundary while squinting and from an angle.",
+      "limits": "ArdaCraft uses Conquest textures. Block names, coordinates and connected-texture transitions will differ with a vanilla resource pack.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "ardacraft-rivendell",
+      "creator": "ArdaCraft contributors, image published by ArdaCraft",
+      "title": "Rivendell · landscape view",
+      "url": "https://www.ardacraft.me/",
+      "tags": [
+        "mountains",
+        "forest",
+        "landmark",
+        "terrain integration",
+        "village",
+        "composition",
+        "atmosphere"
+      ],
+      "verified": "gallery_image_inspected",
+      "documented": "The project labels the image Rivendell and credits its building work to a contributor community.",
+      "studioUse": "Give the higher ridgeline the quieter silhouette when vegetation and a large landmark share a valley view. Repeat an earth tone near the architecture to tie it to the hillside.",
+      "limits": "The building is small in this view. Individual stone IDs, wall weathering, and the source of its lighting cannot be established.",
+      "rights": "link_only",
+      "visualStudy": {
+        "image": "https://www.ardacraft.me/_image/w_3840,q_80/assets/Image-Background-ArdaCraft-21_isEDPdNShjVrdUWg2JmwI.webp",
+        "view": "project landscape image",
+        "composition": "Light cliffs and cloud wrap around a green valley. A terracotta-colored cluster of steep roofs sits below and right of center.",
+        "dominantPalette": "Pale gray cliffs, olive and deep green vegetation, rusty red-brown roofs.",
+        "shadow": "Dark foreground trees at the lateral edges frame the distant architecture.",
+        "highlight": "The high rock faces and low clouds carry the palest broad values.",
+        "temperature": "Warm foliage and rusty roofs come forward against cooler shadowed rock and sky.",
+        "transitions": "Irregular crowns break the straight boundary between cliffs, wooded slopes and masonry.",
+        "clustering": "Trees gather into larger color masses; the repeated roof pitches form one readable red-brown cluster.",
+        "focalPoint": "The warm building group is the color focal point, with the bright ridgeline as a secondary pull.",
+        "weathering": null
+      }
+    },
+    {
+      "id": "ardacraft-bree",
+      "creator": "ArdaCraft contributors",
+      "title": "Bree · settlement reference",
+      "url": "https://ardacraft.me/location/bree",
+      "tags": [
+        "villages",
+        "masonry",
+        "regional architecture",
+        "terrain",
+        "style library"
+      ],
+      "verified": "project_location_page",
+      "documented": "Bree is a named project location. ArdaCraft also lists it along the route documented in Follow Frodo’s Path.",
+      "studioUse": "Gather street-level references before adapting eave heights, roof rhythms and changes in street width to a smaller settlement.",
+      "limits": "Village dimensions and a wall palette were not sampled here.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "additionalUrls": [
+        "https://ardacraft.me/resources/follow-frodos-path"
+      ]
+    },
+    {
+      "id": "westeros-gradients",
+      "creator": "WesterosCraft documentation contributors",
+      "title": "Building fundamentals · Gradients",
+      "url": "https://westeroscraft.com/docs/building/fundamentals/gradients",
+      "tags": [
+        "weathered medieval architecture",
+        "texture hierarchy",
+        "value",
+        "gradient order",
+        "surface scale"
+      ],
+      "verified": "publisher_guide",
+      "documented": "The guide prioritizes value, hue and then texture when ordering stones. It explains how skipped tones and scattered isolated patches interrupt an otherwise continuous facade.",
+      "studioUse": "Choose intermediate stones before painting irregular regions of decay. Check whether their scale suits the width of the whole wall.",
+      "limits": "The tutorial assumes the project's block collection. Verify all color matches in the active pack.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "westeros-repository",
+      "creator": "WesterosCraft documentation contributors",
+      "title": "Repository World",
+      "url": "https://westeroscraft.com/docs/building/repository-world",
+      "tags": [
+        "reference library",
+        "regional styles",
+        "medieval villages",
+        "vocabulary"
+      ],
+      "verified": "publisher_guide",
+      "documented": "The world organizes architectural examples by region and type and includes general components and a block test area.",
+      "studioUse": "Index an original Studio wall or gate by region, scale and site constraint so the player can find it again.",
+      "limits": "The organizational idea transfers independently. Third-party builds and reference worlds were not imported.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "conquest-gradients",
+      "creator": "Conquest Reforged",
+      "title": "Gradienting your Builds",
+      "url": "https://www.conquestreforged.com/guides/gradients",
+      "tags": [
+        "warm-cool",
+        "drips",
+        "moss",
+        "roofs",
+        "surface weathering",
+        "masonry"
+      ],
+      "verified": "publisher_guide",
+      "documented": "Successive tones bridge contrasting colors in the guide's wall diagrams. Its roof discussion connects gradients and moss to the paths that rain takes.",
+      "studioUse": "Place a drip where water could collect and give its boundary an intermediate material. Inspect a roof at its actual pitch.",
+      "limits": "The examples use a custom pack. Exact texture adjacency and moss shades will vary across packs.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "enginnx",
+      "creator": "Enginnx resource index and individually credited contributors",
+      "title": "Minecraft Building Resources",
+      "url": "https://building.enginnx.com/",
+      "tags": [
+        "references",
+        "silhouette",
+        "scale",
+        "line and movement",
+        "negative space",
+        "road",
+        "terrain",
+        "baked lighting",
+        "color theory"
+      ],
+      "verified": "publisher_index",
+      "documented": "The index links lessons on color and design, roof and road diagrams, site planning and terrain. It credits TheLoosestOfGooses and WhaleInThePond for the block color collection.",
+      "studioUse": "Consult one relevant topic at a time. For a gate approach, compare the road's movement, the landmark's silhouette and the nearby terrain before choosing individual stones.",
+      "limits": "This is a curated index. The diagram, video and image authors have separate rights and some credits are incomplete.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "blockbench-style",
+      "creator": "MasterianoX, published by Blockbench Wiki",
+      "title": "Minecraft Style Guide",
+      "url": "https://blockbench.net/wiki/guides/minecraft-style-guide/",
+      "tags": [
+        "texture design",
+        "color ramps",
+        "pixel clusters",
+        "shape",
+        "shading",
+        "value hierarchy"
+      ],
+      "verified": "publisher_guide",
+      "documented": "The guide treats texture, shape and proportion together. Its entity workflow groups shaded pixels to show material and removes unintended banding.",
+      "studioUse": "Translate the principle of readable pixel groups to blocks on a facade. Review at normal play distance before adding detail.",
+      "limits": "Model and pixel-art conventions apply at different scales from a building. Lighting directions recommended for an entity texture are not a world lighting model.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "axiom",
+      "creator": "Moulberry and Axiom documentation contributors",
+      "title": "Axiom documentation · Gradient Painter",
+      "url": "https://github.com/Moulberry/AxiomDocumentation",
+      "tags": [
+        "manual editing",
+        "gradient painter",
+        "tool masks",
+        "Axiom"
+      ],
+      "verified": "publisher_documentation",
+      "documented": "Axiom's tool manual includes a Gradient Painter, Gradient Helper, Script Brush and tool masks.",
+      "studioUse": "Use the manual painter for a player's local corrections and inspect them through the Studio adapter before the next revision.",
+      "limits": "Documentation access does not establish an automation API, code reuse grant, or bundled right to distribute the mod.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "additionalUrls": [
+        "https://axiomdocs.moulberry.com/tools/painting/gradientpainter.html",
+        "https://axiomdocs.moulberry.com/"
+      ]
+    },
+    {
+      "id": "ezedits",
+      "creator": "eztaK_red and Zeranny",
+      "title": "ezEdits · WorldEdit/FAWE extension",
+      "url": "https://ezedits.gitbook.io/ezedits/",
+      "tags": [
+        "mask",
+        "gradient",
+        "noise",
+        "palette",
+        "point light",
+        "sunlight",
+        "WorldEdit"
+      ],
+      "verified": "publisher_documentation",
+      "documented": "The authors document vector-based gradients, noise controls, palette commands and light-oriented texturing.",
+      "studioUse": "Compare the way the tool separates a spatial mask from an ordered palette. Prototype an effect on a small bounded region.",
+      "limits": "Published commands describe a separate extension. Availability in this Fabric instance, licensing for reuse and practical speed were not tested.",
+      "rights": "link_only",
+      "visualStudy": null,
+      "additionalUrls": [
+        "https://ezedits.gitbook.io/ezedits/palettes/palette-commands"
+      ]
+    },
+    {
+      "id": "fastnoise-lite",
+      "creator": "Auburn and FastNoiseLite contributors",
+      "title": "FastNoiseLite · portable noise library and preview",
+      "url": "https://github.com/Auburn/FastNoiseLite",
+      "tags": [
+        "coherent noise",
+        "fractal",
+        "domain warp",
+        "seed",
+        "medium scale",
+        "algorithms"
+      ],
+      "verified": "publisher_repository",
+      "documented": "Repository lists multiple value, simplex and cellular algorithms, domain warping and fractal options, with JavaScript and other language ports.",
+      "studioUse": "Compare two frequencies on one fixed facade and seed; rank candidates by continuity and fit to the intended weathering. Use a mask tied to the structure for physical effects.",
+      "limits": "The library supplies fields rather than architectural decisions. Studio's current painterly pass uses its existing noise sampler.",
+      "rights": "Repository code is MIT. Viewer linked for study. No library code bundled by this catalog.",
+      "visualStudy": null,
+      "additionalUrls": [
+        "https://auburn.github.io/FastNoiseLite/",
+        "https://github.com/Auburn/FastNoiseLite/blob/master/LICENSE"
+      ]
+    },
+    {
+      "id": "mc-palette-picker",
+      "creator": "paulprints and project contributors",
+      "title": "MCPalletePicker · image-to-block palette",
+      "url": "https://github.com/paulprints/MCPalletePicker",
+      "tags": [
+        "palette extraction",
+        "perceptual color",
+        "OKLab",
+        "clustering",
+        "block family"
+      ],
+      "verified": "publisher_repository",
+      "documented": "README describes texture-derived colors, seeded OKLab clustering of reference pixels and matching colors to blocks. It also documents block families and shape filters.",
+      "studioUse": "Extract candidate colors from an authorized image. Test neighboring blocks as actual masonry, including grain, seams and strength of contrast.",
+      "limits": "An image-derived color match does not infer where to put its blocks or whether an installation has the same textures.",
+      "rights": "Repository code is MIT. Source images and Minecraft textures retain their separate rights. Link only.",
+      "visualStudy": null
+    },
+    {
+      "id": "shapecraft-palette",
+      "creator": "Shape Craft",
+      "title": "Block Palette Generator & Color Matcher",
+      "url": "https://shapecraft.tools/art/block-palette",
+      "tags": [
+        "perceptual color",
+        "OKLab",
+        "texture",
+        "reference image",
+        "block suitability",
+        "gradient"
+      ],
+      "verified": "publisher_documentation",
+      "documented": "The site documents color matching, gradient stops and image clustering in OKLab. Filters include falling blocks and light sources.",
+      "studioUse": "Use a perceptual match as an initial shortlist, then reject materials whose states, light emission or texture seams conflict with the wall.",
+      "limits": "Site functionality was reviewed from its own documentation. Accuracy on the active resource pack and any API or reuse license are unverified.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "worldedit-patterns",
+      "creator": "EngineHub / WorldEdit contributors",
+      "title": "WorldEdit patterns",
+      "url": "https://worldedit.enginehub.org/en/latest/usage/general/patterns/",
+      "tags": [
+        "weighted patterns",
+        "bulk editing",
+        "backends",
+        "block distribution"
+      ],
+      "verified": "publisher_documentation",
+      "documented": "The manual documents weighted and uniform random block patterns for selections.",
+      "studioUse": "Keep a weighted-random wall as the control when evaluating a clustered weathering field.",
+      "limits": "Expected material proportions do not guarantee a coherent patch shape.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "gdmc-evaluation",
+      "creator": "GDMC Settlement Generation Challenge organizers",
+      "title": "Settlement evaluation methodology",
+      "url": "https://gendesignmc.wikidot.com/wiki:evaluation",
+      "tags": [
+        "terrain adaptation",
+        "function",
+        "narrative",
+        "aesthetics",
+        "evaluation"
+      ],
+      "verified": "organizer_documentation",
+      "documented": "The organizers describe human evaluation of generated settlements on unseen maps using adaptability, functionality, narrative and aesthetics.",
+      "studioUse": "Review a player's route as well as a distant image. Record a concrete observation for each criterion before judging a treatment.",
+      "limits": "This is a settlement evaluation framework. It gives no specific palette or geometry algorithm.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "gdpc",
+      "creator": "GDPC contributors",
+      "title": "Generative Design Python Client",
+      "url": "https://github.com/avdstaaij/gdpc",
+      "tags": [
+        "survey",
+        "procedural settlement",
+        "world analysis",
+        "geometry"
+      ],
+      "verified": "publisher_repository",
+      "documented": "The project identifies itself as a Python client for the GDMC HTTP Interface.",
+      "studioUse": "Study how surveying an area before planning can expose constraints for a road or settlement approach.",
+      "limits": "This is an external reference; this catalog makes no compatibility claim for Studio's running game.",
+      "rights": "link_only",
+      "visualStudy": null
+    },
+    {
+      "id": "studio-overhead-shadow",
+      "creator": "Minecraft World Studio project",
+      "title": "Registered tower · varied overhead-shadow test",
+      "url": "../../../screenshots/tower-overhead-shadow-varied.png",
+      "tags": [
+        "original study",
+        "overhang",
+        "shadow",
+        "window drips",
+        "value bands",
+        "critique"
+      ],
+      "verified": "local_capture_inspected",
+      "documented": "The capture belongs to the project's registered tower test. The accompanying test receipt records the material revision.",
+      "studioUse": "The dark upper region still spans much of the facade. A critique can ask whether retaining more midtone would keep the eave from dominating the slit windows.",
+      "limits": "This test fixture is above the cloud layer. Terrain integration and ground weathering cannot be judged from this shot.",
+      "rights": "Existing project capture linked in place. Minecraft assets remain subject to their respective rights.",
+      "visualStudy": {
+        "image": "../../../screenshots/tower-overhead-shadow-varied.png",
+        "view": "fixed tower elevation",
+        "composition": "The narrow tower stands alone with sky around the shaft; the small stepped roof flares beyond its sides.",
+        "dominantPalette": "Muted green roof and charcoal-to-gray masonry.",
+        "shadow": "Dark courses directly under the eave have an uneven lower edge.",
+        "highlight": "Lighter shaft stone sits beside the dark slits and below the eave region.",
+        "temperature": "Green-gray stone forms a quieter step between green roof and neutral gray shaft.",
+        "transitions": "Dark patches descend by different distances in adjacent columns.",
+        "clustering": "Upper dark blocks form a mostly continuous cap. Lower slit streaks are much narrower.",
+        "focalPoint": "The green roof and dark band below it.",
+        "weathering": "Narrow marks below slit openings follow the previously tested drip mask."
+      },
+      "additionalUrls": [
+        "../../../docs/shadow-variation-results.json"
+      ]
+    },
+    {
+      "id": "studio-river",
+      "creator": "Minecraft World Studio project",
+      "title": "Registered bridge · weathered downstream view",
+      "url": "../../../screenshots/bridge-weathered-downstream.png",
+      "tags": [
+        "original study",
+        "waterline",
+        "terrain integration",
+        "masonry",
+        "quiet walking surface"
+      ],
+      "verified": "local_capture_inspected",
+      "documented": "The existing bridge-weathering test records sampled water height and changes near the footings.",
+      "studioUse": "Compare both banks from water level and from the approach. Check whether the pale high masonry separates the span from the forest at play distance.",
+      "limits": "A tree obscures part of the left bank. The dark recess high on the slope also competes for attention.",
+      "rights": "Existing project capture linked in place. Minecraft assets remain subject to their respective rights.",
+      "visualStudy": {
+        "image": "../../../screenshots/bridge-weathered-downstream.png",
+        "view": "downstream oblique screenshot",
+        "composition": "The span cuts diagonally across blue water. Sloped banks and trees frame the crossing.",
+        "dominantPalette": "Gray masonry against green foliage, brown banks and blue water.",
+        "shadow": "Darker gray-green blocks collect near the base of the right support.",
+        "highlight": "Pale faces along the upper masonry separate the steps from the hill.",
+        "temperature": "Cool masonry and water contrast with the exposed earth on the slope.",
+        "transitions": "Darker footing stones meet intermediate gray courses before the pale upper faces.",
+        "clustering": "The lower accents form small connected groups while the tread remains quiet.",
+        "focalPoint": "The arch opening and pale bridge face.",
+        "weathering": "Dark right footings meet the water. The material receipt establishes the waterline-based placement."
+      },
+      "additionalUrls": [
+        "../../../docs/bridge-weathering-results.json"
+      ]
+    }
+  ]
+}

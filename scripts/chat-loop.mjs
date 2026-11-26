@@ -15,6 +15,7 @@ import { StudioState } from "./studio-state.mjs";
 import { previewTower, previewBridge, applyDesign, reverseDesign, recordedParameters, designRuns, boundsOf, surveyBridgeWaterline } from "./tower.mjs";
 import {bridgeParameters,bridgeDefaults} from "../packages/geometry/bridge.ts";
 import {architecturalFinish} from "./architectural-finish.mjs";
+import {withArtisticIntent,isArtNoteOnly} from "./artistic-intent.mjs";
 import {exportSchematic} from "./schematic.mjs";
 
 const WORLD="sp:WorldStudioLab", DIM="minecraft:overworld";
@@ -201,20 +202,22 @@ async function design(request,signal,previewOnly,observeOnly=false) {
   await say(`Working with ${planner.provider}. Use @studio cancel or @studio redirect <request>.`);
   let image;
   if(observeOnly) {
-    if(!planner.capabilities.images)throw Error("The selected provider does not support images.");
-    image=await c.tool("screenshot");
-    if(!Buffer.isBuffer(image))throw Error("Minecraft did not return a screenshot.");
+    if(planner.capabilities.images) {
+      image=await c.tool("screenshot");
+      if(!Buffer.isBuffer(image))throw Error("Minecraft did not return a screenshot.");
+    }
   }
   const recent=session.recent.slice(0,-1);
   const bridges=Object.fromEntries(Object.entries(state.bridges).map(([key,b])=>[key,{banks:b.banks,origin:b.origin,params:b.params}]));
-  const decision=await planner.ask({request,site,towers:objects,bridges,defaultNewBridge:bridgeDefaults,defaultNewTower:defaults,recent,
-    shadowQuestion:shadowQuestion?.key,observeOnly,previewOnly},signal,activity,image);
+  const decision=await planner.ask({request,site,towers:objects,bridges,projectStyle:store.projectStyle??null,defaultNewBridge:bridgeDefaults,defaultNewTower:defaults,recent,
+    shadowQuestion:shadowQuestion?.key,observeOnly,hasRenderedView:!!image,previewOnly},signal,activity,image);
   signal.throwIfAborted();
   await context();
   const summary=compact(decision.message).slice(0,450);
   if(observeOnly || decision.action==="answer") {
     shadowQuestion=null;
-    acceptNextInput(signal);await reply(summary||"Please describe the tower or revision.");return;
+    const evidence=observeOnly && !image?"Recipe and spatial observations only. ":"";
+    acceptNextInput(signal);await reply(evidence+(summary||"Please describe the tower or revision."));return;
   }
   if(state.history.at(-1)?.partial) throw Error("Undo the interrupted revision before proposing another edit.");
   if(decision.continueShadow) {
@@ -245,7 +248,8 @@ async function design(request,signal,previewOnly,observeOnly=false) {
   const {plan}=p;
   signal.throwIfAborted();
   checkSelection(plan);
-  if(!plan.count) { lastPreview=null;acceptNextInput(signal);await reply(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
+  if(isArtNoteOnly(plan)) p.artNoteOnly=true;
+  if(!plan.count && !p.artNoteOnly) { lastPreview=null;acceptNextInput(signal);await reply(`No editable changes. ${plan.protectedCount} cells are protected.`);return; }
   p.id=randomBytes(4).toString("hex");
   p.summary=summary;
   if(previewOnly || decision.previewOnly) {
@@ -268,6 +272,14 @@ function intersects(a,b) {
 function towerBounds(t) {
   const {origin:o,params:n}=t,r=n.radius+1;
   return {from:{x:o.x-r,y:o.y,z:o.z-r},to:{x:o.x+r,y:o.y+n.height+n.roof-1,z:o.z+r}};
+}
+
+function artisticFinish(base,decision,kind) {
+  const key=decision.artStyleSource;
+  if(key==="project")return withArtisticIntent(base,decision,kind,store.projectStyle?.intent,store.projectStyle?.revision);
+  const source=key && (Object.hasOwn(state.towers,key)?state.towers[key]:
+    Object.hasOwn(state.bridges,key)?state.bridges[key]:null);
+  return withArtisticIntent(base,decision,kind,source?.params?.artisticIntent);
 }
 
 async function planBridge(site,d) {
@@ -297,7 +309,8 @@ async function planBridge(site,d) {
     key="bridge-"+randomBytes(6).toString("hex");
     base={...bridgeDefaults,dx:b.x-a.x,dy:b.y-a.y,dz:b.z-a.z};before=null;
   }
-  const next=bridgeParameters({...architecturalFinish(base,d,site,origin),width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend,
+  const finish=artisticFinish(architecturalFinish(base,d,site,origin),d,"bridge");
+  const next=bridgeParameters({...finish,width:d.width??base.width,arch:d.arch??base.arch,bend:d.bend??base.bend,
     weathering:d.weathering??base.weathering??"none"});
   if(next.weathering==="none")next.waterline=null;
   else if(!base.weathering || base.weathering==="none") {
@@ -332,7 +345,7 @@ async function planTower(site,objects,decision) {
     if(before) { origin=before.origin;base=objects[key].params; }
     else throw Error("Point at a known tower or ask for a new tower on the ground.");
   }
-  const next=parameters(architecturalFinish(base,decision,site,origin),decision);
+  const next=parameters(artisticFinish(architecturalFinish(base,decision,site,origin),decision,"tower"),decision);
   // Keep an independently owned tower out of this object's editing footprint.
   for(const [other,t] of Object.entries(state.towers)) {
     if(other===key) continue;
@@ -368,7 +381,9 @@ async function edit(direction,entry,signal) {
   finally { receipt=store.finish(result); }
   acceptNextInput(signal);
   const verb=direction==="apply"?"Applied":"Undid";
-  const finish=direction==="apply" && entry.kind==="bridge"?bridgeFinish(plan):"";
+  const art=direction==="apply"?entry.plan.next?.artisticIntent:entry.before?.params?.artisticIntent;
+  const finish=(direction==="apply" && entry.kind==="bridge"?bridgeFinish(plan):"")+
+    (art?` Art direction v${art.revision}: ${art.texture} ${art.palette.replaceAll("_"," ")}.`:"");
   await reply(`${verb} ${entry.id}: ${receipt.written} cells changed, ${result.verified} verified; ${result.skipped} changed since preview or commit and preserved.${finish}`);
 }
 async function surveyedEdit(request,signal) {
@@ -432,7 +447,7 @@ async function handle(input) {
   if(!body)return;
   const cmd=body.toLowerCase();
   if(cmd==="help") {
-    await say("Ask @studio a question or request a build. Commands include mark NAME, markers, select NAME, select A to B, where, look QUESTION, export schematic, voice on/off, spoken on/off, provider, session, history, status, cancel, redirect REQUEST, preview and undo.");
+    await say("Ask @studio a question or request a build. Commands include mark NAME, markers, select NAME, select A to B, where, look QUESTION, critique this build, art direction, export schematic, voice on/off, spoken on/off, provider, session, history, status, cancel, redirect REQUEST, preview and undo.");
     return;
   }
   if(cmd==="status" || cmd==="session") {
@@ -459,6 +474,24 @@ async function handle(input) {
   const speech=cmd.match(/^(voice|spoken)(?:\s+(on|off|status))?$/);
   if(speech) {await say(await voice.configure(speech[1],speech[2]??"status"));return;}
   if(busy) {await say("One request is active. Use @studio status, @studio cancel or @studio redirect <request>.");return;}
+  if(/^(save project style|save this as (?:the |our )?project style)$/.test(cmd)) {
+    const style=store.saveProjectStyle((await survey()).selected);
+    await say(`Project style v${style.revision} saved from ${style.source}. Ask for a new tower or bridge in the project style.`);return;
+  }
+  if(cmd==="restore previous project style") {
+    const style=store.restoreProjectStyle();
+    await say(style?`Restored project style v${style.revision}.`:"Cleared the project's first saved style.");return;
+  }
+  if(cmd==="project style") {
+    const style=store.projectStyle;
+    await say(style?`Project style v${style.revision} from ${style.source}: ${style.intent.texture} ${style.intent.palette.replaceAll("_"," ")}. ${style.intent.atmosphere}.`:"No project style has been saved yet.");return;
+  }
+  if(cmd==="art direction") {
+    const key=(await survey()).selected;
+    const art=(state.bridges[key]??state.towers[key])?.params?.artisticIntent;
+    await say(art?`${key} · art v${art.revision}: ${art.texture} ${art.palette.replaceAll("_"," ")}. Mood: ${art.atmosphere}. Focal point: ${art.focalPoint}.`:"This build has no saved art direction.");
+    return;
+  }
   if(cmd==="export schematic" || cmd==="export preview schematic") {
     if(state.history.at(-1)?.partial)throw Error("Undo the interrupted revision before exporting a design.");
     let kind,params,origin;
@@ -553,9 +586,10 @@ async function handle(input) {
   }
   const previewOnly=/^preview\s/i.test(body);
   const look=body.match(/^look(?:\s+(.+))?$/i);
+  const critique=/^(?:critique\b|what would make (?:this|the .+?) look better\??$|how does (?:this|the .+?) look\??$)/i.test(body);
   const request=look?(look[1]??"Describe what you can see in this Minecraft screenshot."):previewOnly?body.slice(7).trim():body;
   session.record("user",body);
-  start(look?"inspecting the current view":"designing",s=>design(request,s,previewOnly,!!look));
+  start(look||critique?"inspecting the current view":"designing",s=>design(request,s,previewOnly,!!look||critique));
 }
 
 function disconnect() {

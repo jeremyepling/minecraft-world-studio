@@ -10,4 +10,6 @@ Before modifying blocks, identify the active world and dimension, and check the 
 
 Use direct structured operations. Generate repetitive geometry deterministically, compare the live footprint with the previous design, and verify the result. Check command feedback and actual cells before declaring success. Acknowledging a chat command only means it was sent.
 
+For artistic design, painting, critique or revisions to an object with saved art direction, use the [artistic building skill](skills/minecraft-artistic-building/SKILL.md) and its relevant study notes. The [player and engineering guide](docs/painterly-building.md) records executable scope, intent persistence and benchmarks.
+
 Keep human references, executable skills, evidence and private runtime state distinct. Commit scripts, test results, small reference captures and documentation. Keep local/, .codex/, credentials, game saves and backups out of Git.

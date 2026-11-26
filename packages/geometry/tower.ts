@@ -1,6 +1,7 @@
 import {circularLoft, subtract, type Voxel} from "./voxels.ts";
 import {valueNoise} from "./materials.ts";
 import {architecturalStone, type ArchitecturalFinish, type PaintCell} from "./architectural-materials.ts";
+import {painterlyStone, validateArtisticIntent, type ArtisticIntent} from "./painterly-materials.ts";
 
 export type Entrance = "north" | "east" | "south" | "west";
 export type RoofFinish = "copper" | "black_to_grey" | "brown_to_tan";
@@ -14,6 +15,7 @@ export const towerLimits = {
 } as const;
 
 export type TowerParameters = Partial<Record<keyof typeof towerLimits, number>> & ArchitecturalFinish & {
+  artisticIntent?: ArtisticIntent | null;
   entrance?: Entrance;
   roofFinish?: RoofFinish;
 };
@@ -59,6 +61,7 @@ function roofMaterial(point: Voxel, rise: number, finish: RoofFinish): string {
 
 /** Occupied voxels of the recipe. Omitted space is left to the edit adapter's ownership checks. */
 export function* towerCells(params: TowerParameters = {}): Generator<MaterialVoxel> {
+  validateArtisticIntent(params.artisticIntent);
   yield* architecturalStone(towerSurfaces(params),params);
 }
 
@@ -73,7 +76,8 @@ function* towerSurfaces(params: TowerParameters): Generator<PaintCell> {
 
   const shaft = circularLoft({bottom: 0, height, thickness, radiusAt: y => radius - taper * y / (height - 1)});
   for (const point of subtract(shaft, p => doorway(p, entrance) || windowSlit(p))) {
-    yield {...point, material: point.y < 3 ? "andesite" : "stone_bricks", paintable:true};
+    const material=params.artisticIntent ? painterlyStone(point,params.artisticIntent,0) : (point.y<3 ? "andesite" : "stone_bricks");
+    yield {...point, material, paintable:true, stonePalette:params.artisticIntent?.palette};
   }
   const cap = circularLoft({bottom: height, height: roof, thickness: 1.6,
     radiusAt: layer => (radius - taper + 1) * (1 - layer / roof)});

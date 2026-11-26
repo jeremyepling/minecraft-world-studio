@@ -1,0 +1,4 @@
+interface:
+  display_name: "Minecraft Artistic Building"
+  short_description: "Design, paint and refine coherent Minecraft builds"
+  default_prompt: "Use $minecraft-artistic-building to paint the selected tower and preserve its art direction."

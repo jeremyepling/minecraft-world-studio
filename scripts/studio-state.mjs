@@ -42,6 +42,24 @@ export class StudioState {
     writeFileSync(this.file+".tmp",JSON.stringify(this.data),{flush:true});
     renameSync(this.file+".tmp",this.file);
   }
+  get projectStyle() { return this.data.projectStyles?.at(-1); }
+  saveProjectStyle(key) {
+    const intent=(this.data.bridges[key]??this.data.towers[key])?.params?.artisticIntent;
+    if(!intent)throw Error("Aim at a registered building with a saved art direction first.");
+    const styles=this.data.projectStyles??=[];
+    const revision=(this.data.lastProjectStyleRevision??this.projectStyle?.revision??0)+1;
+    const entry={source:key,revision,intent:structuredClone(intent)};
+    this.data.lastProjectStyleRevision=revision;
+    styles.push(entry);
+    this.save();
+    return entry;
+  }
+  restoreProjectStyle() {
+    if(!this.projectStyle)throw Error("There is no saved project style to restore.");
+    this.data.projectStyles.pop();
+    this.save();
+    return this.projectStyle;
+  }
   begin(direction,entry) {
     if(this.data.active) throw Error("An edit is already in progress.");
     this.data.active={direction,entry,receipt:"edit-"+randomUUID()+".jsonl"};
@@ -73,11 +91,12 @@ export class StudioState {
     }
     const omitted=[...(result?.conflicts??[]),...(uncertain?[uncertain]:[])];
     if(direction==="apply") {
-      if(confirmed.length) {
+      const committed = confirmed.length > 0 || (result && entry.artNoteOnly && entry.plan.count === 0);
+      if(committed) {
         this.data.history.push({...entry,applied:confirmed,partial:!result});
         if(entry.kind!=="survey") this.data.selected=entry.key;
       }
-      if(result && confirmed.length && entry.kind!=="survey") {
+      if(result && committed && entry.kind!=="survey") {
         objects[entry.key]={origin:entry.plan.origin,params:entry.plan.next,
           ...(entry.kind==="bridge"?{banks:entry.banks,bounds:entry.designBounds}:{}),
           exclude:[...entry.plan.excluded,...omitted]};
@@ -90,7 +109,7 @@ export class StudioState {
         last.applied=remaining;
         last.partial=true;
         last.undoExcluded=[...(last.undoExcluded??[]),...omitted];
-      } else {
+      } else if(result || !last.artNoteOnly) {
         this.data.history.pop();
         if(entry.kind!=="survey") {
           if(entry.before) objects[entry.key]={...entry.before,

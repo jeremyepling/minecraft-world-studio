@@ -50,6 +50,6 @@ In Fabric 26.3 chat, the tower acquired 24 streak blocks. The shadow request ask
 
 The live test found 79 tower blocks and two bridge blocks with different tones from the earlier finish. Both checked undos preserved a simulated hand edit. [Bridge underside](../screenshots/bridge-player-shadow-varied.png) · [Chat and block verification](shadow-variation-results.json)
 
-## Remaining artistic work
+## Painterly building foundation
 
-The broader milestone includes reference palettes, evaluation from multiple views, terrain blending and personal style preferences. The bridge provides the first in-game example for judging a palette on existing architecture. [Roadmap](roadmap.md)
+Registered towers and bridges support three curated masonry palettes, quiet to expressive coverage, local art direction and opt-in project style reuse. The real chat scenario creates a tower, quiets its masonry and raises it while preserving its style and a hand edit. It also exercises critique from an actual rendered frame. [Matched views and verification](painterly-results.md) · [Player workflow, material evidence and next deliverables](painterly-building.md)

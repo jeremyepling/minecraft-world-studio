@@ -1,5 +1,6 @@
 import {readFileSync} from "node:fs";
 import {CodexRuntime} from "./codex-runtime.mjs";
+import {emptyArtDecision} from "./artistic-intent.mjs";
 import {towerDefaults, towerLimits} from "../packages/geometry/tower.ts";
 
 const designSchema=JSON.parse(readFileSync(new URL("./tower-decision.schema.json",import.meta.url),"utf8"));
@@ -7,6 +8,30 @@ const surveySchema=JSON.parse(readFileSync(new URL("./survey-intent.schema.json"
 
 const artSkills=["minecraft-weathering","minecraft-cast-shadows"].map(name=>
   readFileSync(new URL("../skills/"+name+"/SKILL.md",import.meta.url),"utf8"));
+const artRoot=new URL("../skills/minecraft-artistic-building/",import.meta.url);
+const notes=new Map();
+function note(path) {
+  if(!notes.has(path))notes.set(path,readFileSync(new URL(path,artRoot),"utf8"));
+  return notes.get(path);
+}
+
+export function artisticGuidance(context) {
+  const request=context.request??"";
+  const selected=context.site?.selected;
+  const style=context.towers?.[selected]?.params?.artisticIntent??context.bridges?.[selected]?.params?.artisticIntent;
+  const subjects=[
+    ["composition",/silhouette|architectur|castle|village|fantasy|atmospher|composition|rhythm|focal|proportion|organic|illustrat/i],
+    ["materials",/painterly|artistic|nois[ey]|texture|palette|materials?|color|colour|stonework|limestone|gradien|blend|highlights?|warm|cool|quiet/i],
+    ["exposure",/weather|older|shadow|drip|shelter|terrain|cliff|tree|light source/i],
+    ["critique",/critiqu|evaluat|improve|refin|coheren|style|fit in|match|visually/i]
+  ];
+  const matches=subjects.filter(([,pattern])=>pattern.test(request));
+  if(!style && !matches.length && !context.observeOnly)return [];
+  const keys=matches.map(([key])=>key);
+  if(context.observeOnly)keys.unshift("critique");
+  return [note("SKILL.md"),...[...new Set(keys)].slice(0,2).map(key=>note("knowledge/"+key+".md"))];
+}
+
 export const defaults = towerDefaults;
 
 export function parameters(base, decision) {
@@ -37,7 +62,10 @@ function designPrompt(context) {
     "For a registered stone bridge, a request to weather, darken the stone near water, or lighten the upper stone is a revise_bridge action. Set weathering=weathered for the damp stone palette, subtle to soften it, none to restore plain stone, or null to preserve its finish. Resolve follow-ups such as 'make the weathering subtler' against the selected bridge. Material-only edits leave width, arch and bend null. The editor surveys the water elevation, keeps the walking surface quiet and protects manual edits. Do not guess elevations. Use weathering=null for towers.",
     "The tower roof supports copper (weathered green), black_to_grey and brown_to_tan. Preserve the current finish on dimensional revisions. The arched entrance can face north, east, south or west; older towers default to north. For an entrance revision, resolve 'opposite' from the selected tower's current entrance, or a pointed side from the hit relative to its center. If the side is ambiguous, ask. Set entrance=null when unchanged. Window locations stay fixed. Wall finishes include window drips and directional shadow. Answer unsupported requests conversationally.",
     "Keep message under 450 characters; never claim a proposed edit was applied. The application performs its own world checks and reports the result. Use any relevant previous conversation to resolve references; the supplied current world observation is authoritative.",
+    "The painterly executor paints masonry of registered towers and bridges. artPalette chooses warm_limestone, cool_stone or red_brick. Set it to establish a requested painterly style, or to change the masonry palette explicitly. artTexture accepts quiet, balanced or expressive. artAtmosphere and artFocalPoint are short descriptions (up to 96 characters) guiding later design and critique. For an explicit match to a known build, set artStyleSource to its exact styled object key. Ask if the source is ambiguous. A new ordinary functional build starts plain, even near a styled object. Set ALL art fields null on unrelated turns, a geometry-only revision, a roof-only change or a standalone drip/shadow request. On a styled build, 'too noisy' changes only artTexture to quiet. For a new painterly request choose a mood, focal point and palette from the brief. Answer unsupported changes conversationally and scope alternatives accurately. A critique is read-only. When there is no attached image ground visual statements in supplied spatial or recipe evidence.",
+    "To match a saved project style use artStyleSource=project only when the player asks to follow it, including adding a structure that fits that established project. projectStyle is a snapshot of its current intent. Ask what to match if no style or exemplar has been identified.",
     ...artSkills,
+    ...artisticGuidance(context),
     JSON.stringify(context)
   ].join("\n");
 }
@@ -109,7 +137,7 @@ export function createPlanner({directory,provider="codex",world="sp:WorldStudioL
       report("Preparing the mock reply");
       decision=ephemeral?{action:"inspect"}:{action:"answer",message:"Mock received: "+String(context.request).slice(0,160),
         target:"point",marker:null,previewOnly:false,height:null,radius:null,taper:null,thickness:null,roof:null,roofFinish:null,entrance:null,
-        fromMarker:null,toMarker:null,width:null,arch:null,bend:null,weathering:null,drips:null,light:null,continueShadow:false};
+        fromMarker:null,toMarker:null,width:null,arch:null,bend:null,weathering:null,drips:null,light:null,continueShadow:false,...emptyArtDecision};
     } else {
       const params={schema,ephemeral,signal:cancel,onProgress:report,image:checkedImage(image),
         prompt:ephemeral?surveyPrompt(request):designPrompt(context)};

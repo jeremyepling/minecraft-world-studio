@@ -1,5 +1,7 @@
 # Known limitations
 
+* **Artistic painting.** Automatic masonry painting targets registered towers and bridges. The three curated palettes use full, stateless blocks. The offline sampler supports basic pack ZIPs. Focal point and mood are planning metadata. Arbitrary facade selection, automatic hue ramps, cross-world preferences and independent cameras are planned. [Scope and priorities](painterly-building.md)
+
 * **Directional shadows and opening stains.** These finishes operate on registered tower and bridge designs. Their model of openings and overhangs comes from the generated block geometry. Surrounding trees, hand-built awnings and manually cut windows do not participate in the calculation. Checked edits preserve divergent live blocks. The shadow is a fixed material finish and remains in place as the sun or player moves.
 
 * **Bridge weathering.** The palette handles one dominant water elevation along the span. It samples water blocks beneath the deck within eight blocks below the lower landing. Waterlogged blocks, moisture simulation, custom resource-pack colors and lighting analysis are outside this first pass. A separately pasted schematic has no registered bridge to repaint. [Weathering workflow](current-milestone.md)

@@ -13,9 +13,15 @@
     "thickness",
     "roof",
     "roofFinish",
-    "entrance", "fromMarker", "toMarker", "width", "arch", "bend", "weathering", "drips", "light", "continueShadow"
+    "entrance", "fromMarker", "toMarker", "width", "arch", "bend", "weathering", "drips", "light", "continueShadow",
+    "artPalette", "artTexture", "artAtmosphere", "artFocalPoint", "artStyleSource"
   ],
   "properties": {
+    "artPalette": {"type":["string","null"],"enum":["warm_limestone","cool_stone","red_brick",null]},
+    "artTexture": {"type":["string","null"],"enum":["quiet","balanced","expressive",null]},
+    "artAtmosphere": {"type":["string","null"]},
+    "artFocalPoint": {"type":["string","null"]},
+    "artStyleSource": {"type":["string","null"]},
     "previewOnly": {"type":"boolean"},
     "action": {
       "type": "string",
