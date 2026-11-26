@@ -1,0 +1,103 @@
+{
+  "world": "sp:WorldStudioLab",
+  "case": "clear project style with standing source and matched copy",
+  "commands": [
+    {
+      "message": "@studio Build a new painterly medieval tower in warm limestone here. Use 12-block walls, radius 5, taper 1, wall thickness 1, a 4-block copper roof and a north entrance.",
+      "reply": "[AI] Applied 20915ca1: 375 cells changed, 375 verified; 0 changed since preview or commit and preserved. Art direction v1: balanced warm limestone."
+    },
+    {
+      "message": "@studio save this as the project style",
+      "reply": "[AI] Project style v1 saved from tower-9_211_86. Ask for a new tower or bridge in the project style."
+    },
+    {
+      "message": "@studio Build a new tower here matching our saved project style. Use 12-block walls, radius 5, taper 1, wall thickness 1, a 4-block copper roof and a north entrance.",
+      "reply": "[AI] Applied cd8e44a6: 375 cells changed, 375 verified; 0 changed since preview or commit and preserved. Art direction v1: balanced warm limestone."
+    },
+    {
+      "message": "@studio restore previous project style",
+      "reply": "[AI] Cleared the project's first saved style."
+    },
+    {
+      "message": "@studio project style",
+      "reply": "[AI] No project style has been saved yet."
+    },
+    {
+      "message": "@studio undo",
+      "reply": "[AI] Undid cd8e44a6: 375 cells changed, 375 verified; 0 changed since preview or commit and preserved."
+    },
+    {
+      "message": "@studio undo",
+      "reply": "[AI] Undid 20915ca1: 375 cells changed, 375 verified; 0 changed since preview or commit and preserved."
+    }
+  ],
+  "sourceKey": "tower-9_211_86",
+  "matchedKey": "tower-29_211_86",
+  "projectRevision": 1,
+  "historiesBefore": [
+    "20915ca1",
+    "cd8e44a6"
+  ],
+  "registeredSourceParams": {
+    "height": 12,
+    "radius": 5,
+    "taper": 1,
+    "thickness": 1,
+    "roof": 4,
+    "entrance": "north",
+    "roofFinish": "copper",
+    "artisticIntent": {
+      "version": 1,
+      "approach": "painterly",
+      "revision": 1,
+      "palette": "warm_limestone",
+      "texture": "balanced",
+      "atmosphere": "Quiet, aged medieval warmth",
+      "focalPoint": "North arched entrance against quieter supporting masonry",
+      "kind": "tower",
+      "regions": {
+        "walls": "warm_limestone",
+        "trim": "existing",
+        "roof": "existing"
+      }
+    }
+  },
+  "registeredMatchedParams": {
+    "height": 12,
+    "radius": 5,
+    "taper": 1,
+    "thickness": 1,
+    "roof": 4,
+    "entrance": "north",
+    "roofFinish": "copper",
+    "artisticIntent": {
+      "version": 1,
+      "approach": "painterly",
+      "revision": 1,
+      "palette": "warm_limestone",
+      "texture": "balanced",
+      "atmosphere": "Quiet, aged medieval warmth",
+      "focalPoint": "North arched entrance against quieter supporting masonry",
+      "kind": "tower",
+      "regions": {
+        "walls": "warm_limestone",
+        "trim": "existing",
+        "roof": "existing"
+      },
+      "styleSource": "project",
+      "styleSourceRevision": 1
+    }
+  },
+  "surveySize": 9009,
+  "changedCellsAtRestore": 0,
+  "preservedRegisteredObjects": [
+    "tower-9_211_86",
+    "tower-29_211_86"
+  ],
+  "historiesAfter": [
+    "20915ca1",
+    "cd8e44a6"
+  ],
+  "passed": true,
+  "restored": true
+}
